@@ -33,8 +33,15 @@ public class ModRedstoneJukebox {
 	@SidedProxy(clientSide="sidben.redstonejukebox.client.ClientProxy", serverSide="sidben.redstonejukebox.CommonProxy")
 	public static CommonProxy proxy;
 
+	
+	// IDs
+	public final static int redstoneJukeboxIdleID = 520;
+	public final static int redstoneJukeboxActiveID = 521;
+	public final static int blankRecordItemID = 7200;
+	
 
-	public final static int redstoneJukeboxModelID = 0;
+	// Textures
+	public static int redstoneJukeboxModelID;
 	public final static int texJukeboxDisc = 0;
     public final static int texJukeboxBottom = 1;
 	public final static int texJukeboxTop = 2;
@@ -42,8 +49,9 @@ public class ModRedstoneJukebox {
     public final static int texJukeboxSideOn = 4;
 
 	
-	private final static Item recordBlank = new ItemBlankRecord(7200, CreativeTabs.tabMisc, "recordBlank");
-	private final static Block redstoneJukebox = new BlockRedstoneJukebox(520, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
+    // Blocks and Items
+	private final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
+	private final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
 	
 	
 	

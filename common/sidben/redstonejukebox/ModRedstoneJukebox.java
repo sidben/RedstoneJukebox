@@ -14,10 +14,15 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
+/*
+@NetworkMod(channels = { Reference.CHANNEL_NAME }, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
+public class EquivalentExch
+*/
 
 @Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="0.7")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
@@ -34,12 +39,6 @@ public class ModRedstoneJukebox {
 	public static CommonProxy proxy;
 
 	
-	// IDs
-	public final static int redstoneJukeboxIdleID = 520;
-	public final static int redstoneJukeboxActiveID = 521;
-	public final static int blankRecordItemID = 7200;
-	
-
 	// Textures
 	public static int redstoneJukeboxModelID;
 	public final static int texJukeboxDisc = 0;
@@ -49,6 +48,16 @@ public class ModRedstoneJukebox {
     public final static int texJukeboxSideOn = 4;
 
 	
+	// GUI IDs
+	public static int redstoneJukeboxGuiID = 10;
+
+	
+	// Blocks and Items IDs
+	public final static int redstoneJukeboxIdleID = 520;
+	public final static int redstoneJukeboxActiveID = 521;
+	public final static int blankRecordItemID = 7200;
+	
+
     // Blocks and Items
 	private final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
 	private final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
@@ -104,7 +113,16 @@ public class ModRedstoneJukebox {
 		
 		// Blocks
 		GameRegistry.registerBlock(redstoneJukebox);
+
+
+		// Tile Entities
+		GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
 		
+		
+		// GUIs
+		NetworkRegistry.instance().registerGuiHandler(this, this.proxy);
+		//instance = this;
+
 		
 		// Names
 		LanguageRegistry.addName(recordBlank, "Blank Record");

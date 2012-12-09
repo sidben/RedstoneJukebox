@@ -12,14 +12,15 @@ public class ContainerRedstoneJukebox extends Container
 {
 
     private TileEntityRedstoneJukebox teJukebox;
-    private int playMode;
 
 	
     
     public ContainerRedstoneJukebox(InventoryPlayer inventoryPlayer, TileEntityRedstoneJukebox tileEntity)
     {
-		this.playMode = 0;
-        this.teJukebox = tileEntity;
+		System.out.println("	ContainerRedstoneJukebox");
+
+		
+		this.teJukebox = tileEntity;
 
 
 
@@ -75,6 +76,8 @@ public class ContainerRedstoneJukebox extends Container
 			a = first position of the check
 			b = last position of the check
 			r = order (true = reverse, last to first)
+			
+			return TRUE if sucessfull
 		*/
 
 

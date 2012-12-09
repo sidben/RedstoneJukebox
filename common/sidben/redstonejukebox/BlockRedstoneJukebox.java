@@ -17,7 +17,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
 
 	/*--------------------------------------------------------------------
-	Constants and Variables
+		Constants and Variables
 	--------------------------------------------------------------------*/
 
     private Random random = new Random();
@@ -35,7 +35,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     
 	
     /*--------------------------------------------------------------------
-	Constructors
+		Constructors
 	--------------------------------------------------------------------*/
 
     protected BlockRedstoneJukebox(int blockID, boolean active) {
@@ -52,7 +52,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     
     
 	/*--------------------------------------------------------------------
-	Default parameters
+		Default parameters
 	--------------------------------------------------------------------*/
 
     /**
@@ -87,7 +87,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     
     
 	/*--------------------------------------------------------------------
-	Textures and Rendering
+		Textures and Rendering
 	--------------------------------------------------------------------*/
 	
 	@Override
@@ -169,6 +169,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float a, float b, float c)
     {
+    	// Avoids opening the GUI if sneaking
+    	TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+        if (tileEntity == null || player.isSneaking()) { return false; }
+
+        
+System.out.println("	BlockRedstoneJukebox.onBlockActivated");
     	player.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, world, x, y, z);
     	return true;
     }
@@ -179,6 +185,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6)
     {
+    	/*
 		if (!keepMyInventory)
 		{
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)par1World.getBlockTileEntity(x, y, z);
@@ -189,10 +196,13 @@ public class BlockRedstoneJukebox extends BlockContainer {
 				teJukebox.stopPlaying();
             }
 		}
+		*/
 
         super.breakBlock(par1World, x, y, z, par5, par6);
     }    
 
+
+    
     
     
     /*--------------------------------------------------------------------

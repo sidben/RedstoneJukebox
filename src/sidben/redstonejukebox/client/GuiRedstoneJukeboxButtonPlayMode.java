@@ -38,7 +38,7 @@ public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton
 			{
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 				par1Minecraft.renderEngine.bindTexture(par1Minecraft.renderEngine.getTexture(CommonProxy.redstoneJukeboxGui));
-				this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 166, GuiRedstoneJukeboxButtonPlayMode.myWidth, GuiRedstoneJukeboxButtonPlayMode.myHeight);
+				this.drawTexturedModalRect(this.xPosition, this.yPosition, 24, 166, GuiRedstoneJukeboxButtonPlayMode.myWidth, GuiRedstoneJukeboxButtonPlayMode.myHeight);
 			}
         }
     }

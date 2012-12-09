@@ -19,7 +19,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
 	/*--------------------------------------------------------------------
-	Constants and Variables
+		Constants and Variables
 	--------------------------------------------------------------------*/
 	Random random = new Random();
 
@@ -99,12 +99,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     
 	/*--------------------------------------------------------------------
-	Basic parameters
+		Basic parameters
 	--------------------------------------------------------------------*/
     
     /**
      * Returns the number of slots in the inventory.
      */
+    @Override
     public int getSizeInventory()
     {
         return this.jukeboxPlaylist.length;
@@ -113,31 +114,33 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /**
      * Returns the stack in slot i
      */
-    public ItemStack getStackInSlot(int par1)
+    @Override
+    public ItemStack getStackInSlot(int slot)
     {
-        return this.jukeboxPlaylist[par1];
+        return this.jukeboxPlaylist[slot];
     }
 
     /**
      * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
      * new stack.
      */
-    public ItemStack decrStackSize(int par1, int par2)
+    @Override
+    public ItemStack decrStackSize(int slot, int amount)
     {
-        if (jukeboxPlaylist[par1] != null)
+        if (jukeboxPlaylist[slot] != null)
         {
-            if (jukeboxPlaylist[par1].stackSize <= par2)
+            if (jukeboxPlaylist[slot].stackSize <= amount)
             {
-                ItemStack itemstack = jukeboxPlaylist[par1];
-                jukeboxPlaylist[par1] = null;
+                ItemStack itemstack = jukeboxPlaylist[slot];
+                jukeboxPlaylist[slot] = null;
                 return itemstack;
             }
 
-            ItemStack itemstack1 = jukeboxPlaylist[par1].splitStack(par2);
+            ItemStack itemstack1 = jukeboxPlaylist[slot].splitStack(amount);
 
-            if (jukeboxPlaylist[par1].stackSize == 0)
+            if (jukeboxPlaylist[slot].stackSize == 0)
             {
-                jukeboxPlaylist[par1] = null;
+                jukeboxPlaylist[slot] = null;
             }
 
             return itemstack1;
@@ -152,12 +155,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
      * like when you close a workbench GUI.
      */
-    public ItemStack getStackInSlotOnClosing(int par1)
+    @Override
+    public ItemStack getStackInSlotOnClosing(int slot)
     {
-        if (this.jukeboxPlaylist[par1] != null)
+        if (this.jukeboxPlaylist[slot] != null)
         {
-            ItemStack itemstack = this.jukeboxPlaylist[par1];
-            this.jukeboxPlaylist[par1] = null;
+            ItemStack itemstack = this.jukeboxPlaylist[slot];
+            this.jukeboxPlaylist[slot] = null;
             return itemstack;
         }
         else
@@ -169,19 +173,21 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /**
      * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
      */
-    public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
+    @Override
+    public void setInventorySlotContents(int slot, ItemStack stack)
     {
-        this.jukeboxPlaylist[par1] = par2ItemStack;
+        this.jukeboxPlaylist[slot] = stack;
 
-        if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit())
+        if (stack != null && stack.stackSize > this.getInventoryStackLimit())
         {
-            par2ItemStack.stackSize = this.getInventoryStackLimit();
+        	stack.stackSize = this.getInventoryStackLimit();
         }
     }
 
     /**
      * Returns the name of the inventory.
      */
+    @Override
     public String getInvName()
     {
         return "container.redstoneJukebox";
@@ -191,6 +197,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
      * this more of a set than a get?*
      */
+    @Override
     public int getInventoryStackLimit()
     {
         return 1;
@@ -199,6 +206,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
      */
+    @Override
     public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
     {
         if (worldObj.getBlockTileEntity(xCoord, yCoord, zCoord) != this)
@@ -214,11 +222,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
 
 	/*--------------------------------------------------------------------
-	NBT Stuff
+		NBT Stuff
 	--------------------------------------------------------------------*/
     /**
      * Reads a tile entity from NBT.
      */
+    @Override
     public void readFromNBT(NBTTagCompound par1NBTTagCompound)
     {
         super.readFromNBT(par1NBTTagCompound);
@@ -244,6 +253,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /**
      * Writes a tile entity to NBT.
      */
+    @Override
     public void writeToNBT(NBTTagCompound par1NBTTagCompound)
     {
         super.writeToNBT(par1NBTTagCompound);
@@ -271,13 +281,14 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     
 	/*--------------------------------------------------------------------
-	World Events
+		World Events
 	--------------------------------------------------------------------*/
 
     /**
      * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
      * ticks and creates a new spawn inside its implementation.
      */
+    @Override
     public void updateEntity()
     {
 		/*
@@ -288,6 +299,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         super.updateEntity();
 
+        /*
 		if (!this.worldObj.isRemote)
 		{
 
@@ -304,10 +316,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			}
 
 		}
+		*/
 	}
     
+    @Override
     public void openChest() {}
 
+    @Override
     public void closeChest() {}
     
     
@@ -315,9 +330,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     
 	/*--------------------------------------------------------------------
-	This is where the groove starts :)
+		This is where the groove starts :)
 	--------------------------------------------------------------------*/
-    
+/*    
 	// Returns if this Jukebox is playing a record.
 	public boolean isPlaying()
 	{
@@ -345,9 +360,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	
     public void startPlaying()
     {
-		/*
-		System.out.println("    	TileEntityRedstoneJukebox=.startPlaying");
-		*/
+		// System.out.println("    	TileEntityRedstoneJukebox=.startPlaying");
 
 		if (!this.isPlaying) {
 			this.setPlaylistOrder();
@@ -358,14 +371,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     public void stopPlaying()
     {
-		/*
-		System.out.println("    	TileEntityRedstoneJukebox.stopPlaying");
-		System.out.println("    		" + this.worldObj);
-		System.out.println("    		" + this.xCoord);
-		System.out.println("    		" + this.yCoord);
-		System.out.println("    		" + this.zCoord);
-		System.out.println("    		" + this.isPlaying);
-		*/
+		// System.out.println("    	TileEntityRedstoneJukebox.stopPlaying");
+		// System.out.println("    		" + this.worldObj);
+		// System.out.println("    		" + this.xCoord);
+		// System.out.println("    		" + this.yCoord);
+		// System.out.println("    		" + this.zCoord);
+		// System.out.println("    		" + this.isPlaying);
 
 
 
@@ -440,47 +451,21 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	{
 		this.isPlaying = true;
 		this.delay = this.maxDelay;
-/*
-		if (this.myBlockExists())
-        {
-*/
+
 	        BlockRedstoneJukebox.updateJukeboxBlockState(true, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
-/*
-		}
-		else
-		{
-			// System.out.println("    	TileEntityRedstoneJukebox - no jukebox block found, breaking this");
-			// breaks the block if invalid
-			if (!this.ejected) { this.ejectAll(this.worldObj, this.xCoord, this.yCoord, this.zCoord); }
-		}
-*/
 	}
 
 	private void markAsStopped()
 	{
-		/*
-		System.out.println("    	TileEntityRedstoneJukebox.markAsStopped");
-		*/
+		// System.out.println("    	TileEntityRedstoneJukebox.markAsStopped");
 
 		this.isPlaying = false;
         this.currentPlaySlot = -1;
     	this.nextPlaySlot = -1;
         this.delay = this.maxDelay;
 
-/*
-        if (this.myBlockExists())
-        {
-*/
 	        BlockRedstoneJukebox.updateJukeboxBlockState(false, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
-/*
-		}
-		else
-		{
-			// System.out.println("    	TileEntityRedstoneJukebox - no jukebox block found, breaking this");
-			// breaks the block if invalid
-			if (!this.ejected) { this.ejectAll(this.worldObj, this.xCoord, this.yCoord, this.zCoord); }
-		}
-*/	
+
 	}
 	
 	
@@ -493,9 +478,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//   is this Jukebox. If not, update everything.
 	private void checkIfStillPlaying()
 	{
-		/*
-		System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying");
-		*/
+		// System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying");
 
         this.delay = this.maxDelay;
         
@@ -507,99 +490,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			// **** TEMPTEMPTEMP ****
 			this.markAsStopped();
 			// **** TEMPTEMPTEMP ****
-
-			
-			/*
-			//-- captures the Sound Library
-			if (soundLibrary == null) {
-				try
-				{
-					if (sndSystem == null) {
-						Field var3 = SoundManager.class.getDeclaredFields()[0];
-						var3.setAccessible(true);
-
-						Object var1 = (Object)null;
-
-						//System.out.println("    		loading Sound System");
-						sndSystem = (SoundSystem)var3.get(var1);
-					}
-
-					Field varB = SoundSystem.class.getDeclaredFields()[4];
-					varB.setAccessible(true);
-
-					//System.out.println("    		loading Sound Library");
-					soundLibrary = (Library)varB.get(sndSystem);
-				}
-
-				catch (IllegalArgumentException ex1)
-				{
-					throw new RuntimeException(ex1);
-				}
-
-				catch (IllegalAccessException ex2)
-				{
-					throw new RuntimeException(ex2);
-				}
-			}
-			*/
-
-
-
-			//-- check if there is anything playing
-			String varSourceName = "streaming";
-			/*
-			if (!sndSystem.playing(varSourceName))
-			{
-				if (!this.playlistInitialized)
-				{
-					//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - World load, reset list");
-					this.setPlaylistOrder();
-				}
-
-				//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - Playing next");
-				this.playNextRecord();
-			}
-			else
-			{
-				Source s = soundLibrary.getSource(varSourceName);
-				if (s == null)
-				{
-					//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - no sound library");
-					this.markAsStopped();
-				}
-				else
-				{
-					//-- check if the source is this jukebox
-					if (s.position.x != this.xCoord || s.position.y != this.yCoord || s.position.z != this.zCoord)
-					{
-						//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - no longer the source");
-						this.markAsStopped();
-					}
-					else
-					{
-					//-- check if there is a record on the current slot
-
-						if (this.currentJukeboxPlaySlot() < 0)
-						{
-							//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - current playslot not set");
-							this.markAsStopped();
-						}
-						else
-						{
-							ItemStack r = this.getStackInSlot(this.currentJukeboxPlaySlot());
-							if (r == null || !(Item.itemsList[r.itemID] instanceof ItemRecord))
-							{
-								//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - empty slot, playing next");
-								this.playNextRecord();
-							}
-						}
-
-					}
-				}
-
-			}
-			*/
-
 
 
 		}
@@ -665,12 +555,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
 		// Debug
-		/*
-		System.out.println("	playListOrder for (" + this.xCoord + ", " + this.yCoord + ", "  + this.zCoord + ")");
-		for (int i=0; i < playOrder.length; i++) {
-		System.out.println("		# " + i + " = [" + playOrder[i] + "]");
-		}
-		*/
+		// System.out.println("	playListOrder for (" + this.xCoord + ", " + this.yCoord + ", "  + this.zCoord + ")");
+		// for (int i=0; i < playOrder.length; i++) {
+		// System.out.println("		# " + i + " = [" + playOrder[i] + "]");
+		// }
 
 	}
 
@@ -689,13 +577,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
 			// Debug
-			/*
-			if (this.nextPlaySlot < playOrder.length) {
-			System.out.println("    	checking slot " + playOrder[this.nextPlaySlot] + " (index " + this.nextPlaySlot + ")");
-			} else {
-			System.out.println("    	checking slot INVALID (index " + this.nextPlaySlot + ")");
-			}
-			*/
+			// if (this.nextPlaySlot < playOrder.length) {
+			// System.out.println("    	checking slot " + playOrder[this.nextPlaySlot] + " (index " + this.nextPlaySlot + ")");
+			// } else {
+			// System.out.println("    	checking slot INVALID (index " + this.nextPlaySlot + ")");
+			// }
 
 
 			checkedSlot = this.nextPlaySlot;
@@ -753,10 +639,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					String recordName = ((ItemRecord)Item.itemsList[s.itemID]).recordName;
 					int recordID = ((ItemRecord)Item.itemsList[s.itemID]).shiftedIndex;
 
-					/*
-					System.out.println("    	record found on jukebox slot " + playOrder[checkedSlot] + " (index " + checkedSlot + ")");
-					System.out.println("    	playing record: " + recordName + " (" + recordID + ")");
-					*/
+					// System.out.println("    	record found on jukebox slot " + playOrder[checkedSlot] + " (index " + checkedSlot + ")");
+					// System.out.println("    	playing record: " + recordName + " (" + recordID + ")");
 
 					//-- play the record on the selected slot
 					this.worldObj.playAuxSFXAtEntity((EntityPlayer)null, 1005, this.xCoord, this.yCoord, this.zCoord, recordID);
@@ -787,7 +671,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 	}
 	
-	
+	*/	
 	
 	
 }

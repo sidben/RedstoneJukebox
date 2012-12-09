@@ -1,9 +1,6 @@
 package sidben.redstonejukebox;
 
-import net.minecraft.src.Block;
-import net.minecraft.src.CreativeTabs;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
+import net.minecraft.src.*;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -15,14 +12,31 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
 /*
+Ref (EE3)
+ 
 @NetworkMod(channels = { Reference.CHANNEL_NAME }, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
-public class EquivalentExch
+public class EquivalentExch...
+
+OBS: Channel name <= 16 char
+
+Tut Ref: http://www.minecraftforge.net/wiki/Tutorials/Packet_Handling
+Tut Ref: http://www.minecraftforge.net/wiki/Containers_and_GUIs
+Tut Ref: http://www.minecraftforum.net/topic/1390536-13x-forge-container-based-gui-tutorial/
 */
+
+//@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = PacketHandler.class)
+/*
+@NetworkMod(clientSideRequired=true, serverSideRequired=false,
+clientPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.client.ClientPacketHandler.class),
+serverPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.ServerPacketHandler.class))
+*/
+
 
 @Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="0.7")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false)
@@ -30,7 +44,7 @@ public class ModRedstoneJukebox {
 
 	
     // The instance of your mod that Forge uses.
-	@Instance("ModRedstoneJukebox")
+	@Instance("SidbenRedstoneJukebox")
 	public static ModRedstoneJukebox instance;
 	
 	
@@ -49,7 +63,7 @@ public class ModRedstoneJukebox {
 
 	
 	// GUI IDs
-	public static int redstoneJukeboxGuiID = 10;
+	public static int redstoneJukeboxGuiID = 0;
 
 	
 	// Blocks and Items IDs
@@ -121,7 +135,6 @@ public class ModRedstoneJukebox {
 		
 		// GUIs
 		NetworkRegistry.instance().registerGuiHandler(this, this.proxy);
-		//instance = this;
 
 		
 		// Names

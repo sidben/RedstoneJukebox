@@ -32,6 +32,8 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super(new ContainerRedstoneJukebox(inventory, teJukebox));
 		jukeboxInventory = teJukebox;
+		
+		System.out.println("	GuiRedstoneJukebox");
     }
 
 
@@ -40,6 +42,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     /**
      * Adds the buttons (and other controls) to the screen in question.
      */
+    @Override
     public void initGui()
     {
         super.initGui();
@@ -51,6 +54,7 @@ public class GuiRedstoneJukebox extends GuiContainer
         this.controlList.add(new GuiRedstoneJukeboxButtonLoop(0, startX + 7,  startY + 41));
         this.controlList.add(new GuiRedstoneJukeboxButtonLoop(1, startX + 32, startY + 41));
         this.controlList.add(new GuiRedstoneJukeboxButtonPlayMode(2, startX + 77, startY + 41));
+
     }
 
 
@@ -66,6 +70,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 		++danceNoteCount;
 		if (danceNoteCount > danceNoteSpeed) { ++danceNoteFrame; danceNoteCount = 0; }
 		if (danceNoteFrame >= danceNoteArrayX.length) { danceNoteFrame = 0; }
+
     }
 
 
@@ -99,7 +104,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
 			case 2:
-				// Play mode (shuffle / normal)
+				// Swap play mode (shuffle / normal)
 				if (this.jukeboxInventory.playMode == 0)
 				{
 					this.jukeboxInventory.playMode = 1;
@@ -112,6 +117,11 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
 			}
+			
+
+			// Packet code here
+			// Without this, it works for the client changing buttons, but the server doesn't save and when the world
+			// reloads, the buttons go back to default. Inventory works fine without it.
 
 		}
 
@@ -164,6 +174,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
 		//-- current record indicator (blue note)
+        /*
         if (this.jukeboxInventory.isPlaying())
         {
 
@@ -180,6 +191,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 			}
 
 		}
+		*/
 
 
 		//-- loop indicator

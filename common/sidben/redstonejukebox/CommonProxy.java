@@ -18,13 +18,16 @@ public class CommonProxy implements IGuiHandler {
 	-------------------------------------------------------------------*/
 
 	
+	// returns an instance of the Container
 	@Override
 	public Object getServerGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
 	{
-
+		System.out.println("	Proxy.getServerGuiElement");
+		
 		if (guiID ==  ModRedstoneJukebox.redstoneJukeboxGuiID)
 		{
-			TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)player.worldObj.getBlockTileEntity(x, y, z);
+			//TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)player.worldObj.getBlockTileEntity(x, y, z);
+			TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
 			return new ContainerRedstoneJukebox(player.inventory, teJukebox);
 		}
 
@@ -46,7 +49,8 @@ public class CommonProxy implements IGuiHandler {
 	}
 
 	
-	@Override
+	// returns an instance of the Gui 
+    @Override
 	public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
 	{
 		return null;

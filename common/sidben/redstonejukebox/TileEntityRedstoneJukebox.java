@@ -10,6 +10,7 @@ import net.minecraft.src.ItemRecord;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.NBTTagCompound;
 import net.minecraft.src.NBTTagList;
+import net.minecraft.src.SoundManager;
 import net.minecraft.src.TileEntity;
 import net.minecraft.src.World;
 
@@ -24,12 +25,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	Random random = new Random();
 
 	
-	//-- A reference to the sound system.
-	/*
-    private static SoundSystem sndSystem;
-    private Library soundLibrary;
-    */
-
 
     //-- The delay before a "isPlaying" check
     private static int maxDelay = 20;
@@ -299,10 +294,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         super.updateEntity();
 
-        /*
 		if (!this.worldObj.isRemote)
 		{
-
 
 			if (this.isPlaying)
 			{
@@ -316,8 +309,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			}
 
 		}
-		*/
-	}
+
+    }
     
     @Override
     public void openChest() {}
@@ -332,7 +325,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	/*--------------------------------------------------------------------
 		This is where the groove starts :)
 	--------------------------------------------------------------------*/
-/*    
 	// Returns if this Jukebox is playing a record.
 	public boolean isPlaying()
 	{
@@ -358,6 +350,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	
 	
 	
+	
     public void startPlaying()
     {
 		// System.out.println("    	TileEntityRedstoneJukebox=.startPlaying");
@@ -378,18 +371,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 		// System.out.println("    		" + this.zCoord);
 		// System.out.println("    		" + this.isPlaying);
 
-
-
-		World world = this.worldObj;
-		int x = this.xCoord;
-		int y = this.yCoord;
-		int z = this.zCoord;
-
-
 		if (this.isPlaying) {
 			// Stop all records
-			world.playAuxSFX(1005, x, y, z, 0);
-			world.playRecord((String)null, x, y, z);
+			this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
+			this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
 		}
 		this.markAsStopped();
 
@@ -445,14 +430,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	
 	
 	
-	
 
 	private void markAsPlaying()
 	{
 		this.isPlaying = true;
 		this.delay = this.maxDelay;
 
-	        BlockRedstoneJukebox.updateJukeboxBlockState(true, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+        BlockRedstoneJukebox.updateJukeboxBlockState(true, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 	}
 
 	private void markAsStopped()
@@ -464,10 +448,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     	this.nextPlaySlot = -1;
         this.delay = this.maxDelay;
 
-	        BlockRedstoneJukebox.updateJukeboxBlockState(false, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
-
+        BlockRedstoneJukebox.updateJukeboxBlockState(false, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 	}
-	
 	
 	
 	
@@ -478,26 +460,66 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//   is this Jukebox. If not, update everything.
 	private void checkIfStillPlaying()
 	{
-		// System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying");
+		System.out.println(" ");
+		System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying");
 
-        this.delay = this.maxDelay;
+
+		this.delay = this.maxDelay;
         
 
 		if (!worldObj.isRemote && this.isPlaying)
 		{
 
-			
-			// **** TEMPTEMPTEMP ****
-			this.markAsStopped();
-			// **** TEMPTEMPTEMP ****
+			//-- check if there is anything playing
+			if (!SoundManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
+			{
+				if (!this.playlistInitialized)
+				{
+					System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - World load, reseting list");
+					this.setPlaylistOrder();
+				}
+
+				System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - Playing next");
+				this.playNextRecord();
+			}
+			else
+			{
+
+				//-- check if the source is this jukebox (PS: I'm pretty sure there is some easier way to do this... 
+				if (ModRedstoneJukebox.lastSoundSource.xCoord != this.xCoord || ModRedstoneJukebox.lastSoundSource.yCoord != this.yCoord || ModRedstoneJukebox.lastSoundSource.zCoord != this.zCoord)
+				{
+					System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - no longer the source");
+					this.markAsStopped();
+				}
+				else
+				{
+					//-- check if there is a record on the current slot
+					if (this.currentJukeboxPlaySlot() < 0)
+					{
+						System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - current playslot not set");
+						this.markAsStopped();
+					}
+					else
+					{
+						ItemStack r = this.getStackInSlot(this.currentJukeboxPlaySlot());
+						if (r == null || !(Item.itemsList[r.itemID] instanceof ItemRecord))
+						{
+							System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - empty slot, playing next");
+							this.playNextRecord();
+						}
+					}
+
+				}
+				
+
+			}
 
 
 		}
 	}
 	
 	
-	
-	
+
 	
 	
 	
@@ -671,7 +693,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 	}
 	
-	*/	
+	
 	
 	
 }

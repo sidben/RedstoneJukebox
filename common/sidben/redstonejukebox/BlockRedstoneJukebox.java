@@ -52,7 +52,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     
     
 	/*--------------------------------------------------------------------
-		Default parameters
+		Parameters
 	--------------------------------------------------------------------*/
 
     /**
@@ -174,7 +174,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
         if (tileEntity == null || player.isSneaking()) { return false; }
 
         
-System.out.println("	BlockRedstoneJukebox.onBlockActivated");
+        //System.out.println("	BlockRedstoneJukebox.onBlockActivated");
     	player.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, world, x, y, z);
     	return true;
     }
@@ -185,22 +185,56 @@ System.out.println("	BlockRedstoneJukebox.onBlockActivated");
      */
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6)
     {
-    	/*
 		if (!keepMyInventory)
 		{
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)par1World.getBlockTileEntity(x, y, z);
 
             if (teJukebox != null)
             {
-				teJukebox.ejectAll(par1World, x, y, z);
 				teJukebox.stopPlaying();
+            	teJukebox.ejectAll(par1World, x, y, z);
             }
 		}
-		*/
 
         super.breakBlock(par1World, x, y, z, par5, par6);
     }    
+    
 
+    /**
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor blockID
+     */
+    public void onNeighborBlockChange(World par1World, int x, int y, int z, int blockID)
+    {
+		/*
+		System.out.println("    RedstoneJukebox.onNeighborBlockChange");
+		System.out.println("    	isRemote = " + par1World.isRemote);
+		System.out.println("    	par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5) = " + par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5));;
+		*/
+
+
+
+        if (!par1World.isRemote)
+        {
+			// Only activates if powered from below
+			// 		isBlockIndirectlyProvidingPowerTo - Args: x, y, z, direction
+            if (!par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5))
+            {
+                stopPlaying(par1World, x, y, z);
+                // don't think this is needed
+                //par1World.scheduleBlockUpdate(x, y, z, this.blockID, this.tickRate());
+            }
+            else if (par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5))
+            {
+                startPlaying(par1World, x, y, z);
+                // don't think this is needed
+                //par1World.scheduleBlockUpdate(x, y, z, this.blockID, this.tickRate());
+            }
+        }
+
+
+		super.onNeighborBlockChange(par1World, x, y, z, blockID);
+    }
 
     
     
@@ -236,5 +270,178 @@ System.out.println("	BlockRedstoneJukebox.onBlockActivated");
         }
     }
 
+    
+
+    
+    
+
+	/*--------------------------------------------------------------------
+		Visual Effects
+	--------------------------------------------------------------------*/
+
+    /**
+     * A randomly called display update to be able to add particles or other items for display
+     */
+    public void randomDisplayTick(World par1World, int par2, int par3, int par4, Random par5Random)
+    {
+        if (this.isActive)
+        {
+			// redstone ore sparkles
+			Random var5 = par1World.rand;
+			double var6 = 0.0625D;
+
+			for (int var8 = 0; var8 < 6; ++var8)
+			{
+				double var9 = (double)((float)par2 + var5.nextFloat());
+				double var11 = (double)((float)par3 + var5.nextFloat());
+				double var13 = (double)((float)par4 + var5.nextFloat());
+
+				if (var8 == 0 && !par1World.isBlockOpaqueCube(par2, par3 + 1, par4))
+				{
+					var11 = (double)(par3 + 1) + var6;
+				}
+
+				if (var8 == 1 && !par1World.isBlockOpaqueCube(par2, par3 - 1, par4))
+				{
+					var11 = (double)(par3 + 0) - var6;
+				}
+
+				if (var8 == 2 && !par1World.isBlockOpaqueCube(par2, par3, par4 + 1))
+				{
+					var13 = (double)(par4 + 1) + var6;
+				}
+
+				if (var8 == 3 && !par1World.isBlockOpaqueCube(par2, par3, par4 - 1))
+				{
+					var13 = (double)(par4 + 0) - var6;
+				}
+
+				if (var8 == 4 && !par1World.isBlockOpaqueCube(par2 + 1, par3, par4))
+				{
+					var9 = (double)(par2 + 1) + var6;
+				}
+
+				if (var8 == 5 && !par1World.isBlockOpaqueCube(par2 - 1, par3, par4))
+				{
+					var9 = (double)(par2 + 0) - var6;
+				}
+
+				if (var9 < (double)par2 || var9 > (double)(par2 + 1) || var11 < 0.0D || var11 > (double)(par3 + 1) || var13 < (double)par4 || var13 > (double)(par4 + 1))
+				{
+					par1World.spawnParticle("reddust", var9, var11, var13, 0.0D, 0.0D, 0.0D);
+				}
+			}
+
+        }
+    }
+
+
+
+
+
+
+
+
+	/*--------------------------------------------------------------------
+		Redstone logic
+	--------------------------------------------------------------------*/
+
+    /**
+     * Can this block provide power. Only wire currently seems to have this change based on its state.
+     */
+    public boolean canProvidePower()
+    {
+        return true;
+    }
+
+    /**
+     * Returns true if the block is emitting indirect/weak redstone power on the specified side. If isBlockNormalCube
+     * returns true, standard redstone propagation rules will apply instead and this will not be called. Args: World, X,
+     * Y, Z, side
+     */
+    public boolean isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side)
+    {
+		/*
+		System.out.println("");
+		System.out.println("    RedstoneJukebox.isProvidingWeakPower(world, " + x + ", " + y + ", " + z + ", " + side + ")");
+		System.out.println("		active = " + this.isActive);
+		*/
+
+		if (side == 0 || side == 1)
+		{
+			return false;
+		}
+		else
+		{
+			return this.isActive;
+		}
+    }
+
+    /**
+     * Returns true if the block is emitting direct/strong redstone power on the specified side. Args: World, X, Y, Z,
+     * side
+     */
+    public boolean isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
+    {
+		/*
+		System.out.println("");
+		System.out.println("    RedstoneJukebox.isProvidingStrongPower(world, " + x + ", " + y + ", " + z + ", " + side + ")");
+		System.out.println("		active = " + this.isActive);
+		*/
+
+		return false;
+
+    }
+
+
+
+
+
+
+
+
+
+	/*--------------------------------------------------------------------
+		Custom Methods
+	--------------------------------------------------------------------*/
+
+	//-- Stop playing this jukebox
+    private void stopPlaying(World world, int x, int y, int z)
+    {
+		/*
+		System.out.println("    RedstoneJukebox.stopPlaying(world, " + x + ", " + y + ", " + z + ")");
+		*/
+
+        if (!world.isRemote)
+        {
+            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
+            if (teJukebox != null)
+            {
+				teJukebox.stopPlaying();
+			}
+		}
+	}
+
+
+	//-- Start playing this jukebox
+    private void startPlaying(World world, int x, int y, int z)
+    {
+		/*
+		System.out.println("    RedstoneJukebox.startPlaying(world, " + x + ", " + y + ", " + z + ")");
+		*/
+
+
+        if (!world.isRemote)
+        {
+            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
+            if (teJukebox != null)
+            {
+				teJukebox.startPlaying();
+			}
+
+
+		}
+
+	}
     
 }

@@ -1,6 +1,13 @@
 package sidben.redstonejukebox;
 
+import java.beans.EventHandler;
+
+import paulscode.sound.Vector3D;
+
+import sidben.redstonejukebox.client.SoundEventHandler;
+
 import net.minecraft.src.*;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -35,6 +42,9 @@ Tut Ref: http://www.minecraftforum.net/topic/1390536-13x-forge-container-based-g
 @NetworkMod(clientSideRequired=true, serverSideRequired=false,
 clientPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.client.ClientPacketHandler.class),
 serverPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.ServerPacketHandler.class))
+
+
+OBS 2: Gui working fine, no packets needed yet.
 */
 
 
@@ -44,6 +54,7 @@ public class ModRedstoneJukebox {
 
 	
     // The instance of your mod that Forge uses.
+	// Obs: MUST BE THE VALUE OF MODIF ABOVE!!1!11!!one!
 	@Instance("SidbenRedstoneJukebox")
 	public static ModRedstoneJukebox instance;
 	
@@ -53,7 +64,7 @@ public class ModRedstoneJukebox {
 	public static CommonProxy proxy;
 
 	
-	// Textures
+	// Textures and Models IDs
 	public static int redstoneJukeboxModelID;
 	public final static int texJukeboxDisc = 0;
     public final static int texJukeboxBottom = 1;
@@ -75,12 +86,23 @@ public class ModRedstoneJukebox {
     // Blocks and Items
 	private final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
 	private final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
+	private final static Block redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setLightValue(0.75F);
+	
+	
+	// Global variable
+	public final static String sourceName = "streaming";	// music discs are called "streaming" 
+	public static Vec3 lastSoundSource;						// holds the position of the last sound source
 	
 	
 	
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event) {
-		// Stub Method
+		// Register my custom sound handler
+		SoundEventHandler soundEventHandler = new SoundEventHandler();
+		MinecraftForge.EVENT_BUS.register(soundEventHandler);
+		
+		// resets the sound source
+		ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
 	}
 	
 	
@@ -100,7 +122,7 @@ public class ModRedstoneJukebox {
 		ItemStack recordStack9 = new ItemStack(Item.recordStal);
 		ItemStack recordStack10 = new ItemStack(Item.recordStrad);
 		ItemStack recordStack11 = new ItemStack(Item.recordWard);
-		ItemStack recordStack12 = new ItemStack(Item.field_85180_cf);	// wait
+		ItemStack recordStack12 = new ItemStack(Item.field_85180_cf);	// wait record
 
 		ItemStack flintStack = new ItemStack(Item.flint);
 		ItemStack redstoneStack = new ItemStack(Item.redstone);

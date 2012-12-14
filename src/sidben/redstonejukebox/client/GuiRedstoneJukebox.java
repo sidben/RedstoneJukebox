@@ -32,8 +32,6 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super(new ContainerRedstoneJukebox(inventory, teJukebox));
 		jukeboxInventory = teJukebox;
-		
-		System.out.println("	GuiRedstoneJukebox");
     }
 
 
@@ -123,6 +121,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 			// Without this, it works for the client changing buttons, but the server doesn't save and when the world
 			// reloads, the buttons go back to default. Inventory works fine without it.
 
+
 		}
 
 
@@ -171,12 +170,17 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
 
+        // OBS: this class does not access the right TileEntity, the isPlaying is always false. I'll search for a more elegant way
 
+System.out.println("  dancing note - this.jukeboxInventory.isPlaying() = " + this.jukeboxInventory.isPlaying());
 
+		
 		//-- current record indicator (blue note)
-        /*
         if (this.jukeboxInventory.isPlaying())
         {
+
+        	
+System.out.println("  dancing note - slot = " + this.jukeboxInventory.currentJukeboxPlaySlot());
 
 			switch (this.jukeboxInventory.currentJukeboxPlaySlot())
 			{
@@ -191,7 +195,6 @@ public class GuiRedstoneJukebox extends GuiContainer
 			}
 
 		}
-		*/
 
 
 		//-- loop indicator

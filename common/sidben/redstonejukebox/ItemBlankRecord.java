@@ -1,7 +1,7 @@
 package sidben.redstonejukebox;
 
-import net.minecraft.src.CreativeTabs;
-import net.minecraft.src.Item;
+import java.util.List;
+import net.minecraft.src.*;
 
 
 public class ItemBlankRecord extends Item {
@@ -19,4 +19,12 @@ public class ItemBlankRecord extends Item {
 	public String getTextureFile () {
 		return CommonProxy.textureSheet;
 	}
+
+
+     // allows items to add custom lines of information to the mouseover description
+    public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean par4)
+    {
+    	par3List.add("Trade with a villager!");
+    }
+	
 }

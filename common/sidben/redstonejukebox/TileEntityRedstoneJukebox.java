@@ -1,18 +1,12 @@
 package sidben.redstonejukebox;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.util.Random;
-
-import net.minecraft.src.EntityItem;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.IInventory;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemRecord;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.NBTTagCompound;
-import net.minecraft.src.NBTTagList;
-import net.minecraft.src.SoundManager;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.World;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.network.PacketDispatcher;
+import net.minecraft.src.*;
 
 
 public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
@@ -43,7 +37,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public int playMode;
 
     
-    //-- Array with the order in witch the records will play (playlist). used for the shuffle option.
+    //-- Array with the order in which the records will play (playlist). used for the shuffle option.
     private int[] playOrder;
     
 
@@ -53,6 +47,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 	//-- Slot currentlly playing. OBS: this var refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
 	private int currentPlaySlot;
+	
+	
+	//-- Slot of the jukebox with the current playing record.
+	private int currentJukeboxPlaySlot;
 	
 
 	//-- Slot to play next. OBS: this var refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
@@ -67,14 +65,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private boolean playlistInitialized;
 
 
-    //-- Indicates if this TE had all itens ejected (on break)
-    private boolean ejected;
-
 
 
     
     /*--------------------------------------------------------------------
-	Constructors
+		Constructors
 	--------------------------------------------------------------------*/
 
     public TileEntityRedstoneJukebox()
@@ -87,7 +82,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         isLoop = false;
         this.delay = this.maxDelay;
         playlistInitialized = false;
-        ejected = false;
     }
 
     
@@ -217,7 +211,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
 
 	/*--------------------------------------------------------------------
-		NBT Stuff
+		NBT Stuff and Packet
 	--------------------------------------------------------------------*/
     /**
      * Reads a tile entity from NBT.
@@ -225,6 +219,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public void readFromNBT(NBTTagCompound par1NBTTagCompound)
     {
+		//System.out.println("	TileEntityRedstoneJukebox.readNBT");
+		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+
+		
         super.readFromNBT(par1NBTTagCompound);
         NBTTagList nbttaglist = par1NBTTagCompound.getTagList("Items");
         jukeboxPlaylist = new ItemStack[getSizeInventory()];
@@ -243,6 +241,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         playMode = par1NBTTagCompound.getShort("PlayMode");
         isLoop = par1NBTTagCompound.getBoolean("Loop");
         isPlaying = par1NBTTagCompound.getBoolean("Playing");
+        
+        //System.out.println("		isplaying = " + this.isPlaying);
+		//System.out.println("		isloop = " + this.isLoop);
+		//System.out.println("		playmode = " + this.playMode);
     }
 
     /**
@@ -251,7 +253,14 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public void writeToNBT(NBTTagCompound par1NBTTagCompound)
     {
-        super.writeToNBT(par1NBTTagCompound);
+		//System.out.println("	TileEntityRedstoneJukebox.WriteNBT");
+		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+		//System.out.println("		isloop = " + this.isLoop);
+		//System.out.println("		playmode = " + this.playMode);
+		//System.out.println("		isplaying = " + this.isPlaying);
+
+		
+		super.writeToNBT(par1NBTTagCompound);
         par1NBTTagCompound.setShort("PlayMode", (short)playMode);
         par1NBTTagCompound.setBoolean("Loop", (boolean)isLoop);
         par1NBTTagCompound.setBoolean("Playing", (boolean)isPlaying);
@@ -270,7 +279,85 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         par1NBTTagCompound.setTag("Items", nbttaglist);
     }
+    
+    
+    public void resync()
+    {
+		//System.out.println("	TileEntityRedstoneJukebox.resync");
 
+		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+    }
+    
+    
+    /**
+     * Called when you receive a TileEntityData packet for the location this
+     * TileEntity is currently in. On the client, the NetworkManager will always
+     * be the remote server. On the server, it will be whomever is responsible for 
+     * sending the packet.
+     * 
+     * @param net The NetworkManager the packet originated from 
+     * @param packet The data packet
+     */
+    public void onDataPacket(INetworkManager net, Packet132TileEntityData packet)
+    {
+		//System.out.println("	TileEntityRedstoneJukebox.onDataPacket");
+		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+		//System.out.println("		isloop = " + this.isLoop);
+		//System.out.println("		playmode = " + this.playMode);
+		//System.out.println("		isplaying = " + this.isPlaying);
+		
+		//System.out.println("		pkt action = " + packet.actionType);
+		//System.out.println("		pkt x = " + packet.xPosition);
+		//System.out.println("		pkt y = " + packet.yPosition);
+		//System.out.println("		pkt z = " + packet.zPosition);
+		
+		// Read NBT packet from the server
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+		{
+			NBTTagCompound tag = packet.customParam1;
+	
+	        playMode = tag.getShort("PlayMode");
+	        isLoop = tag.getBoolean("Loop");
+	        isPlaying = tag.getBoolean("Playing");
+	        
+	        // Extra info
+	        currentJukeboxPlaySlot = tag.getShort("JukeboxPlaySlot");
+	
+			//System.out.println("		loop = " + tag.getBoolean("Loop"));
+			//System.out.println("		playmode = " + tag.getShort("PlayMode"));
+			//System.out.println("		playing = " + tag.getBoolean("Playing"));
+			//System.out.println("		slot = " + this.getCurrentPlaySlot());
+			//System.out.println("		juke slot = " + this.getCurrentJukeboxPlaySlot());
+		}
+		
+
+    }
+    
+
+    /**
+     * Overriden in a sign to provide the text.
+     */
+    public Packet getDescriptionPacket()
+    {
+		//System.out.println("	TileEntityRedstoneJukebox.getDescriptionPacket");
+		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+		//System.out.println("		isloop = " + this.isLoop);
+		//System.out.println("		playmode = " + this.playMode);
+		//System.out.println("		isplaying = " + this.isPlaying);
+		//System.out.println("		slot = " + this.getCurrentPlaySlot());
+		//System.out.println("		juke slot = " + this.getCurrentJukeboxPlaySlot());
+		
+
+		
+		// Send the NBT Packet to client
+		NBTTagCompound tag = new NBTTagCompound();
+        this.writeToNBT(tag);
+        
+        // Extra info (used in GUI)
+        tag.setShort("JukeboxPlaySlot", (short)this.getCurrentJukeboxPlaySlot());
+        
+        return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 1, tag);
+    }
     
 
     
@@ -292,6 +379,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 		System.out.println("    		this.isPlaying = " + this.isPlaying);
 		*/
 
+    	
         super.updateEntity();
 
 		if (!this.worldObj.isRemote)
@@ -332,19 +420,24 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	}
 
 	// Returns the index currently playing (of the play list).
-	public int currentPlaySlot()
+	public int getCurrentPlaySlot()
 	{
 		return this.currentPlaySlot;
 	}
 
 	// Returns the slot currently playing (of the jukebox).
-	public int currentJukeboxPlaySlot()
+	public int getCurrentJukeboxPlaySlot()
 	{
-		if (this.currentPlaySlot > -1) {
-			return this.playOrder[this.currentPlaySlot];
+		/*
+		if (this.getCurrentPlaySlot() > -1) {
+			return this.playOrder[this.getCurrentPlaySlot()];
 		} else {
 			return -1;
 		}
+		*/
+		// the code above does not work on Server/Client, because the list was ordered in the server. Private var added.  
+		
+		return currentJukeboxPlaySlot;
 	}
 
 	
@@ -384,10 +477,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     
 	// eject all records to the world
-	public void ejectAll(World world, int x, int y, int z)
+	public void ejectAllAndStopPlaying(World world, int x, int y, int z)
 	{
-		this.ejected = true;
-
+		if (this.isPlaying) {
+			// Stop all records
+			this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
+			this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
+		}
+		
+		
 		for (int var8 = 0; var8 < this.getSizeInventory(); ++var8)
 		{
 			ItemStack item = this.getStackInSlot(var8);
@@ -423,6 +521,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				}
 			}
 		}
+		
 	}
     
 
@@ -460,9 +559,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//   is this Jukebox. If not, update everything.
 	private void checkIfStillPlaying()
 	{
-		System.out.println(" ");
-		System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying");
+//		System.out.println(" ");
+//		System.out.println("    TileEntityRedstoneJukebox.checkIfStillPlaying");
+//		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
 
+		
+		
 
 		this.delay = this.maxDelay;
         
@@ -475,11 +577,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			{
 				if (!this.playlistInitialized)
 				{
-					System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - World load, reseting list");
+					//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - World load, reseting list");
 					this.setPlaylistOrder();
 				}
 
-				System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - Playing next");
+				//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - Playing next");
 				this.playNextRecord();
 			}
 			else
@@ -488,23 +590,23 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				//-- check if the source is this jukebox (PS: I'm pretty sure there is some easier way to do this... 
 				if (ModRedstoneJukebox.lastSoundSource.xCoord != this.xCoord || ModRedstoneJukebox.lastSoundSource.yCoord != this.yCoord || ModRedstoneJukebox.lastSoundSource.zCoord != this.zCoord)
 				{
-					System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - no longer the source");
+					//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - no longer the source");
 					this.markAsStopped();
 				}
 				else
 				{
 					//-- check if there is a record on the current slot
-					if (this.currentJukeboxPlaySlot() < 0)
+					if (this.getCurrentJukeboxPlaySlot() < 0)
 					{
-						System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - current playslot not set");
+						//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - current playslot not set");
 						this.markAsStopped();
 					}
 					else
 					{
-						ItemStack r = this.getStackInSlot(this.currentJukeboxPlaySlot());
+						ItemStack r = this.getStackInSlot(this.getCurrentJukeboxPlaySlot());
 						if (r == null || !(Item.itemsList[r.itemID] instanceof ItemRecord))
 						{
-							System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - empty slot, playing next");
+							//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - empty slot, playing next");
 							this.playNextRecord();
 						}
 					}
@@ -669,8 +771,14 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
 					this.currentPlaySlot = checkedSlot;
+					this.currentJukeboxPlaySlot= this.playOrder[checkedSlot];
+
 					this.markAsPlaying();
 
+					
+					// This will force a getDescriptionPacket / onDataPacket combo to resync client and server
+					this.resync();
+					
 					break;
 				}
 				else

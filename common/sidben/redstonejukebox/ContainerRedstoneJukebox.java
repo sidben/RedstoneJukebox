@@ -136,6 +136,12 @@ public class ContainerRedstoneJukebox extends Container
     }
 
     
+
     
+    public TileEntityRedstoneJukebox GetTileEntity()
+    {
+        return this.teJukebox;
+    }
+
     
 }

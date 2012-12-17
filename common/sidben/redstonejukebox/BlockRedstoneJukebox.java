@@ -2,6 +2,11 @@ package sidben.redstonejukebox;
 
 import java.util.Random;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Side;
+import cpw.mods.fml.common.asm.*;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.src.Block;
 import net.minecraft.src.BlockContainer;
 import net.minecraft.src.CreativeTabs;
@@ -138,11 +143,24 @@ public class BlockRedstoneJukebox extends BlockContainer {
 			//--- top
 			return ModRedstoneJukebox.texJukeboxTop;
 
+    	case 7:
+			//--- Extra texture (disc)
+			return ModRedstoneJukebox.texJukeboxDisc;
+
     	default:
 	        //--- sides
 			if (this.isActive) { return ModRedstoneJukebox.texJukeboxSideOn; }
 			return ModRedstoneJukebox.texJukeboxSideOff;
 		}
+    }
+    
+    
+    /**
+     * Returns which pass should this block be rendered on. 0 for solids and 1 for alpha
+     */
+    public int getRenderBlockPass()
+    {
+        return 0;
     }
 
 	
@@ -158,8 +176,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void onBlockAdded(World par1World, int x, int y, int z)
     {
-        super.onBlockAdded(par1World, x, y, z);
-        par1World.markBlockForUpdate(x, y, z);
+		System.out.println("    RedstoneJukebox.onBlockAdded");
+		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+
+		
+		super.onBlockAdded(par1World, x, y, z);
+        //par1World.markBlockForUpdate(x, y, z);
 	}
 
 
@@ -185,14 +207,15 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6)
     {
-		if (!keepMyInventory)
+
+    	if (!keepMyInventory)
 		{
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)par1World.getBlockTileEntity(x, y, z);
 
             if (teJukebox != null)
             {
-				teJukebox.stopPlaying();
-            	teJukebox.ejectAll(par1World, x, y, z);
+				// teJukebox.stopPlaying();		<--- This call may cause the block to be replaced again after broke, it calls the "updateJukeboxBlockState"
+            	teJukebox.ejectAllAndStopPlaying(par1World, x, y, z);
             }
 		}
 
@@ -248,7 +271,11 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z)
     {
-        TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
+		System.out.println("	updateJukeboxBlockState");
+		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+
+		
+		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
         keepMyInventory = true;
 
         if (active)
@@ -282,6 +309,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     /**
      * A randomly called display update to be able to add particles or other items for display
      */
+    @SideOnly(Side.CLIENT)
     public void randomDisplayTick(World par1World, int par2, int par3, int par4, Random par5Random)
     {
         if (this.isActive)

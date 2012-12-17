@@ -33,6 +33,8 @@ public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton
         if (this.drawButton)
         {
 			boolean isMouseOver = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+			this.field_82253_i = isMouseOver;
+			
 
 			if (isMouseOver)
 			{
@@ -44,6 +46,13 @@ public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton
     }
 
 
+
+
+    // OBS: Mouseover
+    public boolean func_82252_a()
+    {
+        return this.field_82253_i;
+    }    
     
     
 }

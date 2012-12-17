@@ -1,13 +1,16 @@
 package sidben.redstonejukebox;
 
+
 import java.beans.EventHandler;
+import java.util.Random;
 
 import paulscode.sound.Vector3D;
 
-import sidben.redstonejukebox.client.SoundEventHandler;
+import sidben.redstonejukebox.client.*;
 
 import net.minecraft.src.*;
 import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -42,6 +45,7 @@ Tut Ref: http://www.minecraftforum.net/topic/1390536-13x-forge-container-based-g
 @NetworkMod(clientSideRequired=true, serverSideRequired=false,
 clientPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.client.ClientPacketHandler.class),
 serverPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.ServerPacketHandler.class))
+http://www.minecraftforum.net/topic/1390536-145forge-container-based-gui-tutorial/
 
 
 OBS 2: Gui working fine, no packets needed yet.
@@ -49,7 +53,7 @@ OBS 2: Gui working fine, no packets needed yet.
 
 
 @Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="0.7")
-@NetworkMod(clientSideRequired=true, serverSideRequired=false)
+@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = PacketHandler.class)
 public class ModRedstoneJukebox {
 
 	
@@ -64,6 +68,10 @@ public class ModRedstoneJukebox {
 	public static CommonProxy proxy;
 
 	
+	// Channels
+	public static final String jukeboxChannel = "chRSJukebox";
+	
+	
 	// Textures and Models IDs
 	public static int redstoneJukeboxModelID;
 	public final static int texJukeboxDisc = 0;
@@ -75,23 +83,32 @@ public class ModRedstoneJukebox {
 	
 	// GUI IDs
 	public static int redstoneJukeboxGuiID = 0;
+	public static int recordTradingGuiID = 1;
 
 	
 	// Blocks and Items IDs
 	public final static int redstoneJukeboxIdleID = 520;
 	public final static int redstoneJukeboxActiveID = 521;
 	public final static int blankRecordItemID = 7200;
+	public final static int customRecordItemID = 7201;
 	
 
     // Blocks and Items
-	private final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
-	private final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
-	private final static Block redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setLightValue(0.75F);
+	public final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
+	public final static Item customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord");
+	public final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
+	public final static Block redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setLightValue(0.75F);
 	
 	
 	// Global variable
 	public final static String sourceName = "streaming";	// music discs are called "streaming" 
 	public static Vec3 lastSoundSource;						// holds the position of the last sound source
+	
+	
+	// Global Fake Villager
+	/*
+	public static EntityMusicVillager musicVillager;
+	*/  
 	
 	
 	
@@ -100,6 +117,10 @@ public class ModRedstoneJukebox {
 		// Register my custom sound handler
 		SoundEventHandler soundEventHandler = new SoundEventHandler();
 		MinecraftForge.EVENT_BUS.register(soundEventHandler);
+		
+		// Register my custom player handler
+		PlayerEventHandler playerEventHandler = new PlayerEventHandler();
+		MinecraftForge.EVENT_BUS.register(playerEventHandler);
 		
 		// resets the sound source
 		ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
@@ -161,6 +182,7 @@ public class ModRedstoneJukebox {
 		
 		// Names
 		LanguageRegistry.addName(recordBlank, "Blank Record");
+		LanguageRegistry.addName(customRecord, "Music Disc");
 		LanguageRegistry.addName(redstoneJukebox, "Redstone Jukebox");
 		
 		
@@ -172,5 +194,77 @@ public class ModRedstoneJukebox {
 	public void postInit(FMLPostInitializationEvent event) {
 		// Stub Method
 	}
+	
+	
+
+	/*
+	public static EntityVillager getFakeMusicVillager(World world, int originalEntityId)
+	{
+		if (musicVillager == null || musicVillager.worldObj != world) { musicVillager = new EntityMusicVillager(world, originalEntityId); }
+		return musicVillager;
+	}
+	*/
+	
+
+	
+	private static MerchantRecipeList randomRecordCatalog;
+
+    public static MerchantRecipeList getRandomRecordList()
+    {
+		System.out.println("	getRandomRecordList");
+		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+
+		if (randomRecordCatalog == null)
+		{
+			System.out.println("		creating new list");
+	
+			Random rand = new Random();
+			randomRecordCatalog = new MerchantRecipeList();
+			ItemStack emptyDisc = new ItemStack(ModRedstoneJukebox.recordBlank, 1);
+
+
+			ItemStack offerDisc1 = new ItemStack(ModRedstoneJukebox.customRecord);
+			if (offerDisc1.stackTagCompound == null) { offerDisc1.stackTagCompound = new NBTTagCompound(); }
+			offerDisc1.stackTagCompound.setString("Song", "record01");
+			offerDisc1.stackTagCompound.setString("SongTitle", "Toe Jam & Earl - Toe Jam Jammin");
+			offerDisc1.setItemDamage(93);
+			
+			ItemStack offerDisc2 = new ItemStack(ModRedstoneJukebox.customRecord);
+			if (offerDisc2.stackTagCompound == null) { offerDisc2.stackTagCompound = new NBTTagCompound(); }
+			offerDisc2.stackTagCompound.setString("Song", "record02");
+			offerDisc2.stackTagCompound.setString("SongTitle", "Cave Story Theme");
+			offerDisc2.setItemDamage(151);
+
+			
+//	        if (offerDisc1.stackTagCompound == null) {
+//	        	offerDisc1.stackTagCompound = new NBTTagCompound();
+//	        }
+//	        if (!offerDisc1.stackTagCompound.hasKey("display")) {
+//	        	offerDisc1.stackTagCompound.setCompoundTag("display", new NBTTagCompound());
+//	        }
+//	        offerDisc1.stackTagCompound.getCompoundTag("display").setString("Lore", "Custom record");
+
+/*
+			NBTTagCompound nbttagcompound = new NBTTagCompound();
+            nbttagcompound.setByte("Slot", (byte)i);
+            jukeboxPlaylist[i].writeToNBT(nbttagcompound);
+            nbttaglist.appendTag(nbttagcompound);
+*/
+			
+	   	
+			randomRecordCatalog.add(new MerchantRecipe(emptyDisc, new ItemStack(Item.emerald, (4 + rand.nextInt(4))), offerDisc1));
+			randomRecordCatalog.add(new MerchantRecipe(emptyDisc, new ItemStack(Item.emerald, (4 + rand.nextInt(4))), offerDisc2));
+			randomRecordCatalog.add(new MerchantRecipe(emptyDisc, new ItemStack(Item.emerald, (4 + rand.nextInt(4))), new ItemStack(ModRedstoneJukebox.customRecord)));
+			//randomRecordCatalog.add(new MerchantRecipe(new ItemStack(Item.bone), new ItemStack(Item.emerald)));
+		}
+		else
+		{
+			System.out.println("		list found");
+		}
+
+
+		return randomRecordCatalog;    	
+    }	
+	
 
 }

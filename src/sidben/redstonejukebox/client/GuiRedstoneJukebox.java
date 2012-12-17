@@ -1,16 +1,15 @@
 package sidben.redstonejukebox.client;
 
+import java.io.*;
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import sidben.redstonejukebox.CommonProxy;
 import sidben.redstonejukebox.ContainerRedstoneJukebox;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.TileEntityRedstoneJukebox;
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiContainer;
-import net.minecraft.src.InventoryPlayer;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.StatCollector;
+import net.minecraft.src.*;
 
 
 
@@ -32,6 +31,13 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super(new ContainerRedstoneJukebox(inventory, teJukebox));
 		jukeboxInventory = teJukebox;
+
+
+		//System.out.println("	GuiRedstoneJukebox");
+		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+		//System.out.println("		isloop = " + this.jukeboxInventory.isLoop);
+		//System.out.println("		playmode = " + this.jukeboxInventory.playMode);
+
     }
 
 
@@ -45,14 +51,13 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super.initGui();
 
-        int startX = (this.width - this.xSize) / 2;
-        int startY = (this.height - this.ySize) / 2;
+        //int startX = (this.width - this.xSize) / 2;		<-- no need, use guiLeft
+        //int startY = (this.height - this.ySize) / 2;		<-- no need, use guiTop
 
 
-        this.controlList.add(new GuiRedstoneJukeboxButtonLoop(0, startX + 7,  startY + 41));
-        this.controlList.add(new GuiRedstoneJukeboxButtonLoop(1, startX + 32, startY + 41));
-        this.controlList.add(new GuiRedstoneJukeboxButtonPlayMode(2, startX + 77, startY + 41));
-
+        this.controlList.add(new GuiRedstoneJukeboxButtonLoop(0, this.guiLeft + 7,  this.guiTop + 41));
+        this.controlList.add(new GuiRedstoneJukeboxButtonLoop(1, this.guiLeft + 32, this.guiTop + 41));
+        this.controlList.add(new GuiRedstoneJukeboxButtonPlayMode(2, this.guiLeft + 77, this.guiTop + 41));
     }
 
 
@@ -116,12 +121,35 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 			}
 			
+			
+			//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+			//System.out.println("		te.isloop (pre)" + this.jukeboxInventory.isLoop);
+			//System.out.println("		te.mode (pre)" + this.jukeboxInventory.playMode);
 
+			
+			
 			// Packet code here
 			// Without this, it works for the client changing buttons, but the server doesn't save and when the world
 			// reloads, the buttons go back to default. Inventory works fine without it.
-
-
+     
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeBoolean(this.jukeboxInventory.isLoop);
+            	outputStream.writeInt(this.jukeboxInventory.playMode);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+            //this.mc.getSendQueue().addToSendQueue(new Packet250CustomPayload(var2, var3.toByteArray()));
+			Packet250CustomPayload packet = new Packet250CustomPayload();
+			packet.channel = ModRedstoneJukebox.jukeboxChannel;
+			packet.data = bos.toByteArray();
+			packet.length = bos.size();
+			PacketDispatcher.sendPacketToServer(packet);
+			
 		}
 
 
@@ -133,9 +161,32 @@ public class GuiRedstoneJukebox extends GuiContainer
     /**
      * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
-    protected void drawGuiContainerForegroundLayer(int par1, int par2)
+    protected void drawGuiContainerForegroundLayer(int x, int y)
     {
         this.fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
+
+        // Tooltips
+        GuiButton btPlayOnce = (GuiButton)this.controlList.get(0);
+        GuiButton btPlayLoop = (GuiButton)this.controlList.get(1);
+        GuiButton btPlaymode = (GuiButton)this.controlList.get(2);
+
+        if (btPlayOnce.func_82252_a())
+        {
+            this.drawCreativeTabHoveringText("Play records only once", x - this.guiLeft, y - this.guiTop + 21);
+        }
+        else if (btPlayLoop.func_82252_a())
+        {
+            this.drawCreativeTabHoveringText("Play records in loop", x - this.guiLeft, y - this.guiTop + 21);
+        }
+        else if (btPlaymode.func_82252_a())
+        {
+    		switch (this.jukeboxInventory.playMode)
+    		{
+    			case 0: this.drawCreativeTabHoveringText("Play mode: In order", x - this.guiLeft, y - this.guiTop + 21); break;
+    			case 1: this.drawCreativeTabHoveringText("Play mode: Shuffle", x - this.guiLeft, y - this.guiTop + 21); break;
+    		}
+        }
+
     }
 
 
@@ -172,7 +223,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
         // OBS: this class does not access the right TileEntity, the isPlaying is always false. I'll search for a more elegant way
 
-System.out.println("  dancing note - this.jukeboxInventory.isPlaying() = " + this.jukeboxInventory.isPlaying());
+//System.out.println("  dancing note - this.jukeboxInventory.isPlaying() = " + this.jukeboxInventory.isPlaying());
 
 		
 		//-- current record indicator (blue note)
@@ -180,9 +231,9 @@ System.out.println("  dancing note - this.jukeboxInventory.isPlaying() = " + thi
         {
 
         	
-System.out.println("  dancing note - slot = " + this.jukeboxInventory.currentJukeboxPlaySlot());
+//System.out.println("  dancing note - slot = " + this.jukeboxInventory.currentJukeboxPlaySlot());
 
-			switch (this.jukeboxInventory.currentJukeboxPlaySlot())
+			switch (this.jukeboxInventory.getCurrentJukeboxPlaySlot())
 			{
 				case 0: drawTexturedModalRect(j + danceNoteArrayX[danceNoteFrame] + 27, 	k + danceNoteArrayY[danceNoteFrame] + 26, 176, 1, 12, 10); break;
 				case 1: drawTexturedModalRect(j + danceNoteArrayX[danceNoteFrame] + 46, 	k + danceNoteArrayY[danceNoteFrame] + 26, 176, 1, 12, 10); break;

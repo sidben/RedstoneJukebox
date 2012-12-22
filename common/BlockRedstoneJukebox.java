@@ -1,20 +1,20 @@
-package sidben.redstonejukebox;
+package sidben.redstonejukebox.common;
 
 import java.util.Random;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.*;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.asm.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+import net.minecraft.block.*;
+import net.minecraft.block.material.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.Block;
-import net.minecraft.src.BlockContainer;
-import net.minecraft.src.CreativeTabs;
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.IBlockAccess;
-import net.minecraft.src.Material;
-import net.minecraft.src.TileEntity;
-import net.minecraft.src.World;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.*;
+import net.minecraft.world.*;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 
@@ -43,7 +43,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
 		Constructors
 	--------------------------------------------------------------------*/
 
-    protected BlockRedstoneJukebox(int blockID, boolean active) {
+    public BlockRedstoneJukebox(int blockID, boolean active) {
 		super(blockID, ModRedstoneJukebox.texJukeboxBottom, Material.wood);
         this.isActive = active;
 	}

@@ -5,11 +5,15 @@ import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
-import sidben.redstonejukebox.CommonProxy;
-import sidben.redstonejukebox.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.common.*;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.*;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.src.*;
+import net.minecraft.util.StatCollector;
 
 
 

@@ -7,22 +7,27 @@ import java.util.Random;
 import paulscode.sound.Vector3D;
 
 import sidben.redstonejukebox.client.*;
+import sidben.redstonejukebox.common.*;
 
+import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.*;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.src.*;
+import net.minecraft.util.Vec3;
+import net.minecraft.village.MerchantRecipe;
+import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.Mod.*;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
@@ -53,7 +58,7 @@ OBS 2: Gui working fine, no packets needed yet.
 
 
 @Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="0.7")
-@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = PacketHandler.class)
+@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
 public class ModRedstoneJukebox {
 
 	
@@ -96,8 +101,8 @@ public class ModRedstoneJukebox {
     // Blocks and Items
 	public final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
 	public final static Item customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord");
-	public final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
-	public final static Block redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setBlockName("redstoneJukebox").setRequiresSelfNotify().setLightValue(0.75F);
+	public final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
+	public final static Block redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setLightValue(0.75F);
 	
 	
 	// Global variable
@@ -143,7 +148,7 @@ public class ModRedstoneJukebox {
 		ItemStack recordStack9 = new ItemStack(Item.recordStal);
 		ItemStack recordStack10 = new ItemStack(Item.recordStrad);
 		ItemStack recordStack11 = new ItemStack(Item.recordWard);
-		ItemStack recordStack12 = new ItemStack(Item.field_85180_cf);	// wait record
+		ItemStack recordStack12 = new ItemStack(Item.recordWait);
 
 		ItemStack flintStack = new ItemStack(Item.flint);
 		ItemStack redstoneStack = new ItemStack(Item.redstone);
@@ -169,7 +174,7 @@ public class ModRedstoneJukebox {
 		
 		
 		// Blocks
-		GameRegistry.registerBlock(redstoneJukebox);
+		GameRegistry.registerBlock(redstoneJukebox, "redstoneJukebox");
 
 
 		// Tile Entities
@@ -194,7 +199,15 @@ public class ModRedstoneJukebox {
 	public void postInit(FMLPostInitializationEvent event) {
 		// Stub Method
 	}
+
 	
+	@ServerStarting
+	public void serverStarting(FMLServerStartingEvent event) {
+		// register custom commands
+		
+		event.registerServerCommand(new CommandPlayStream());
+	}
+
 	
 
 	/*
@@ -227,13 +240,13 @@ public class ModRedstoneJukebox {
 			if (offerDisc1.stackTagCompound == null) { offerDisc1.stackTagCompound = new NBTTagCompound(); }
 			offerDisc1.stackTagCompound.setString("Song", "record01");
 			offerDisc1.stackTagCompound.setString("SongTitle", "Toe Jam & Earl - Toe Jam Jammin");
-			offerDisc1.setItemDamage(93);
+			offerDisc1.setItemDamage(1);
 			
 			ItemStack offerDisc2 = new ItemStack(ModRedstoneJukebox.customRecord);
 			if (offerDisc2.stackTagCompound == null) { offerDisc2.stackTagCompound = new NBTTagCompound(); }
 			offerDisc2.stackTagCompound.setString("Song", "record02");
 			offerDisc2.stackTagCompound.setString("SongTitle", "Cave Story Theme");
-			offerDisc2.setItemDamage(151);
+			offerDisc2.setItemDamage(2);
 
 			
 //	        if (offerDisc1.stackTagCompound == null) {

@@ -1,11 +1,17 @@
-package sidben.redstonejukebox;
+package sidben.redstonejukebox.common;
 
 import java.io.*;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.*;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.src.*;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.relauncher.Side;
 
 
 

@@ -1,12 +1,24 @@
-package sidben.redstonejukebox;
+package sidben.redstonejukebox.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.Random;
+
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.relauncher.Side;
+import net.minecraft.client.audio.SoundManager;
+import net.minecraft.entity.item.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.*;
+import net.minecraft.nbt.*;
+import net.minecraft.network.*;
+import net.minecraft.network.packet.*;
 import net.minecraft.src.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.world.World;
 
 
 public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
@@ -510,7 +522,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 					if (item.hasTagCompound())
 					{
-						var14.item.setTagCompound((NBTTagCompound)item.getTagCompound().copy());
+						//var14.item.setTagCompound((NBTTagCompound)item.getTagCompound().copy());
+						var14.func_92014_d().setTagCompound((NBTTagCompound)item.getTagCompound().copy());
 					}
 
 					float var15 = 0.05F;

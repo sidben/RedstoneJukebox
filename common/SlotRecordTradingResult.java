@@ -1,7 +1,11 @@
-package sidben.redstonejukebox;
+package sidben.redstonejukebox.common;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.src.*;
+import net.minecraft.village.MerchantRecipe;
 
 
 // Adapted version of SlotMerchantResult

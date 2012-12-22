@@ -4,13 +4,13 @@ import java.io.File;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.SoundManager;
-import net.minecraft.src.SoundPoolEntry;
-import net.minecraft.src.Vec3;
+import net.minecraft.util.Vec3;
+
 import net.minecraftforge.client.event.sound.*;
 import net.minecraftforge.event.ForgeSubscribe;
 import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.asm.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 
 // ref: http://www.minecraftforum.net/topic/1058091-tutorial-custom-sounds-and-more/

@@ -1,11 +1,18 @@
-package sidben.redstonejukebox;
+package sidben.redstonejukebox.common;
 
 import java.util.List;
 
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.asm.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.*;
 import net.minecraft.src.*;
+import net.minecraft.world.World;
 
 
 public class ItemCustomRecord extends ItemRecord
@@ -15,13 +22,14 @@ public class ItemCustomRecord extends ItemRecord
 
     
 	
-	protected ItemCustomRecord(int id, String name) {
+	public ItemCustomRecord(int id, String name) {
 		super(id, name);
 		//this.recordComposer = composer;
 		setMaxStackSize(1);
 		//setIconIndex(1);
 		setItemName(name); 
-		setCreativeTab(null);
+		//setCreativeTab(null);
+        setCreativeTab(CreativeTabs.tabMisc);
 
 		this.setMaxDamage(0);
         this.setHasSubtypes(true);
@@ -38,14 +46,17 @@ public class ItemCustomRecord extends ItemRecord
 	@SideOnly(Side.CLIENT)
 	public int getIconFromDamage(int damage)
 	{
+		/*
 		switch(damage)
 		{
-			case 0: return 0;  
-			case 1: return 1; 
-			case 93: return 2;
-			case 151: return 3;
-			default: return 48; 
+			case 0: return 48;  
+			case 1: return 49; 
 		}
+		*/
+		int texIndex = 0;
+		texIndex = 48 + damage;
+		if (texIndex > 126) { texIndex = 126; }
+		return texIndex;
 	}
 
 	
@@ -166,17 +177,19 @@ System.out.println("		song: " + songID + " (" + songTitle + ")");
    
    
    
+
    /**
     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
     */
-   /*
    public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
    {
-       par3List.add(new ItemStack(par1, 1, 0));
+       for (int var4 = 1; var4 < 64; ++var4)
+       {
+           par3List.add(new ItemStack(par1, 1, var4));
+       }
    }
-   */
-   
 
-    
-	
+   
+   
+   
 }

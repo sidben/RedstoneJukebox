@@ -1,20 +1,30 @@
 package sidben.redstonejukebox.client;
 
 import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.asm.SideOnly;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.Random;
 
+import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.IMerchant;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.src.*;
+import net.minecraft.util.StatCollector;
+import net.minecraft.village.*;
+import net.minecraft.world.World;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import sidben.redstonejukebox.CommonProxy;
-import sidben.redstonejukebox.ContainerRecordTrading;
+import sidben.redstonejukebox.common.*;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 
 
@@ -222,15 +232,15 @@ System.out.println("		index to = " + this.currentRecipeIndex);
 
             if (this.func_74188_c(36, 24, 16, 16, par1, par2))
             {
-                this.func_74184_a(var9, par1, par2);
+                this.drawItemStackTooltip(var9, par1, par2);
             }
             else if (var10 != null && this.func_74188_c(62, 24, 16, 16, par1, par2))
             {
-                this.func_74184_a(var10, par1, par2);
+                this.drawItemStackTooltip(var10, par1, par2);
             }
             else if (this.func_74188_c(120, 24, 16, 16, par1, par2))
             {
-                this.func_74184_a(var11, par1, par2);
+                this.drawItemStackTooltip(var11, par1, par2);
             }
 
             GL11.glPopMatrix();

@@ -1,12 +1,15 @@
 package sidben.redstonejukebox.client;
 
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.src.*;
+import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
-import sidben.redstonejukebox.CommonProxy;
-import sidben.redstonejukebox.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.common.*;
+
 
 
 public class ClientProxy extends CommonProxy {

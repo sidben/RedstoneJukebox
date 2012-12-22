@@ -1,7 +1,13 @@
-package sidben.redstonejukebox;
+package sidben.redstonejukebox.common;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.entity.IMerchant;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.*;
 import net.minecraft.src.*;
+import net.minecraft.village.*;
 
 
 public class InventoryRecordTrading implements IInventory 

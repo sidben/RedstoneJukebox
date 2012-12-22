@@ -2,10 +2,10 @@ package sidben.redstonejukebox.client;
 
 import org.lwjgl.opengl.GL11;
 
-import sidben.redstonejukebox.CommonProxy;
-
+import sidben.redstonejukebox.common.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.GuiButton;
+import net.minecraft.client.gui.GuiButton;
+
 
 
 

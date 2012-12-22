@@ -2,13 +2,16 @@ package sidben.redstonejukebox.client;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.item.ItemStack;
 import net.minecraft.src.*;
 import net.minecraftforge.client.event.sound.PlayStreamingEvent;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 
 
 

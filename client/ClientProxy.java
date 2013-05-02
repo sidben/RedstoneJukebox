@@ -30,7 +30,8 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
 	{
-		
+System.out.println("	Proxy.getClientGuiElement");
+
 		if (guiID ==  ModRedstoneJukebox.redstoneJukeboxGuiID)
 		{
 			TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
@@ -38,20 +39,18 @@ public class ClientProxy extends CommonProxy {
 		}
 		else if (guiID ==  ModRedstoneJukebox.recordTradingGuiID)
 		{
-			System.out.println("	Client proxy - record sale GUI");
+//System.out.println("	Client proxy - record sale GUI");
 			
-			// OBS: The X value is the EntityID - facepalm cortesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
+			// OBS: The X value is the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
 			Entity villager = world.getEntityByID(x);
-			//Entity villager = ModRedstoneJukebox.getFakeMusicVillager(world, x);
-			if (villager instanceof EntityVillager)
+			if (villager instanceof EntityVillager && CustomRecordHelper.canTradeRecords(x))
 			{
-				System.out.println("	Client proxy - villager found - " + x);
+//System.out.println("	Client proxy - villager found - " + x);
 				return new GuiRecordTrading(player.inventory, (EntityVillager)villager, world);
-				//return new GuiMerchant(player.inventory, (EntityVillager)villager, world);
 			}
 			else
 			{
-				System.out.println("	Client proxy - no villager... - " + x);
+System.out.println("	Client proxy - no valid villager... - " + x);
 			}
 		}
 		

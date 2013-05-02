@@ -27,30 +27,28 @@ public class CommonProxy implements IGuiHandler {
 	@Override
 	public Object getServerGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
 	{
-		System.out.println("	Proxy.getServerGuiElement");
+System.out.println("	Proxy.getServerGuiElement");
 		
 		if (guiID ==  ModRedstoneJukebox.redstoneJukeboxGuiID)
 		{
-			//TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)player.worldObj.getBlockTileEntity(x, y, z);
 			TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
 			return new ContainerRedstoneJukebox(player.inventory, teJukebox);
 		}
 		else if (guiID ==  ModRedstoneJukebox.recordTradingGuiID)
 		{
-			System.out.println("	Common proxy - record sale Container");
+//System.out.println("	Common proxy - record sale Container");
 
-			// OBS: The X value is the EntityID - facepalm cortesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
+			// OBS: The X value is the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
 			Entity villager = world.getEntityByID(x);
-			//Entity villager = ModRedstoneJukebox.getFakeMusicVillager(world, x);
-			if (villager instanceof EntityVillager)
+			if (villager instanceof EntityVillager && CustomRecordHelper.canTradeRecords(x))
 			{
-				System.out.println("	Common proxy - villager found - " + x);
+//System.out.println("	Common proxy - villager found - " + x);
+				CustomRecordHelper.validateOffers(CustomRecordHelper.getStoreID(x));				// revalidates the offers before opening the GUI
 				return new ContainerRecordTrading(player.inventory, (EntityVillager)villager, world);
-				//return new ContainerMerchant(player.inventory, (EntityVillager)villager, world);
 			}
 			else
 			{
-				System.out.println("	Client proxy - no villager... - " + x);
+System.out.println("	Common proxy - no valid villager... - " + x);
 			}
 		}
 

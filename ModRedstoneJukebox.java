@@ -1,32 +1,45 @@
 package sidben.redstonejukebox;
 
 
-import java.beans.EventHandler;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
 
-import paulscode.sound.Vector3D;
-
-import sidben.redstonejukebox.client.*;
-import sidben.redstonejukebox.common.*;
-
-import net.minecraft.block.*;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.*;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.src.*;
 import net.minecraft.util.Vec3;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
+import sidben.redstonejukebox.client.PlayerEventHandler;
+import sidben.redstonejukebox.client.SoundEventHandler;
+import sidben.redstonejukebox.common.BlockRedstoneJukebox;
+import sidben.redstonejukebox.common.CommandPlayBgMusic;
+import sidben.redstonejukebox.common.CommandPlayRecord;
+import sidben.redstonejukebox.common.CommandPlayRecordAt;
+import sidben.redstonejukebox.common.CommonProxy;
+import sidben.redstonejukebox.common.CustomRecordHelper;
+import sidben.redstonejukebox.common.ItemBlankRecord;
+import sidben.redstonejukebox.common.ItemCustomRecord;
+import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.*;
+import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod.PostInit;
+import cpw.mods.fml.common.Mod.PreInit;
+import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkMod.SidedPacketHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -54,6 +67,7 @@ http://www.minecraftforum.net/topic/1390536-145forge-container-based-gui-tutoria
 
 
 OBS 2: Gui working fine, no packets needed yet.
+OBS 3: Packets were needed to send info between client and server on the Gui (GuiButtons)
 */
 
 
@@ -74,7 +88,7 @@ public class ModRedstoneJukebox {
 
 	
 	// Channels
-	public static final String jukeboxChannel = "chRSJukebox";
+	public static final String jukeboxChannel = "chRSJukebox";		// OBS: move this to a config class, along with the ModID
 	
 	
 	// Textures and Models IDs
@@ -92,48 +106,139 @@ public class ModRedstoneJukebox {
 
 	
 	// Blocks and Items IDs
-	public final static int redstoneJukeboxIdleID = 520;
-	public final static int redstoneJukeboxActiveID = 521;
-	public final static int blankRecordItemID = 7200;
-	public final static int customRecordItemID = 7201;
+	public static int redstoneJukeboxIdleID;
+	public static int redstoneJukeboxActiveID;
+	public static int blankRecordItemID;
+	public static int customRecordItemID;
 	
 
     // Blocks and Items
-	public final static Item recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
-	public final static Item customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord");
-	public final static Block redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
-	public final static Block redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setLightValue(0.75F);
+	public static Item recordBlank;
+	public static Item customRecord;
+	public static Block redstoneJukebox;
+	public static Block redstoneJukeboxActive; 
 	
 	
 	// Global variable
 	public final static String sourceName = "streaming";	// music discs are called "streaming" 
-	public static Vec3 lastSoundSource;						// holds the position of the last sound source
+	public static Vec3 lastSoundSource;						// holds the position of the last sound source (may be used with redstone noteblocks)
+	public final static int maxCustomRecords = 32;			// Limit of custom records accepted
+	public final static int maxCustomRecordIcon = 63;		// Limit of icon IDs for the records. This is stored on the metadata of the item. Start at zero.
+	public final static int maxStores = 16;					// Number of "record stores" available. Each "store" is a random selection of records for trade.
+	public static String customRecordsFolder;
+	public static int customRecordOffersMin;				// Minimal of custom records a villager can offer
+	public static int customRecordOffersMax;				// Maximum of custom records a villager can offer
+	public static int customRecordPriceMin;					// Minimal value of custom records in emeralds
+	public static int customRecordPriceMax;					// Maximum value of custom records in emeralds
 	
+		
 	
-	// Global Fake Villager
-	/*
-	public static EntityMusicVillager musicVillager;
-	*/  
-	
+
 	
 	
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event) {
-		// Register my custom sound handler
+        // Config file (ref: http://www.minecraftforge.net/wiki/How_to_make_an_advanced_configuration_file)
+        Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+
+        // Custom records config
+    	String customRecordCategory = "custom_records";
+
+    	
+        try 
+        {
+        	// loading the configuration from its file
+        	config.load();
+        	
+        	
+        	// Load blocks and items IDs
+        	this.redstoneJukeboxIdleID 		= config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
+        	this.redstoneJukeboxActiveID 	= config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
+        	this.blankRecordItemID 			= config.getItem(config.CATEGORY_ITEM, "blankRecordItemID", 7200).getInt(7200);
+        	this.customRecordItemID 		= config.getItem(config.CATEGORY_ITEM, "customRecordItemID", 7201).getInt(7201);
+
+        	// Merchant config
+        	this.customRecordsFolder		= "jukebox";  		// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
+        	this.customRecordOffersMin		= config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);
+        	this.customRecordOffersMax		= config.get(customRecordCategory, "customRecordOffersMax", 4).getInt(4);
+        	this.customRecordPriceMin		= config.get(customRecordCategory, "customRecordPriceMin", 5).getInt(5);
+        	this.customRecordPriceMax		= config.get(customRecordCategory, "customRecordPriceMax", 9).getInt(9);
+        	
+        	// Extra validation on the merchant config (min and max values)
+        	if (this.customRecordOffersMin < 1) this.customRecordOffersMin = 1;
+        	if (this.customRecordOffersMax < this.customRecordOffersMin) this.customRecordOffersMax = this.customRecordOffersMin;
+        	if (this.customRecordOffersMin < 1) this.customRecordPriceMin = 1;
+        	if (this.customRecordPriceMax < this.customRecordPriceMin) this.customRecordPriceMax = this.customRecordPriceMin;
+        	
+        			
+
+        	// Load the custom records
+        	CustomRecordHelper.LoadCustomRecordsConfig(config, customRecordCategory);
+        	
+
+        	// Custom records config help
+        	String br 				= System.getProperty("line.separator");
+        	String helpComment		= "";
+
+        	helpComment				+= "How to add a custom record config" + br;
+        	helpComment				+= "------------------------------------------------------------------" + br;
+        	helpComment				+= "For each custom record, add a line below like this:" + br;
+        	helpComment				+= br;
+        	helpComment				+= "S:record###=ICON_ID;SONG_FILE;SONG_NAME" + br;
+        	helpComment				+= "    ###       = A number between 000 and 099. Do not repeat numbers. The numbers don't need to be in order." + br;
+        	helpComment				+= "    ICON_ID   = The icon of the this record. Must be a number between 1 and 63." + br;
+        	helpComment				+= "    SONG_FILE = The name of the song file that should be on the 'mods/jukebox' folder. Only OGG files are accepted." + br;
+        	helpComment				+= "    SONG_NAME = The title of the song. Plain text, avoid using unicode characters.";
+
+        	config.addCustomCategoryComment(customRecordCategory, helpComment);
+
+
+        	
+        	      	
+
+
+System.out.println("Loading RedstoneJukebox config");
+System.out.println("	Idle: " + this.redstoneJukeboxIdleID);
+System.out.println("	Active: " + this.redstoneJukeboxActiveID);
+System.out.println("	Blank: " + this.blankRecordItemID);
+System.out.println("	Custom: " + this.customRecordItemID);
+System.out.println("	Record List size: " + CustomRecordHelper.getRecordList().size());
+
+        } 
+        catch (Exception e) 
+        {
+        	FMLCommonHandler.instance().getFMLLogger().log(Level.SEVERE, "Error loading the configuration of the Redstone Jukebox Mod. Error message: " + e.getMessage() + " / " + e.toString());
+        } 
+        finally 
+        {
+        	// saving the configuration to its file
+        	config.save();
+        }
+        
+        
+        
+        // Register my custom sound handler
 		SoundEventHandler soundEventHandler = new SoundEventHandler();
 		MinecraftForge.EVENT_BUS.register(soundEventHandler);
 		
-		// Register my custom player handler
+		// Register my custom player event handler
 		PlayerEventHandler playerEventHandler = new PlayerEventHandler();
 		MinecraftForge.EVENT_BUS.register(playerEventHandler);
 		
-		// resets the sound source
+		// resets the sound source reference
 		ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
 	}
 	
 	
 	@Init
 	public void load(FMLInitializationEvent event) {
+
+		// Blocks and Items
+		recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
+		customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord");
+		redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setBlockName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
+		redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setBlockName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setLightValue(0.75F);
+
 		
 		// Crafting Recipes
 		ItemStack recordStack0 = new ItemStack(recordBlank, 1);
@@ -170,6 +275,11 @@ public class ModRedstoneJukebox {
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack10, flintStack, redstoneStack);
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack11, flintStack, redstoneStack);
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack12, flintStack, redstoneStack);
+		// Load all custom records metadata as possible recipes. Maybe I can upgrade this to only consider metadata in use.
+		for (int varCont = 0; varCont <= maxCustomRecordIcon; ++varCont)
+		{
+			GameRegistry.addShapelessRecipe(recordStack0, new ItemStack(customRecord, 1, varCont), flintStack, redstoneStack);
+	    }
 		GameRegistry.addRecipe(new ItemStack(redstoneJukebox), "ggg", "tjt", "www", 'g', glassStack, 't', redstoneTorchStack, 'j', jukeboxStack, 'w', woodStack);
 		
 		
@@ -191,6 +301,10 @@ public class ModRedstoneJukebox {
 		LanguageRegistry.addName(redstoneJukebox, "Redstone Jukebox");
 		
 		
+		// Custom Trades
+		CustomRecordHelper.InitializeAllStores();		
+
+		
 		proxy.registerRenderers();
 	}
 	
@@ -204,80 +318,10 @@ public class ModRedstoneJukebox {
 	@ServerStarting
 	public void serverStarting(FMLServerStartingEvent event) {
 		// register custom commands
-		
-		event.registerServerCommand(new CommandPlayStream());
+		event.registerServerCommand(new CommandPlayRecord());
+		event.registerServerCommand(new CommandPlayRecordAt());
+		event.registerServerCommand(new CommandPlayBgMusic());
 	}
 
 	
-
-	/*
-	public static EntityVillager getFakeMusicVillager(World world, int originalEntityId)
-	{
-		if (musicVillager == null || musicVillager.worldObj != world) { musicVillager = new EntityMusicVillager(world, originalEntityId); }
-		return musicVillager;
-	}
-	*/
-	
-
-	
-	private static MerchantRecipeList randomRecordCatalog;
-
-    public static MerchantRecipeList getRandomRecordList()
-    {
-		System.out.println("	getRandomRecordList");
-		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-
-		if (randomRecordCatalog == null)
-		{
-			System.out.println("		creating new list");
-	
-			Random rand = new Random();
-			randomRecordCatalog = new MerchantRecipeList();
-			ItemStack emptyDisc = new ItemStack(ModRedstoneJukebox.recordBlank, 1);
-
-
-			ItemStack offerDisc1 = new ItemStack(ModRedstoneJukebox.customRecord);
-			if (offerDisc1.stackTagCompound == null) { offerDisc1.stackTagCompound = new NBTTagCompound(); }
-			offerDisc1.stackTagCompound.setString("Song", "record01");
-			offerDisc1.stackTagCompound.setString("SongTitle", "Toe Jam & Earl - Toe Jam Jammin");
-			offerDisc1.setItemDamage(1);
-			
-			ItemStack offerDisc2 = new ItemStack(ModRedstoneJukebox.customRecord);
-			if (offerDisc2.stackTagCompound == null) { offerDisc2.stackTagCompound = new NBTTagCompound(); }
-			offerDisc2.stackTagCompound.setString("Song", "record02");
-			offerDisc2.stackTagCompound.setString("SongTitle", "Cave Story Theme");
-			offerDisc2.setItemDamage(2);
-
-			
-//	        if (offerDisc1.stackTagCompound == null) {
-//	        	offerDisc1.stackTagCompound = new NBTTagCompound();
-//	        }
-//	        if (!offerDisc1.stackTagCompound.hasKey("display")) {
-//	        	offerDisc1.stackTagCompound.setCompoundTag("display", new NBTTagCompound());
-//	        }
-//	        offerDisc1.stackTagCompound.getCompoundTag("display").setString("Lore", "Custom record");
-
-/*
-			NBTTagCompound nbttagcompound = new NBTTagCompound();
-            nbttagcompound.setByte("Slot", (byte)i);
-            jukeboxPlaylist[i].writeToNBT(nbttagcompound);
-            nbttaglist.appendTag(nbttagcompound);
-*/
-			
-	   	
-			randomRecordCatalog.add(new MerchantRecipe(emptyDisc, new ItemStack(Item.emerald, (4 + rand.nextInt(4))), offerDisc1));
-			randomRecordCatalog.add(new MerchantRecipe(emptyDisc, new ItemStack(Item.emerald, (4 + rand.nextInt(4))), offerDisc2));
-			randomRecordCatalog.add(new MerchantRecipe(emptyDisc, new ItemStack(Item.emerald, (4 + rand.nextInt(4))), new ItemStack(ModRedstoneJukebox.customRecord)));
-			//randomRecordCatalog.add(new MerchantRecipe(new ItemStack(Item.bone), new ItemStack(Item.emerald)));
-		}
-		else
-		{
-			System.out.println("		list found");
-		}
-
-
-		return randomRecordCatalog;    	
-    }	
-	
-
 }

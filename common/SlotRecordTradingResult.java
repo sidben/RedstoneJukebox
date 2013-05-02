@@ -9,7 +9,7 @@ import net.minecraft.village.MerchantRecipe;
 
 
 // Adapted version of SlotMerchantResult
-//public class SlotRecordTradingResult extends SlotMerchantResult 
+//public class SlotRecordTradingResult extends SlotMerchantResult
 public class SlotRecordTradingResult extends Slot
 {
     /** Merchant's inventory. */
@@ -80,19 +80,20 @@ System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide())
     {
 System.out.println("	RecordTradingSlot.onPickupFromSlot");
 System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+System.out.println("		store #" + theMerchantInventory.storeId);
 if (par2ItemStack == null) { System.out.println("		item = null"); }
 if (par2ItemStack != null) { System.out.println("		item = " + par2ItemStack.itemID + " (" + par2ItemStack.getItemName() + ")"); }
 
-    	
-    	this.onCrafting(par2ItemStack);
-        MerchantRecipe var3 = this.theMerchantInventory.getCurrentRecipe();
 
-        if (var3 != null)
+    	this.onCrafting(par2ItemStack);
+        MerchantRecipe slotRecipe = this.theMerchantInventory.getCurrentRecipe();
+
+        if (slotRecipe != null)
         {
             ItemStack var4 = this.theMerchantInventory.getStackInSlot(0);
             ItemStack var5 = this.theMerchantInventory.getStackInSlot(1);
 
-            if (this.func_75230_a(var3, var4, var5) || this.func_75230_a(var3, var5, var4))
+            if (this.func_75230_a(slotRecipe, var4, var5) || this.func_75230_a(slotRecipe, var5, var4))
             {
                 if (var4 != null && var4.stackSize <= 0)
                 {
@@ -107,6 +108,7 @@ if (par2ItemStack != null) { System.out.println("		item = " + par2ItemStack.item
                 this.theMerchantInventory.setInventorySlotContents(0, var4);
                 this.theMerchantInventory.setInventorySlotContents(1, var5);
                 //this.theMerchant.useRecipe(var3);
+                CustomRecordHelper.useRecipe(slotRecipe, theMerchantInventory.storeId);
             }
         }
     }
@@ -135,9 +137,9 @@ if (par2ItemStack != null) { System.out.println("		item = " + par2ItemStack.item
         return false;
     }
 
-    
-    
-    
-    
-    
+
+
+
+
+
 }

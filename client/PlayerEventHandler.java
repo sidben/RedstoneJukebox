@@ -22,11 +22,11 @@ public class PlayerEventHandler {
 	@ForgeSubscribe				// no idea what this line does
 	public void onEntityInteractEvent(EntityInteractEvent event)
 	{
+		/*
 		System.out.println("");
 		System.out.println("	onEntityInteractEvent");
 		System.out.println("		id = " + event.target.entityId);
 		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		/*
 		System.out.println("		remote = " + event.entityPlayer.worldObj.isRemote);
 		System.out.println("		remote target = " + event.target.worldObj.isRemote);
 		*/

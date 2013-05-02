@@ -31,7 +31,7 @@ public class ContainerRecordTrading extends Container
 
     public ContainerRecordTrading(InventoryPlayer par1InventoryPlayer, IMerchant par2IMerchant, World par3World)
     {
-		System.out.println("	ContainerRecordMerchant");
+//System.out.println("	ContainerRecordMerchant");
 		
 
 		

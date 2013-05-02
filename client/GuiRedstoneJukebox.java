@@ -227,15 +227,20 @@ public class GuiRedstoneJukebox extends GuiContainer
 
         // OBS: this class does not access the right TileEntity, the isPlaying is always false. I'll search for a more elegant way
 
-//System.out.println("  dancing note - this.jukeboxInventory.isPlaying() = " + this.jukeboxInventory.isPlaying());
-
+/*
+System.out.println("  dancing note - isPlaying() = " + this.jukeboxInventory.isPlaying());
+System.out.println("  dancing note - slot = " + this.jukeboxInventory.getCurrentJukeboxPlaySlot());
+System.out.println("  dancing note - playmode = " + this.jukeboxInventory.playMode);
+System.out.println("  ");
+*/
+		
 		
 		//-- current record indicator (blue note)
         if (this.jukeboxInventory.isPlaying())
         {
 
         	
-//System.out.println("  dancing note - slot = " + this.jukeboxInventory.currentJukeboxPlaySlot());
+
 
 			switch (this.jukeboxInventory.getCurrentJukeboxPlaySlot())
 			{

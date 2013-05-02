@@ -57,7 +57,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	private boolean isPlaying;
 	
 
-	//-- Slot currentlly playing. OBS: this var refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
+	//-- Slot currently playing. OBS: this var refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
 	private int currentPlaySlot;
 	
 	
@@ -347,7 +347,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
 
     /**
-     * Overriden in a sign to provide the text.
+     * Overridden in a sign to provide the text.
      */
     public Packet getDescriptionPacket()
     {
@@ -367,6 +367,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         
         // Extra info (used in GUI)
         tag.setShort("JukeboxPlaySlot", (short)this.getCurrentJukeboxPlaySlot());
+        //tag.setBoolean("Playing", (boolean)isPlaying);		tried to add this here, so the GUI knows when it starts playing. didn't work
         
         return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 1, tag);
     }
@@ -705,6 +706,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	private void playNextRecord()
 	{
 		int checkedSlot;
+		boolean isCustomRecord = false;
 
 
 		while (this.nextPlaySlot > -1) {
@@ -750,6 +752,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				else
 				{
 					this.stopPlaying();			// This stop playing, not just mark as stopped, because someone may remove the last record, causing a playNext
+
+System.out.println("	Stop playing 1 (" + isPlaying() + ")");
+					
 					break;
 				}
 			}
@@ -759,6 +764,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			// another check, because of loop
 			if (checkedSlot < 0) {
 				this.stopPlaying();			// This stop playing, not just mark as stopped, because someone may remove the last record, causing a playNext
+
+System.out.println("	Stop playing 2 (" + isPlaying() + ")");
+
 				break;
 			}
 
@@ -774,23 +782,45 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				if (s != null && (Item.itemsList[s.itemID] instanceof ItemRecord))
 				{
 					String recordName = ((ItemRecord)Item.itemsList[s.itemID]).recordName;
-					int recordID = ((ItemRecord)Item.itemsList[s.itemID]).shiftedIndex;
+					if (!CustomRecordHelper.isVanillaRecord(recordName));
+					{
+System.out.println("	TE.RecordName not Vanilla (" + recordName + ")");
+						// Not a vanilla record. Custom records stores the real songID on metaTags.
+						try 
+						{
+							recordName = ((ItemCustomRecord)Item.itemsList[s.itemID]).getSongID(s);
+							isCustomRecord = true;
+						} 
+						catch (java.lang.ClassCastException ex) 
+						{
+							// error casting record. Should not happen for real.
+							System.out.println("RedstoneJukebox - error getting record title [" + recordName + "]");
+						}
+					}
+
+System.out.println("	TE.RecordName = " + recordName);
+					//int recordID = ((ItemRecord)Item.itemsList[s.itemID]).shiftedIndex;
 
 					// System.out.println("    	record found on jukebox slot " + playOrder[checkedSlot] + " (index " + checkedSlot + ")");
 					// System.out.println("    	playing record: " + recordName + " (" + recordID + ")");
 
 					//-- play the record on the selected slot
-					this.worldObj.playAuxSFXAtEntity((EntityPlayer)null, 1005, this.xCoord, this.yCoord, this.zCoord, recordID);
-
+					CustomRecordHelper.playRecordAt(recordName, this.xCoord, this.yCoord, this.zCoord);
+					if (isCustomRecord) { CustomRecordHelper.showRecordPlayingMessage(recordName); }
+					
 
 					this.currentPlaySlot = checkedSlot;
 					this.currentJukeboxPlaySlot= this.playOrder[checkedSlot];
 
 					this.markAsPlaying();
 
-					
+
+					/*
 					// This will force a getDescriptionPacket / onDataPacket combo to resync client and server
 					this.resync();
+					
+					OBS: as a test, I put this line outside the loop
+					*/
 					
 					break;
 				}
@@ -810,6 +840,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 		}
 
+
+		// This will force a getDescriptionPacket / onDataPacket combo to resync client and server
+		this.resync();
 
 
 	}

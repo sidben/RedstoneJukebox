@@ -3,6 +3,8 @@ package sidben.redstonejukebox.client;
 import java.io.File;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.common.CustomRecordHelper;
+import sidben.redstonejukebox.common.CustomRecordObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Vec3;
 
@@ -24,20 +26,14 @@ public class SoundEventHandler
 	public void onSoundLoad(SoundLoadEvent event)
 	{
 		System.out.println("	SoundEventHandler.onSoundLoad");
+       
+        // Load the custom records to the sound pool
+		//if (CustomRecordHelper.getRecordList() != null
+		for (CustomRecordObject record: CustomRecordHelper.getRecordList())
+		{
+			event.manager.soundPoolStreaming.addSound("redstonejukebox/" + record.songID + ".ogg", new File(record.filePath));
+		}
 
-        Minecraft mc = Minecraft.getMinecraft();
-		System.out.println("		folder: " + mc.mcDataDir + "/mods/RedstoneJukeboxCustomRecords");
-		
-		File test = new File(mc.mcDataDir, "/mods/RedstoneJukeboxCustomRecords/tje-theme.ogg");
-		System.out.println("		test file: " + test.getAbsolutePath());
-		System.out.println("		test file: " + test.getPath());
-		System.out.println("		test file: " + test.exists());
-		
-
-        event.manager.soundPoolStreaming.addSound("redstonejukebox/record01.ogg", new File(mc.mcDataDir, "/mods/RedstoneJukeboxCustomRecords/tje-theme.ogg"));
-        event.manager.soundPoolStreaming.addSound("redstonejukebox/record02.ogg", new File(mc.mcDataDir, "/mods/RedstoneJukeboxCustomRecords/cave-story-theme.ogg"));
-        event.manager.soundPoolStreaming.addSound("redstonejukebox/record03.ogg", new File(mc.mcDataDir, "/mods/RedstoneJukeboxCustomRecords/threshold.ogg"));
-        event.manager.soundPoolStreaming.addSound("redstonejukebox/record04.ogg", new File(mc.mcDataDir, "/mods/RedstoneJukeboxCustomRecords/hammer-bros-bat1.ogg"));
 	}
 
 	

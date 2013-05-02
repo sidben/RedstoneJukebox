@@ -12,6 +12,7 @@ import java.util.Random;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -42,6 +43,7 @@ public class GuiRecordTrading  extends GuiContainer
     private GuiButtonMerchant nextRecipeButtonIndex;
     private GuiButtonMerchant previousRecipeButtonIndex;
     private int currentRecipeIndex = 0;
+    private int storeId = 0;
 
     private MerchantRecipeList recordList;
 
@@ -52,17 +54,21 @@ public class GuiRecordTrading  extends GuiContainer
     {
         super(new ContainerRecordTrading(player, merchant, world));
         this.theIMerchant = merchant;
+        this.storeId =  CustomRecordHelper.getStoreID(((Entity)merchant).entityId);
 
-        System.out.println("	starting random list");
-        recordList = ModRedstoneJukebox.getRandomRecordList();
-        System.out.println("	ending random list");
+System.out.println("	GUI for store #" + storeId);        
         
+//System.out.println("	starting random list");
+        recordList = CustomRecordHelper.getStoreCatalog(this.storeId);
+//System.out.println("	ending random list");
         
-		System.out.println("	GuiRecordTrading");
-		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		System.out.println("		recipe index = " + this.currentRecipeIndex);
-    	System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
 
+/*
+System.out.println("	GuiRecordTrading");
+System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
+System.out.println("		recipe index = " + this.currentRecipeIndex);
+System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
+*/
     }
 
     
@@ -177,6 +183,28 @@ System.out.println("		index to = " + this.currentRecipeIndex);
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
+
+    
+        //MerchantRecipeList var7 = this.theIMerchant.getRecipes(this.mc.thePlayer);
+        MerchantRecipeList var7 = recordList;
+        
+
+        // Draws a X on the locked trades
+        if (var7 != null && !var7.isEmpty())
+        {
+            int var8 = this.currentRecipeIndex;
+            MerchantRecipe var9 = (MerchantRecipe)var7.get(var8);
+
+            if (var9.func_82784_g())
+            {
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/gui/trading.png"));
+                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+                GL11.glDisable(GL11.GL_LIGHTING);
+                this.drawTexturedModalRect(this.guiLeft + 83, this.guiTop + 21, 212, 0, 28, 21);
+                this.drawTexturedModalRect(this.guiLeft + 83, this.guiTop + 51, 212, 0, 28, 21);
+            }
+        }
+    
     }
 
     /**

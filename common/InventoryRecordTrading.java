@@ -208,8 +208,8 @@ System.out.println("		recipe index = " + par1);
 		MerchantRecipe slotRecipe = (MerchantRecipe)offersList.get(this.currentRecipeIndex);
 
 System.out.println("		details: ");
-System.out.println("			max uses: " + slotRecipe.maxTradeUses);
-System.out.println("			uses: " + slotRecipe.toolUses);
+//System.out.println("			max uses: " + slotRecipe.maxTradeUses);
+//System.out.println("			uses: " + slotRecipe.toolUses);
 
 //System.out.println("			func_82784_g: " + slotRecipe.func_82784_g());
 System.out.println("			item buy: " + slotRecipe.getItemToBuy().itemID + " (" + slotRecipe.getItemToBuy().stackSize + "x " + slotRecipe.getItemToBuy().getItemName() + ")");
@@ -306,8 +306,8 @@ System.out.println("		recipe index = " + this.currentRecipeIndex);
 System.out.println("		valid = " + validRecipe);
 //if (var4 != null) System.out.println("		recipe func_82784_g = " + var4.func_82784_g());
 System.out.println("		details: ");
-System.out.println("			max uses: " + slotRecipe.maxTradeUses);
-System.out.println("			uses: " + slotRecipe.toolUses);
+//System.out.println("			max uses: " + slotRecipe.maxTradeUses);
+//System.out.println("			uses: " + slotRecipe.toolUses);
 System.out.println("			item buy: " + slotRecipe.getItemToBuy().itemID + " (" + slotRecipe.getItemToBuy().getItemName() + ")");
 if (slotRecipe.getSecondItemToBuy() != null) { System.out.println("			item buy 2: " + slotRecipe.getSecondItemToBuy().itemID + " (" + slotRecipe.getSecondItemToBuy().getItemName() + ")"); }
 if (slotRecipe.getSecondItemToBuy() == null) { System.out.println("			item buy 2: null"); }

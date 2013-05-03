@@ -116,12 +116,24 @@ public class CustomRecordHelper
 						// check to see if the file exists, otherwise the code will cause a crash or stop all game sounds.
 						if (new File(songFilePath).isFile())
 						{
-							auxRecord = new CustomRecordObject(lineArray[0], Integer.parseInt(lineArray[1]), songFilePath , lineArray[3]);
-							auxRecord.songID = auxRecord.songID.toLowerCase();
-							if (auxRecord.iconIndex < 1) auxRecord.iconIndex = 1;
-							if (auxRecord.iconIndex > 63) auxRecord.iconIndex = 63;
-							recordList.add(auxRecord);
-							recordNames += ";" + lineArray[0];
+							if (!recordNames.contains(lineArray[0]))
+							{
+								lineArray[3] = lineArray[3].trim();
+								if (lineArray[3].equals("")) { 
+									lineArray[3] = "(no name)"; 
+								} 
+								else if (lineArray[3].length() > 64) {
+									lineArray[3] = lineArray[3].substring(0, 63); 
+								}							
+								
+								auxRecord = new CustomRecordObject(lineArray[0], Integer.parseInt(lineArray[1]), songFilePath , lineArray[3]);
+								auxRecord.songID = auxRecord.songID.toLowerCase();
+								if (auxRecord.iconIndex < 1) auxRecord.iconIndex = 1;
+								if (auxRecord.iconIndex > 63) auxRecord.iconIndex = 63;
+								recordList.add(auxRecord);
+								recordNames += ";" + lineArray[0];
+							}
+
 						}
 						else
 						{

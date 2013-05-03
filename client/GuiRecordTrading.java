@@ -100,7 +100,8 @@ System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
      */
     protected void drawGuiContainerForegroundLayer(int par1, int par2)
     {
-        this.fontRenderer.drawString(StatCollector.translateToLocal("entity.Villager.name") + " (secret trade)", 20, 6, 4210752);
+        // this.fontRenderer.drawString(StatCollector.translateToLocal("entity.Villager.name") + " (secret trade)", 20, 6, 4210752);
+    	this.fontRenderer.drawString(StatCollector.translateToLocal("entity.Villager.name"), 56, 6, 4210752);
         this.fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
     }
 
@@ -197,7 +198,7 @@ System.out.println("		index to = " + this.currentRecipeIndex);
 
             if (var9.func_82784_g())
             {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/gui/trading.png"));
+                GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui));
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 GL11.glDisable(GL11.GL_LIGHTING);
                 this.drawTexturedModalRect(this.guiLeft + 83, this.guiTop + 21, 212, 0, 28, 21);

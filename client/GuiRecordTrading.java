@@ -43,9 +43,9 @@ public class GuiRecordTrading  extends GuiContainer
     private GuiButtonMerchant nextRecipeButtonIndex;
     private GuiButtonMerchant previousRecipeButtonIndex;
     private int currentRecipeIndex = 0;
-    private int storeId = 0;
+    private int storeId = 0;										// Every merchant shares access to one of the available stores.
 
-    private MerchantRecipeList recordList;
+    private MerchantRecipeList recordList;							// Record trading uses a special trades list, shared by some merchants
 
     
     
@@ -56,19 +56,9 @@ public class GuiRecordTrading  extends GuiContainer
         this.theIMerchant = merchant;
         this.storeId =  CustomRecordHelper.getStoreID(((Entity)merchant).entityId);
 
-System.out.println("	GUI for store #" + storeId);        
-        
-//System.out.println("	starting random list");
+		//--DEBUG--// 
+        // System.out.println("	GUI for store #" + storeId);        
         recordList = CustomRecordHelper.getStoreCatalog(this.storeId);
-//System.out.println("	ending random list");
-        
-
-/*
-System.out.println("	GuiRecordTrading");
-System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-System.out.println("		recipe index = " + this.currentRecipeIndex);
-System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
-*/
     }
 
     
@@ -84,7 +74,6 @@ System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
         this.controlList.add(this.previousRecipeButtonIndex = new GuiButtonMerchant(2, var1 + 36 - 19, var2 + 24 - 1, false));
         this.nextRecipeButtonIndex.enabled = false;
         this.previousRecipeButtonIndex.enabled = false;
-        
     }
 
     
@@ -100,7 +89,7 @@ System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
      */
     protected void drawGuiContainerForegroundLayer(int par1, int par2)
     {
-        // this.fontRenderer.drawString(StatCollector.translateToLocal("entity.Villager.name") + " (secret trade)", 20, 6, 4210752);
+    	//Shows the name "Villager" and "Inventory"
     	this.fontRenderer.drawString(StatCollector.translateToLocal("entity.Villager.name"), 56, 6, 4210752);
         this.fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
     }
@@ -112,7 +101,6 @@ System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
     public void updateScreen()
     {
         super.updateScreen();
-        //MerchantRecipeList var1 = this.theIMerchant.getRecipes(this.mc.thePlayer);
         MerchantRecipeList var1 = recordList;
 
         if (var1 != null)
@@ -129,26 +117,22 @@ System.out.println("		recipes list (" + (recordList.size()) + " recipes)");
      */
     protected void actionPerformed(GuiButton par1GuiButton)
     {
-System.out.println("	GuiRecordTrading.actionPerformed");
-System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-System.out.println("		index from = " + this.currentRecipeIndex);
-
-		
 		boolean var2 = false;
 
+		// Action = Move to the previous offer
         if (par1GuiButton == this.nextRecipeButtonIndex)
         {
             ++this.currentRecipeIndex;
             var2 = true;
         }
+
+		// Action = Move to the next offer        
         else if (par1GuiButton == this.previousRecipeButtonIndex)
         {
             --this.currentRecipeIndex;
             var2 = true;
         }
 
-
-System.out.println("		index to = " + this.currentRecipeIndex);
 
 		
 		if (var2)
@@ -177,7 +161,6 @@ System.out.println("		index to = " + this.currentRecipeIndex);
      */
     protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
     {
-        //int var4 = this.mc.renderEngine.getTexture("/gui/trading.png");
     	int var4 = this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.renderEngine.bindTexture(var4);
@@ -186,7 +169,6 @@ System.out.println("		index to = " + this.currentRecipeIndex);
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
 
     
-        //MerchantRecipeList var7 = this.theIMerchant.getRecipes(this.mc.thePlayer);
         MerchantRecipeList var7 = recordList;
         
 
@@ -215,7 +197,6 @@ System.out.println("		index to = " + this.currentRecipeIndex);
     {
     	
     	super.drawScreen(par1, par2, par3);
-        //MerchantRecipeList var4 = this.theIMerchant.getRecipes(this.mc.thePlayer);
     	MerchantRecipeList var4 = recordList; 
 
         if (var4 != null && !var4.isEmpty())
@@ -224,17 +205,6 @@ System.out.println("		index to = " + this.currentRecipeIndex);
             int var6 = (this.height - this.ySize) / 2;
             int var7 = this.currentRecipeIndex;
             MerchantRecipe var8 = (MerchantRecipe)var4.get(var7);
-
-            if (var8.func_82784_g())
-            {
-                //GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture("/gui/trading.png"));
-            	GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui));
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                GL11.glDisable(GL11.GL_LIGHTING);
-                this.drawTexturedModalRect(this.guiLeft + 83, this.guiTop + 21, 212, 0, 28, 21);
-                this.drawTexturedModalRect(this.guiLeft + 83, this.guiTop + 51, 212, 0, 28, 21);
-            }
-
             GL11.glPushMatrix();
             ItemStack var9 = var8.getItemToBuy();
             ItemStack var10 = var8.getSecondItemToBuy();
@@ -259,15 +229,15 @@ System.out.println("		index to = " + this.currentRecipeIndex);
             itemRenderer.zLevel = 0.0F;
             GL11.glDisable(GL11.GL_LIGHTING);
 
-            if (this.func_74188_c(36, 24, 16, 16, par1, par2))
+            if (this.isPointInRegion(36, 24, 16, 16, par1, par2))
             {
                 this.drawItemStackTooltip(var9, par1, par2);
             }
-            else if (var10 != null && this.func_74188_c(62, 24, 16, 16, par1, par2))
+            else if (var10 != null && this.isPointInRegion(62, 24, 16, 16, par1, par2))
             {
                 this.drawItemStackTooltip(var10, par1, par2);
             }
-            else if (this.func_74188_c(120, 24, 16, 16, par1, par2))
+            else if (this.isPointInRegion(120, 24, 16, 16, par1, par2))
             {
                 this.drawItemStackTooltip(var11, par1, par2);
             }
@@ -290,33 +260,5 @@ System.out.println("		index to = " + this.currentRecipeIndex);
     }
     
 
-    
-    /**
-     * Called when the screen is unloaded. Used to disable keyboard repeat events
-     */
-    /*
-     * Supposed to add custom particles to the villager...
-     * 
-    public void onGuiClosed()
-    {
-    	super.onGuiClosed();
 
-    	if (this.theIMerchant != null)
-    	{
-	        // Random particles
-    		EntityVillager villager = (EntityVillager) this.theIMerchant;
-	        
-	        for (int c = 0; c < 5; ++c)
-	        {
-	            double var3 = rand.nextGaussian() * 0.02D;
-	            double var5 = rand.nextGaussian() * 0.02D;
-	            double var7 = rand.nextGaussian() * 0.02D;
-	            villager.worldObj.spawnParticle("note", villager.posX + (double)(this.rand.nextFloat() * villager.width * 2.0F) - (double)villager.width, villager.posY + 1.0D + (double)(this.rand.nextFloat() * villager.height), villager.posZ + (double)(this.rand.nextFloat() * villager.width * 2.0F) - (double)villager.width, var3, var5, var7);
-	        }
-    	}
-    }
-    */
-
-    
-    
 }

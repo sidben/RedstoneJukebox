@@ -45,33 +45,8 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
-/*
-Ref (EE3)
- 
-@NetworkMod(channels = { Reference.CHANNEL_NAME }, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
-public class EquivalentExch...
 
-OBS: Channel name <= 16 char
-
-Tut Ref: http://www.minecraftforge.net/wiki/Tutorials/Packet_Handling
-Tut Ref: http://www.minecraftforge.net/wiki/Containers_and_GUIs
-Tut Ref: http://www.minecraftforum.net/topic/1390536-13x-forge-container-based-gui-tutorial/
-*/
-
-//@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = PacketHandler.class)
-/*
-@NetworkMod(clientSideRequired=true, serverSideRequired=false,
-clientPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.client.ClientPacketHandler.class),
-serverPacketHandlerSpec = @SidedPacketHandler(channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.ServerPacketHandler.class))
-http://www.minecraftforum.net/topic/1390536-145forge-container-based-gui-tutorial/
-
-
-OBS 2: Gui working fine, no packets needed yet.
-OBS 3: Packets were needed to send info between client and server on the Gui (GuiButtons)
-*/
-
-
-@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="0.7")
+@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.0")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
 public class ModRedstoneJukebox {
 
@@ -88,7 +63,7 @@ public class ModRedstoneJukebox {
 
 	
 	// Channels
-	public static final String jukeboxChannel = "chRSJukebox";		// OBS: move this to a config class, along with the ModID
+	public static final String jukeboxChannel = "chRSJukebox";		// OBS TODO: move this to a "config" class, along with the ModID
 	
 	
 	// Textures and Models IDs
@@ -121,11 +96,11 @@ public class ModRedstoneJukebox {
 	
 	// Global variable
 	public final static String sourceName = "streaming";	// music discs are called "streaming" 
-	public static Vec3 lastSoundSource;						// holds the position of the last sound source (may be used with redstone noteblocks)
+	public static Vec3 lastSoundSource;						// holds the position of the last sound source (used so only 1 redstone jukebox is active at a time)
 	public final static int maxCustomRecords = 32;			// Limit of custom records accepted
 	public final static int maxCustomRecordIcon = 63;		// Limit of icon IDs for the records. This is stored on the metadata of the item. Start at zero.
 	public final static int maxStores = 16;					// Number of "record stores" available. Each "store" is a random selection of records for trade.
-	public static String customRecordsFolder;
+	public static String customRecordsFolder = "jukebox";  	// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
 	public static int customRecordOffersMin;				// Minimal of custom records a villager can offer
 	public static int customRecordOffersMax;				// Maximum of custom records a villager can offer
 	public static int customRecordPriceMin;					// Minimal value of custom records in emeralds
@@ -158,7 +133,6 @@ public class ModRedstoneJukebox {
         	this.customRecordItemID 		= config.getItem(config.CATEGORY_ITEM, "customRecordItemID", 7201).getInt(7201);
 
         	// Merchant config
-        	this.customRecordsFolder		= "jukebox";  		// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
         	this.customRecordOffersMin		= config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);
         	this.customRecordOffersMax		= config.get(customRecordCategory, "customRecordOffersMax", 4).getInt(4);
         	this.customRecordPriceMin		= config.get(customRecordCategory, "customRecordPriceMin", 5).getInt(5);
@@ -167,6 +141,7 @@ public class ModRedstoneJukebox {
         	// Extra validation on the merchant config (min and max values)
         	if (this.customRecordOffersMin < 1) this.customRecordOffersMin = 1;
         	if (this.customRecordOffersMax < this.customRecordOffersMin) this.customRecordOffersMax = this.customRecordOffersMin;
+        	if (this.customRecordOffersMax > 8) this.customRecordOffersMax = 8;
         	if (this.customRecordOffersMin < 1) this.customRecordPriceMin = 1;
         	if (this.customRecordPriceMax < this.customRecordPriceMin) this.customRecordPriceMax = this.customRecordPriceMin;
         	
@@ -185,24 +160,22 @@ public class ModRedstoneJukebox {
         	helpComment				+= "For each custom record, add a line below like this:" + br;
         	helpComment				+= br;
         	helpComment				+= "S:record###=ICON_ID;SONG_FILE;SONG_NAME" + br;
-        	helpComment				+= "    ###       = A number between 000 and 099. Do not repeat numbers. The numbers don't need to be in order." + br;
+        	helpComment				+= "    ###       = A number between 000 and 0" + (maxCustomRecords - 1) + ". Do not repeat numbers. The numbers don't need to be in order." + br;
         	helpComment				+= "    ICON_ID   = The icon of the this record. Must be a number between 1 and 63." + br;
         	helpComment				+= "    SONG_FILE = The name of the song file that should be on the 'mods/jukebox' folder. Only OGG files are accepted." + br;
-        	helpComment				+= "    SONG_NAME = The title of the song. Plain text, avoid using unicode characters.";
-
+        	helpComment				+= "    SONG_NAME = The title of the song. Plain text, avoid using unicode characters. Max of 64 characters.";
+        	helpComment				+= br;
+        	helpComment				+= "Extra notes:" + br;
+        	helpComment				+= "  - if the game can't find the song file, the record won't be added;" + br;
+        	helpComment				+= "  - if the config line is incorrect, the record won't be added;" + br;
+        	
         	config.addCustomCategoryComment(customRecordCategory, helpComment);
 
-
-        	
-        	      	
-
-
-System.out.println("Loading RedstoneJukebox config");
-System.out.println("	Idle: " + this.redstoneJukeboxIdleID);
-System.out.println("	Active: " + this.redstoneJukeboxActiveID);
-System.out.println("	Blank: " + this.blankRecordItemID);
-System.out.println("	Custom: " + this.customRecordItemID);
-System.out.println("	Record List size: " + CustomRecordHelper.getRecordList().size());
+			//--DEBUG--// 
+			/*
+			System.out.println("Loading RedstoneJukebox config:");
+			System.out.println("	Record List size: " + CustomRecordHelper.getRecordList().size());
+			*/
 
         } 
         catch (Exception e) 
@@ -263,6 +236,7 @@ System.out.println("	Record List size: " + CustomRecordHelper.getRecordList().si
 		ItemStack jukeboxStack = new ItemStack(Block.jukebox);
 				
 		
+		// Recipe: Blank record
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack1, flintStack, redstoneStack);
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack2, flintStack, redstoneStack);
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack3, flintStack, redstoneStack);
@@ -280,6 +254,8 @@ System.out.println("	Record List size: " + CustomRecordHelper.getRecordList().si
 		{
 			GameRegistry.addShapelessRecipe(recordStack0, new ItemStack(customRecord, 1, varCont), flintStack, redstoneStack);
 	    }
+
+		// Recipe: Redstone Jukebox
 		GameRegistry.addRecipe(new ItemStack(redstoneJukebox), "ggg", "tjt", "www", 'g', glassStack, 't', redstoneTorchStack, 'j', jukeboxStack, 'w', woodStack);
 		
 		

@@ -45,6 +45,7 @@ public class CommandPlayRecord  extends CommandBase
     public void processCommand(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
     {
 		boolean sucess;
+		boolean showName = false;
     	
     	if (par2ArrayOfStr.length < 1)
         {
@@ -52,19 +53,15 @@ public class CommandPlayRecord  extends CommandBase
         }
         else
         {
-			sucess = CustomRecordHelper.playRecord(par2ArrayOfStr[0].toLowerCase());
-			if (sucess)
+			// Show playing message, if needed 
+			if (par2ArrayOfStr.length >= 2)
 			{
-				// Show playing message, if needed 
-				if (par2ArrayOfStr.length >= 2)
-				{
-					if (par2ArrayOfStr[1].equals("showname"))
-					{
-						CustomRecordHelper.showRecordPlayingMessage(par2ArrayOfStr[0].toLowerCase());
-					}
-				}
+				if (par2ArrayOfStr[1].equals("showname")) { showName = true; }
 			}
-			else
+
+			// Play the song
+			sucess = CustomRecordHelper.playRecord(par2ArrayOfStr[0].toLowerCase(), showName);
+			if (!sucess)
 			{
 				// error message
 				throw new CommandException("Record not found", new Object[0]);

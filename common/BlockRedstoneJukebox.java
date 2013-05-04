@@ -176,12 +176,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void onBlockAdded(World par1World, int x, int y, int z)
     {
-		System.out.println("    RedstoneJukebox.onBlockAdded");
-		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-
-		
 		super.onBlockAdded(par1World, x, y, z);
-        //par1World.markBlockForUpdate(x, y, z);
 	}
 
 
@@ -196,14 +191,13 @@ public class BlockRedstoneJukebox extends BlockContainer {
         if (tileEntity == null || player.isSneaking()) { return false; }
 
         
-        //System.out.println("	BlockRedstoneJukebox.onBlockActivated");
     	player.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, world, x, y, z);
     	return true;
     }
 
     
     /**
-     * ejects contained items into the world, and notifies neighbours of an update, as appropriate
+     * ejects contained items into the world, and notifies neighbors of an update, as appropriate
      */
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6)
     {
@@ -214,7 +208,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
             if (teJukebox != null)
             {
-				// teJukebox.stopPlaying();		<--- This call may cause the block to be replaced again after broke, it calls the "updateJukeboxBlockState"
             	teJukebox.ejectAllAndStopPlaying(par1World, x, y, z);
             }
 		}
@@ -229,13 +222,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void onNeighborBlockChange(World par1World, int x, int y, int z, int blockID)
     {
-		/*
-		System.out.println("    RedstoneJukebox.onNeighborBlockChange");
-		System.out.println("    	isRemote = " + par1World.isRemote);
-		System.out.println("    	par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5) = " + par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5));;
-		*/
-
-
 
         if (!par1World.isRemote)
         {
@@ -244,14 +230,10 @@ public class BlockRedstoneJukebox extends BlockContainer {
             if (!par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5))
             {
                 stopPlaying(par1World, x, y, z);
-                // don't think this is needed
-                //par1World.scheduleBlockUpdate(x, y, z, this.blockID, this.tickRate());
             }
             else if (par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5))
             {
                 startPlaying(par1World, x, y, z);
-                // don't think this is needed
-                //par1World.scheduleBlockUpdate(x, y, z, this.blockID, this.tickRate());
             }
         }
 
@@ -271,10 +253,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z)
     {
-		System.out.println("	updateJukeboxBlockState");
-		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-
-		
 		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
         keepMyInventory = true;
 
@@ -384,17 +362,11 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
     /**
      * Returns true if the block is emitting indirect/weak redstone power on the specified side. If isBlockNormalCube
-     * returns true, standard redstone propagation rules will apply instead and this will not be called. Args: World, X,
-     * Y, Z, side
+     * returns true, standard redstone propagation rules will apply instead and this will not be called. 
+     * Args: World, X, Y, Z, side
      */
     public boolean isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side)
     {
-		/*
-		System.out.println("");
-		System.out.println("    RedstoneJukebox.isProvidingWeakPower(world, " + x + ", " + y + ", " + z + ", " + side + ")");
-		System.out.println("		active = " + this.isActive);
-		*/
-
 		if (side == 0 || side == 1)
 		{
 			return false;
@@ -406,19 +378,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
     }
 
     /**
-     * Returns true if the block is emitting direct/strong redstone power on the specified side. Args: World, X, Y, Z,
-     * side
+     * Returns true if the block is emitting direct/strong redstone power on the specified side. 
+     * Args: World, X, Y, Z, side
      */
     public boolean isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
     {
-		/*
-		System.out.println("");
-		System.out.println("    RedstoneJukebox.isProvidingStrongPower(world, " + x + ", " + y + ", " + z + ", " + side + ")");
-		System.out.println("		active = " + this.isActive);
-		*/
-
 		return false;
-
     }
 
 
@@ -436,10 +401,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	//-- Stop playing this jukebox
     private void stopPlaying(World world, int x, int y, int z)
     {
-		/*
-		System.out.println("    RedstoneJukebox.stopPlaying(world, " + x + ", " + y + ", " + z + ")");
-		*/
-
         if (!world.isRemote)
         {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
@@ -454,11 +415,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	//-- Start playing this jukebox
     private void startPlaying(World world, int x, int y, int z)
     {
-		/*
-		System.out.println("    RedstoneJukebox.startPlaying(world, " + x + ", " + y + ", " + z + ")");
-		*/
-
-
         if (!world.isRemote)
         {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
@@ -466,10 +422,8 @@ public class BlockRedstoneJukebox extends BlockContainer {
             {
 				teJukebox.startPlaying();
 			}
-
-
 		}
-
 	}
+
     
 }

@@ -45,6 +45,7 @@ public class CommandPlayRecordAt  extends CommandBase
     public void processCommand(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
     {
 		boolean sucess = false;
+		boolean showName = false; 
 		
     	
     	if (par2ArrayOfStr.length < 4)
@@ -53,32 +54,15 @@ public class CommandPlayRecordAt  extends CommandBase
         }
         else
         {
-			//sucess = CustomRecordHelper.playBgMusic(par2ArrayOfStr[0].toLowerCase());
-        	if (par2ArrayOfStr[0].toLowerCase().equals("changeto")) {
-
-System.out.println("	change position ");
-
-        		Minecraft mc = Minecraft.getMinecraft();
-        		mc.sndManager.sndSystem.setPosition("streaming", parseInt(par1ICommandSender, par2ArrayOfStr[1]), parseInt(par1ICommandSender, par2ArrayOfStr[2]), parseInt(par1ICommandSender, par2ArrayOfStr[3]));
-
-        	} else {
-            	sucess = CustomRecordHelper.playRecordAt(par2ArrayOfStr[0].toLowerCase(), parseInt(par1ICommandSender, par2ArrayOfStr[1]), parseInt(par1ICommandSender, par2ArrayOfStr[2]), parseInt(par1ICommandSender, par2ArrayOfStr[3]));
-        		
-        	}
-        		
-        		
-			if (sucess)
+			// Show playing message, if needed 
+			if (par2ArrayOfStr.length >= 2)
 			{
-				// Show playing message, if needed 
-				if (par2ArrayOfStr.length >= 5)
-				{
-					if (par2ArrayOfStr[4].equals("showname"))
-					{
-						CustomRecordHelper.showRecordPlayingMessage(par2ArrayOfStr[0].toLowerCase());
-					}
-				}
+				if (par2ArrayOfStr[1].equals("showname")) { showName = true; }
 			}
-			else
+
+			// Play the song
+           	sucess = CustomRecordHelper.playRecordAt(par2ArrayOfStr[0].toLowerCase(), parseInt(par1ICommandSender, par2ArrayOfStr[1]), parseInt(par1ICommandSender, par2ArrayOfStr[2]), parseInt(par1ICommandSender, par2ArrayOfStr[3]), showName);
+			if (!sucess)
 			{
 				// error message
 				throw new CommandException("Record not found", new Object[0]);

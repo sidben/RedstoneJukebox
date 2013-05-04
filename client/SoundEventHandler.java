@@ -25,50 +25,28 @@ public class SoundEventHandler
 	@ForgeSubscribe
 	public void onSoundLoad(SoundLoadEvent event)
 	{
-		System.out.println("	SoundEventHandler.onSoundLoad");
-       
         // Load the custom records to the sound pool
-		//if (CustomRecordHelper.getRecordList() != null
 		for (CustomRecordObject record: CustomRecordHelper.getRecordList())
 		{
+			// custom records are added under "redstonejukebox", so it won't mix with vanilla
 			event.manager.soundPoolStreaming.addSound("redstonejukebox/" + record.songID + ".ogg", new File(record.filePath));
 		}
 
 	}
 
-	
-	
-	//-- Called when the SoundManager tried to play streaming files. As of vanilla minecraft it's only use for the jukebox.
-	@SideOnly(Side.CLIENT)
-	@ForgeSubscribe
-	public void onPlayStreamingEvent(PlayStreamingEvent event)
-	{
-		System.out.println("	SoundEventHandler.PlayStreamingEvent(manager, source, " + event.name + ", " + event.x +  ", " + event.y +  ", " + event.z + ")");
-		// OBS: in this case, NAME is the record name
-				
-	}
-	
+
 	
 	//-- Is called right before streaming sound type is being played.
 	@SideOnly(Side.CLIENT)
 	@ForgeSubscribe
-	// public void PlayStreamingSourceEvent(SoundManager manager, String name, float x, float y, float z)
 	public void onPlayStreamingSourceEvent(PlayStreamingSourceEvent event)
 	{
-
-		System.out.println("	SoundEventHandler.PlayStreamingSourceEvent(manager, " + event.name + ", " + event.x +  ", " + event.y +  ", " + event.z + ")");
-		// OBS: in this case, NAME is the source type. Here should be "streaming".
-		
-		// Updates the position of the last streaming source. The if is not really nedded, but this may change in the future.
+		// Updates the position of the last streaming source. The if is not really needed, but this may change in the future.
 		if (event.name == ModRedstoneJukebox.sourceName)
 		{
 			ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)event.x, (double)event.y, (double)event.z);
-			
-			System.out.println("	SoundEventHandler - updating sound source: " + event.x +  ", " + event.y +  ", " + event.z);
 		}
-		
-	        
 	}
 	
-
+	
 }

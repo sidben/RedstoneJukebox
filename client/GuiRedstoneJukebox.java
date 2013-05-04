@@ -22,6 +22,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
     private TileEntityRedstoneJukebox jukeboxInventory;
 
+    // Aux for the dancing blue note that indicates the current record playing
 	private static int danceNoteSpeed = 2;
 	private static int[] danceNoteArrayX = { 0,  1,  2,  1,  0, -1, -2, -1};
 	private static int[] danceNoteArrayY = { 0,  0,  1,  0,  0,  0,  1,  0};
@@ -35,13 +36,6 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super(new ContainerRedstoneJukebox(inventory, teJukebox));
 		jukeboxInventory = teJukebox;
-
-
-		//System.out.println("	GuiRedstoneJukebox");
-		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		//System.out.println("		isloop = " + this.jukeboxInventory.isLoop);
-		//System.out.println("		playmode = " + this.jukeboxInventory.playMode);
-
     }
 
 
@@ -54,10 +48,6 @@ public class GuiRedstoneJukebox extends GuiContainer
     public void initGui()
     {
         super.initGui();
-
-        //int startX = (this.width - this.xSize) / 2;		<-- no need, use guiLeft
-        //int startY = (this.height - this.ySize) / 2;		<-- no need, use guiTop
-
 
         this.controlList.add(new GuiRedstoneJukeboxButtonLoop(0, this.guiLeft + 7,  this.guiTop + 41));
         this.controlList.add(new GuiRedstoneJukeboxButtonLoop(1, this.guiLeft + 32, this.guiTop + 41));
@@ -77,7 +67,6 @@ public class GuiRedstoneJukebox extends GuiContainer
 		++danceNoteCount;
 		if (danceNoteCount > danceNoteSpeed) { ++danceNoteFrame; danceNoteCount = 0; }
 		if (danceNoteFrame >= danceNoteArrayX.length) { danceNoteFrame = 0; }
-
     }
 
 
@@ -86,13 +75,6 @@ public class GuiRedstoneJukebox extends GuiContainer
      */
     protected void actionPerformed(GuiButton par1GuiButton)
     {
-		/*
-		System.out.println("");
-		System.out.println("    GuiRedstoneJukebox.Action");
-		System.out.println("    	buttonID = " + par1GuiButton.id);
-		*/
-
-
         if (par1GuiButton.enabled)
         {
 
@@ -126,16 +108,9 @@ public class GuiRedstoneJukebox extends GuiContainer
 			}
 			
 			
-			//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-			//System.out.println("		te.isloop (pre)" + this.jukeboxInventory.isLoop);
-			//System.out.println("		te.mode (pre)" + this.jukeboxInventory.playMode);
-
-			
-			
 			// Packet code here
 			// Without this, it works for the client changing buttons, but the server doesn't save and when the world
 			// reloads, the buttons go back to default. Inventory works fine without it.
-     
             ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
             DataOutputStream outputStream = new DataOutputStream(bos);
             try 
@@ -147,7 +122,6 @@ public class GuiRedstoneJukebox extends GuiContainer
             	ex.printStackTrace();
             }
             
-            //this.mc.getSendQueue().addToSendQueue(new Packet250CustomPayload(var2, var3.toByteArray()));
 			Packet250CustomPayload packet = new Packet250CustomPayload();
 			packet.channel = ModRedstoneJukebox.jukeboxChannel;
 			packet.data = bos.toByteArray();
@@ -225,22 +199,10 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
 
-        // OBS: this class does not access the right TileEntity, the isPlaying is always false. I'll search for a more elegant way
-
-/*
-System.out.println("  dancing note - isPlaying() = " + this.jukeboxInventory.isPlaying());
-System.out.println("  dancing note - slot = " + this.jukeboxInventory.getCurrentJukeboxPlaySlot());
-System.out.println("  dancing note - playmode = " + this.jukeboxInventory.playMode);
-System.out.println("  ");
-*/
-		
 		
 		//-- current record indicator (blue note)
         if (this.jukeboxInventory.isPlaying())
         {
-
-        	
-
 
 			switch (this.jukeboxInventory.getCurrentJukeboxPlaySlot())
 			{
@@ -302,8 +264,6 @@ System.out.println("  ");
 		}
 
         itemRenderer.zLevel = 0.0F;
-
-
 
     }
 

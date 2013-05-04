@@ -231,10 +231,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public void readFromNBT(NBTTagCompound par1NBTTagCompound)
     {
-		//System.out.println("	TileEntityRedstoneJukebox.readNBT");
-		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-
-		
         super.readFromNBT(par1NBTTagCompound);
         NBTTagList nbttaglist = par1NBTTagCompound.getTagList("Items");
         jukeboxPlaylist = new ItemStack[getSizeInventory()];
@@ -254,9 +250,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         isLoop = par1NBTTagCompound.getBoolean("Loop");
         isPlaying = par1NBTTagCompound.getBoolean("Playing");
         
-        //System.out.println("		isplaying = " + this.isPlaying);
-		//System.out.println("		isloop = " + this.isLoop);
-		//System.out.println("		playmode = " + this.playMode);
     }
 
     /**
@@ -265,13 +258,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public void writeToNBT(NBTTagCompound par1NBTTagCompound)
     {
-		//System.out.println("	TileEntityRedstoneJukebox.WriteNBT");
-		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		//System.out.println("		isloop = " + this.isLoop);
-		//System.out.println("		playmode = " + this.playMode);
-		//System.out.println("		isplaying = " + this.isPlaying);
-
-		
 		super.writeToNBT(par1NBTTagCompound);
         par1NBTTagCompound.setShort("PlayMode", (short)playMode);
         par1NBTTagCompound.setBoolean("Loop", (boolean)isLoop);
@@ -295,8 +281,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     public void resync()
     {
-		//System.out.println("	TileEntityRedstoneJukebox.resync");
-
 		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
     }
     
@@ -312,17 +296,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     public void onDataPacket(INetworkManager net, Packet132TileEntityData packet)
     {
-		//System.out.println("	TileEntityRedstoneJukebox.onDataPacket");
-		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		//System.out.println("		isloop = " + this.isLoop);
-		//System.out.println("		playmode = " + this.playMode);
-		//System.out.println("		isplaying = " + this.isPlaying);
-		
-		//System.out.println("		pkt action = " + packet.actionType);
-		//System.out.println("		pkt x = " + packet.xPosition);
-		//System.out.println("		pkt y = " + packet.yPosition);
-		//System.out.println("		pkt z = " + packet.zPosition);
-		
+	
 		// Read NBT packet from the server
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
 		{
@@ -334,12 +308,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	        
 	        // Extra info
 	        currentJukeboxPlaySlot = tag.getShort("JukeboxPlaySlot");
-	
-			//System.out.println("		loop = " + tag.getBoolean("Loop"));
-			//System.out.println("		playmode = " + tag.getShort("PlayMode"));
-			//System.out.println("		playing = " + tag.getBoolean("Playing"));
-			//System.out.println("		slot = " + this.getCurrentPlaySlot());
-			//System.out.println("		juke slot = " + this.getCurrentJukeboxPlaySlot());
 		}
 		
 
@@ -351,23 +319,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     public Packet getDescriptionPacket()
     {
-		//System.out.println("	TileEntityRedstoneJukebox.getDescriptionPacket");
-		//System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		//System.out.println("		isloop = " + this.isLoop);
-		//System.out.println("		playmode = " + this.playMode);
-		//System.out.println("		isplaying = " + this.isPlaying);
-		//System.out.println("		slot = " + this.getCurrentPlaySlot());
-		//System.out.println("		juke slot = " + this.getCurrentJukeboxPlaySlot());
-		
-
-		
 		// Send the NBT Packet to client
 		NBTTagCompound tag = new NBTTagCompound();
         this.writeToNBT(tag);
         
         // Extra info (used in GUI)
         tag.setShort("JukeboxPlaySlot", (short)this.getCurrentJukeboxPlaySlot());
-        //tag.setBoolean("Playing", (boolean)isPlaying);		tried to add this here, so the GUI knows when it starts playing. didn't work
         
         return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 1, tag);
     }
@@ -386,13 +343,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public void updateEntity()
     {
-		/*
-		System.out.println("");
-		System.out.println("    	TileEntityRedstoneJukebox.updateEntity (not remote)");
-		System.out.println("    		this.isPlaying = " + this.isPlaying);
-		*/
-
-    	
         super.updateEntity();
 
 		if (!this.worldObj.isRemote)
@@ -441,15 +391,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	// Returns the slot currently playing (of the jukebox).
 	public int getCurrentJukeboxPlaySlot()
 	{
-		/*
-		if (this.getCurrentPlaySlot() > -1) {
-			return this.playOrder[this.getCurrentPlaySlot()];
-		} else {
-			return -1;
-		}
-		*/
-		// the code above does not work on Server/Client, because the list was ordered in the server. Private var added.  
-		
 		return currentJukeboxPlaySlot;
 	}
 
@@ -470,20 +411,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     public void stopPlaying()
     {
-		// System.out.println("    	TileEntityRedstoneJukebox.stopPlaying");
-		// System.out.println("    		" + this.worldObj);
-		// System.out.println("    		" + this.xCoord);
-		// System.out.println("    		" + this.yCoord);
-		// System.out.println("    		" + this.zCoord);
-		// System.out.println("    		" + this.isPlaying);
-
 		if (this.isPlaying) {
 			// Stop all records
 			this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
 			this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
 		}
 		this.markAsStopped();
-
 	}
 
     
@@ -523,8 +456,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 					if (item.hasTagCompound())
 					{
-						//var14.item.setTagCompound((NBTTagCompound)item.getTagCompound().copy());
-						var14.func_92014_d().setTagCompound((NBTTagCompound)item.getTagCompound().copy());
+						var14.getEntityItem().setTagCompound((NBTTagCompound)item.getTagCompound().copy());
 					}
 
 					float var15 = 0.05F;
@@ -554,8 +486,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 	private void markAsStopped()
 	{
-		// System.out.println("    	TileEntityRedstoneJukebox.markAsStopped");
-
 		this.isPlaying = false;
         this.currentPlaySlot = -1;
     	this.nextPlaySlot = -1;
@@ -573,13 +503,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//   is this Jukebox. If not, update everything.
 	private void checkIfStillPlaying()
 	{
-//		System.out.println(" ");
-//		System.out.println("    TileEntityRedstoneJukebox.checkIfStillPlaying");
-//		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-
-		
-		
-
 		this.delay = this.maxDelay;
         
 
@@ -591,20 +514,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			{
 				if (!this.playlistInitialized)
 				{
-					//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - World load, reseting list");
 					this.setPlaylistOrder();
 				}
 
-				//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - Playing next");
 				this.playNextRecord();
 			}
 			else
 			{
 
-				//-- check if the source is this jukebox (PS: I'm pretty sure there is some easier way to do this... 
+				//-- check if the source is this jukebox (PS: I'm pretty sure there is some easier way to do this...
 				if (ModRedstoneJukebox.lastSoundSource.xCoord != this.xCoord || ModRedstoneJukebox.lastSoundSource.yCoord != this.yCoord || ModRedstoneJukebox.lastSoundSource.zCoord != this.zCoord)
 				{
-					//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - no longer the source");
 					this.markAsStopped();
 				}
 				else
@@ -612,7 +532,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					//-- check if there is a record on the current slot
 					if (this.getCurrentJukeboxPlaySlot() < 0)
 					{
-						//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - current playslot not set");
 						this.markAsStopped();
 					}
 					else
@@ -620,7 +539,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 						ItemStack r = this.getStackInSlot(this.getCurrentJukeboxPlaySlot());
 						if (r == null || !(Item.itemsList[r.itemID] instanceof ItemRecord))
 						{
-							//System.out.println("    	TileEntityRedstoneJukebox.checkIfStillPlaying - empty slot, playing next");
 							this.playNextRecord();
 						}
 					}
@@ -646,6 +564,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	private void setPlaylistOrder()
 	{
 		int totalRecords = 0;
+		boolean validRecord = false;
 		playlistInitialized = true;
 
 
@@ -666,17 +585,22 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			ItemStack s = this.getStackInSlot(i);
 			if (s != null && (Item.itemsList[s.itemID] instanceof ItemRecord))
 			{
-				//playOrder[totalRecords] = i;
-				++totalRecords;
+				validRecord = true;
+				
+				// Only counts valid records, custom records with no song are ignored
+				if (Item.itemsList[s.itemID] instanceof ItemCustomRecord)
+				{
+					if (((ItemCustomRecord)Item.itemsList[s.itemID]).getSongID(s).equals("")) { validRecord = false; }
+				}
+				if (validRecord) { ++totalRecords; }
 			}
 
 		}
 
+				
 		// shuffle if needed
 		if (this.playMode == 1 && totalRecords > 1)
 		{
-			//for (int i=0; i < totalRecords; i++) {		// <-- only shuffle the slots with records. I decided to change it, so new records added after the jukebox starts playing can be used
-			//	int randomPosition = random.nextInt(totalRecords);
 			for (int i=0; i < playOrder.length; i++) {
 				int randomPosition = random.nextInt(playOrder.length);
 				int temp = playOrder[i];
@@ -692,12 +616,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 		}
 
 
-		// Debug
-		// System.out.println("	playListOrder for (" + this.xCoord + ", " + this.yCoord + ", "  + this.zCoord + ")");
-		// for (int i=0; i < playOrder.length; i++) {
-		// System.out.println("		# " + i + " = [" + playOrder[i] + "]");
-		// }
-
 	}
 
 
@@ -706,21 +624,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	private void playNextRecord()
 	{
 		int checkedSlot;
-		boolean isCustomRecord = false;
+		boolean playSuccess = false;
 
 
 		while (this.nextPlaySlot > -1) {
 
 			// another check, just to be sure...
 			if (this.nextPlaySlot < 0) { break; }
-
-
-			// Debug
-			// if (this.nextPlaySlot < playOrder.length) {
-			// System.out.println("    	checking slot " + playOrder[this.nextPlaySlot] + " (index " + this.nextPlaySlot + ")");
-			// } else {
-			// System.out.println("    	checking slot INVALID (index " + this.nextPlaySlot + ")");
-			// }
 
 
 			checkedSlot = this.nextPlaySlot;
@@ -730,16 +640,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			// check if it's at the end of the playlist (again, because of the ++ above)
 			if (checkedSlot >= playOrder.length)
 			{
-				//System.out.println("    	limit reached (loop = " + this.isLoop);
 				checkedSlot = -1;
 				boolean mustLoop = false;
 
 				// check for loop
-				if (this.isLoop)
-				{
-					mustLoop = true;
-				}
-
+				if (this.isLoop) { mustLoop = true; }
 
 				if (mustLoop)
 				{
@@ -747,14 +652,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					this.setPlaylistOrder();
 					checkedSlot = this.nextPlaySlot;
 					++this.nextPlaySlot;
-
 				}
 				else
 				{
 					this.stopPlaying();			// This stop playing, not just mark as stopped, because someone may remove the last record, causing a playNext
-
-System.out.println("	Stop playing 1 (" + isPlaying() + ")");
-					
 					break;
 				}
 			}
@@ -764,9 +665,6 @@ System.out.println("	Stop playing 1 (" + isPlaying() + ")");
 			// another check, because of loop
 			if (checkedSlot < 0) {
 				this.stopPlaying();			// This stop playing, not just mark as stopped, because someone may remove the last record, causing a playNext
-
-System.out.println("	Stop playing 2 (" + isPlaying() + ")");
-
 				break;
 			}
 
@@ -776,20 +674,19 @@ System.out.println("	Stop playing 2 (" + isPlaying() + ")");
 			// check only if it's a valid index
 			if (playOrder[checkedSlot] != -1)
 			{
-
 				//check the slot for a record. If don't find, advance on the play list
 				ItemStack s = this.getStackInSlot(playOrder[checkedSlot]);
 				if (s != null && (Item.itemsList[s.itemID] instanceof ItemRecord))
 				{
-					String recordName = ((ItemRecord)Item.itemsList[s.itemID]).recordName;
-					if (!CustomRecordHelper.isVanillaRecord(recordName));
+					
+					// gets the song name
+					String recordName = "(no name)";
+					if (Item.itemsList[s.itemID] instanceof ItemCustomRecord)
 					{
-System.out.println("	TE.RecordName not Vanilla (" + recordName + ")");
-						// Not a vanilla record. Custom records stores the real songID on metaTags.
+						// Custom records stores the real songID on metaTags.
 						try 
 						{
 							recordName = ((ItemCustomRecord)Item.itemsList[s.itemID]).getSongID(s);
-							isCustomRecord = true;
 						} 
 						catch (java.lang.ClassCastException ex) 
 						{
@@ -797,44 +694,45 @@ System.out.println("	TE.RecordName not Vanilla (" + recordName + ")");
 							System.out.println("RedstoneJukebox - error getting record title [" + recordName + "]");
 						}
 					}
-
-System.out.println("	TE.RecordName = " + recordName);
-					//int recordID = ((ItemRecord)Item.itemsList[s.itemID]).shiftedIndex;
-
-					// System.out.println("    	record found on jukebox slot " + playOrder[checkedSlot] + " (index " + checkedSlot + ")");
-					// System.out.println("    	playing record: " + recordName + " (" + recordID + ")");
-
-					//-- play the record on the selected slot
-					CustomRecordHelper.playRecordAt(recordName, this.xCoord, this.yCoord, this.zCoord);
-					if (isCustomRecord) { CustomRecordHelper.showRecordPlayingMessage(recordName); }
+					else
+					{
+						// Vanilla records
+						recordName = ((ItemRecord)Item.itemsList[s.itemID]).recordName;
+					}
+						
+					
+					//-- Try to play the record on the selected slot
+					playSuccess = CustomRecordHelper.playRecordAt(recordName, this.xCoord, this.yCoord, this.zCoord, true);
 					
 
-					this.currentPlaySlot = checkedSlot;
-					this.currentJukeboxPlaySlot= this.playOrder[checkedSlot];
+					// Only updates if the play command was successful
+					if (playSuccess) 
+					{
+						this.currentPlaySlot = checkedSlot;
+						this.currentJukeboxPlaySlot= this.playOrder[checkedSlot];
+	
+						this.markAsPlaying();
 
-					this.markAsPlaying();
+						/*
+						// This will force a getDescriptionPacket / onDataPacket combo to resync client and server
+						this.resync();
+						
+						OBS: as a test, I put this line outside the loop
+						*/
 
-
-					/*
-					// This will force a getDescriptionPacket / onDataPacket combo to resync client and server
-					this.resync();
+						break;
+					}
 					
-					OBS: as a test, I put this line outside the loop
-					*/
-					
-					break;
 				}
 				else
 				{
-					//System.out.println("    	no record found, moving next");
-
+					// System.out.println("    	no record found, moving next");
 				}
 
 			}
 			else
 			{
-				//System.out.println("    	no index found, moving next");
-
+				// System.out.println("    	no index found, moving next");
 			}
 
 

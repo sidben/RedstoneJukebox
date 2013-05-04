@@ -1,5 +1,8 @@
 package sidben.redstonejukebox.common;
 
+/*
+ * Helper class for the custom records config load.
+ */
 public class CustomRecordObject 
 {
 	

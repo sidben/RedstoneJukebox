@@ -21,15 +21,6 @@ public class PacketHandler implements IPacketHandler
 
 	@Override
 	public void onPacketData(INetworkManager manager, Packet250CustomPayload payload, Player player){
-		System.out.println("	PacketHandler.onPacketData");
-		System.out.println("		id = " + payload.getPacketId());
-		System.out.println("		channel = " + payload.channel);
-		System.out.println("		player in juke? " + (((EntityPlayer)player).openContainer instanceof ContainerRedstoneJukebox));
-		System.out.println("		player in trade? " + (((EntityPlayer)player).openContainer instanceof ContainerRecordTrading));
-		System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-		
-
-		
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
 		
 		if (payload.channel == ModRedstoneJukebox.jukeboxChannel)
@@ -37,8 +28,6 @@ public class PacketHandler implements IPacketHandler
 			if (side == Side.SERVER)
 			{
 				// Action on some GUI
-				System.out.println("	Jukebox Server Action");
-				
                 try
                 {
 					DataInputStream data = new DataInputStream(new ByteArrayInputStream(payload.data));
@@ -50,8 +39,6 @@ public class PacketHandler implements IPacketHandler
 						ContainerRedstoneJukebox myJuke = (ContainerRedstoneJukebox)sender.openContainer;
 						TileEntityRedstoneJukebox teJukebox = myJuke.GetTileEntity(); 
 		
-						System.out.println("		te.isloop (pre)" + teJukebox.isLoop);
-						System.out.println("		te.mode (pre)" + teJukebox.playMode);
 						
 						boolean isLoop = data.readBoolean();
 						int playMode = data.readInt();
@@ -62,10 +49,6 @@ public class PacketHandler implements IPacketHandler
 	
 						// Sync Server and Client TileEntities (markBlockForUpdate method)
 						teJukebox.resync();
-						
-						System.out.println("		te.isloop (pos)" + teJukebox.isLoop);
-						System.out.println("		te.mode (pos)" + teJukebox.playMode);
-
 					}
 
 					// Record Trading GUI Packet
@@ -75,9 +58,6 @@ public class PacketHandler implements IPacketHandler
 
 						ContainerRecordTrading myTrade = (ContainerRecordTrading)sender.openContainer;
 						myTrade.setCurrentRecipeIndex(currentRecipe);
-						
-						System.out.println("		Trade recipe index: " + currentRecipe);
-
 					}
 
 				}

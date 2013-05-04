@@ -24,7 +24,7 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 
 		// top render (disc)
-		renderblocks.setRenderMinMax(0.0D, 0.0D, 0.0D, 1.0D, 0.749D, 1.0D);
+		renderblocks.setRenderBounds(0.0D, 0.0D, 0.0D, 1.0D, 0.749D, 1.0D);
 
 
 		GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
@@ -39,7 +39,7 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 
 		// Regular block render (6 sides)
-		renderblocks.setRenderMinMax(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+		renderblocks.setRenderBounds(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
 
 
 		GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
@@ -78,7 +78,7 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 
 
-		renderblocks.setRenderMinMax(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+		renderblocks.setRenderBounds(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
 		renderblocks.clearOverrideBlockTexture();
 		
 	}

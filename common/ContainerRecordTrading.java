@@ -16,14 +16,13 @@ import net.minecraft.world.*;
 
 
 
-//-- Based on ContainerMerchant (maybe won't be needed)
+//-- Based on ContainerMerchant 
 public class ContainerRecordTrading extends Container 
 {
 
 	
     /** Instance of Merchant. */
     private IMerchant theMerchant;
-    //  private InventoryMerchant merchantInventory;
     private InventoryRecordTrading merchantInventory;
 
     /** Instance of World. */
@@ -31,16 +30,11 @@ public class ContainerRecordTrading extends Container
 
     public ContainerRecordTrading(InventoryPlayer par1InventoryPlayer, IMerchant par2IMerchant, World par3World)
     {
-//System.out.println("	ContainerRecordMerchant");
-		
-
-		
 		this.theMerchant = par2IMerchant;
         this.theWorld = par3World;
         this.merchantInventory = new InventoryRecordTrading(par1InventoryPlayer.player, par2IMerchant);
         this.addSlotToContainer(new Slot(this.merchantInventory, 0, 36, 53));
         this.addSlotToContainer(new Slot(this.merchantInventory, 1, 62, 53));
-        //this.addSlotToContainer(new SlotRecordTradingResult(par1InventoryPlayer.player, par2IMerchant, this.merchantInventory, 2, 120, 53));
         this.addSlotToContainer(new SlotRecordTradingResult(par1InventoryPlayer.player, this.merchantInventory, 2, 120, 53));
         int var4;
 
@@ -69,11 +63,11 @@ public class ContainerRecordTrading extends Container
     }
 
     /**
-     * Updates crafting matrix; called from onCraftMatrixChanged. Args: none
+     * Looks for changes made in the container, sends them to every listener.
      */
-    public void updateCraftingResults()
+    public void detectAndSendChanges()
     {
-        super.updateCraftingResults();
+        super.detectAndSendChanges();
     }
 
     /**

@@ -17,9 +17,6 @@ public class ContainerRedstoneJukebox extends Container
     
     public ContainerRedstoneJukebox(InventoryPlayer inventoryPlayer, TileEntityRedstoneJukebox tileEntity)
     {
-		System.out.println("	ContainerRedstoneJukebox");
-
-		
 		this.teJukebox = tileEntity;
 
 
@@ -99,8 +96,6 @@ public class ContainerRedstoneJukebox extends Container
                 {
                     return null;
                 }
-
-            	//    slot.onSlotChange(myStack, returnStack);		// maybe I can add a check here to play the next record. Need testing
             }
             else
             {

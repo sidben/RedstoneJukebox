@@ -42,13 +42,7 @@ public class ItemCustomRecord extends ItemRecord
 	@SideOnly(Side.CLIENT)
 	public int getIconFromDamage(int damage)
 	{
-		/*
-		switch(damage)
-		{
-			case 0: return 48;  
-			case 1: return 49; 
-		}
-		*/
+		// OBS: DamageValue is used to set the custom record icon.
 		int texIndex = 0;
 		texIndex = 48 + damage;
 		if (texIndex > 126) { texIndex = 126; }
@@ -77,8 +71,7 @@ public class ItemCustomRecord extends ItemRecord
             {
                 ((BlockJukeBox)Block.jukebox).insertRecord(par3World, x, y, z, par1ItemStack);
                 songID = getSongID(par1ItemStack);
-                CustomRecordHelper.playRecordAt(songID, x, y, z);
-                CustomRecordHelper.showRecordPlayingMessage(CustomRecordHelper.getSongTitle(songID));
+                CustomRecordHelper.playRecordAt(songID, x, y, z, true);
                 --par1ItemStack.stackSize;
                 return true;
             }
@@ -99,7 +92,6 @@ public class ItemCustomRecord extends ItemRecord
 	   
 	   
 	   if (songID != "") songTitle = CustomRecordHelper.getSongTitle(songID); 
-	   //if (par1ItemStack.stackTagCompound != null && par1ItemStack.stackTagCompound.hasKey("SongTitle")) { songTitle = par1ItemStack.stackTagCompound.getString("SongTitle"); }
 	   
 	   if (songTitle != "")
 	   {

@@ -20,15 +20,12 @@ public class SlotRecordTradingResult extends Slot
     private EntityPlayer thePlayer;
     private int field_75231_g;
 
-    /** "Instance" of the Merchant. */
-    //private final IMerchant theMerchant;
 
     //public SlotMerchantResult(EntityPlayer par1EntityPlayer, IMerchant par2IMerchant, InventoryMerchant par3InventoryMerchant, int par4, int par5, int par6)
     public SlotRecordTradingResult(EntityPlayer par1EntityPlayer, InventoryRecordTrading par3InventoryMerchant, int par4, int par5, int par6)
     {
         super(par3InventoryMerchant, par4, par5, par6);
         this.thePlayer = par1EntityPlayer;
-        //this.theMerchant = par2IMerchant;
         this.theMerchantInventory = par3InventoryMerchant;
     }
 
@@ -69,22 +66,12 @@ public class SlotRecordTradingResult extends Slot
      */
     protected void onCrafting(ItemStack par1ItemStack)
     {
-System.out.println("	RecordTradingSlot.onCrafting");
-System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-
     	par1ItemStack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75231_g);
         this.field_75231_g = 0;
     }
 
     public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack par2ItemStack)
     {
-System.out.println("	RecordTradingSlot.onPickupFromSlot");
-System.out.println("		side = " + FMLCommonHandler.instance().getEffectiveSide());
-System.out.println("		store #" + theMerchantInventory.storeId);
-if (par2ItemStack == null) { System.out.println("		item = null"); }
-if (par2ItemStack != null) { System.out.println("		item = " + par2ItemStack.itemID + " (" + par2ItemStack.getItemName() + ")"); }
-
-
     	this.onCrafting(par2ItemStack);
         MerchantRecipe slotRecipe = this.theMerchantInventory.getCurrentRecipe();
 
@@ -107,7 +94,7 @@ if (par2ItemStack != null) { System.out.println("		item = " + par2ItemStack.item
 
                 this.theMerchantInventory.setInventorySlotContents(0, var4);
                 this.theMerchantInventory.setInventorySlotContents(1, var5);
-                //this.theMerchant.useRecipe(var3);
+
                 CustomRecordHelper.useRecipe(slotRecipe, theMerchantInventory.storeId);
             }
         }

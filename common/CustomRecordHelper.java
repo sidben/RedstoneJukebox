@@ -83,15 +83,13 @@ public class CustomRecordHelper
 
     	// Initialize the list, where it loads the songs
     	CustomRecordHelper.InitializeList(recordsConfigList);
-
-
 	}
 
 	public static void InitializeList(ArrayList<String> configArray)
 	{
 		Minecraft mc = Minecraft.getMinecraft();
 		recordList = new ArrayList<CustomRecordObject>();
-		String recordNames = "13;cat;blocks;chirp;far;mall;mellohi;stal;strad;ward;11;wait";
+		String recordNames = "13;cat;blocks;chirp;far;mall;mellohi;stal;strad;ward;11;wait";		// start with vanilla records
 		CustomRecordObject auxRecord = null;
 		String songFilePath;
 
@@ -134,10 +132,6 @@ public class CustomRecordHelper
 								recordNames += ";" + lineArray[0];
 							}
 
-						}
-						else
-						{
-							// file not found
 						}
 
 					}
@@ -244,8 +238,6 @@ public class CustomRecordHelper
 	public static int getStoreID(int villagerID)
 	{
 		int storeID = (villagerID % (int)(ModRedstoneJukebox.maxStores * 1.5));		// goes from 0 to maxStores + X. When result is > maxStores, the merchant have no store. 
-		//System.out.println(" Store ID = " + storeID + " of " + ModRedstoneJukebox.maxStores);
-System.out.println(" Villager #" + villagerID + " = " + storeID);		
 		return storeID;
 	}
 	
@@ -309,8 +301,6 @@ System.out.println(" Villager #" + villagerID + " = " + storeID);
 	 */
 	public static void validateOffers(int storeId)
 	{
-System.out.println(" Validating store #" + storeId + " ");
-		
 		MerchantRecipeList offersList = allStoresCatalog.get(storeId);
 		MerchantRecipeList newOffersList;
 		MerchantRecipe auxRecipe;
@@ -331,7 +321,6 @@ System.out.println(" Validating store #" + storeId + " ");
 		// creates a new list, if needed
 		if (mustRecreate)
 		{
-System.out.println(" New list for store #" + storeId + " ");
 			newOffersList = InitializeRandomStoreCatalog();
 			allStoresCatalog.set(storeId, newOffersList);
 		}
@@ -359,13 +348,12 @@ System.out.println(" New list for store #" + storeId + " ");
 		if (offersSize < 1) { offersSize = 1; }
 		if (offersSize > 8) { offersSize = 8; }
 
-System.out.println("	this store have " + offersSize + " offers.");
 
 		// add the selected number of offers
 		for (int offerId = 1; offerId <= offersSize; ++offerId)
 		{
 			// Loops to avoid adding the same record ID twice. Max loop is 10 to avoid infinite loop if random is not random enough to get unique ids.
-			for (int tryCOnt = 1; tryCOnt < 10; ++tryCOnt)
+			for (int tryCont = 1; tryCont < 10; ++tryCont)
 			{
 				// Draws a record to sell. 0 to 11 is vanilla records, above that is custom records
 				auxRecordId = rand.nextInt(totalRecordsAmout);
@@ -387,10 +375,6 @@ System.out.println("	this store have " + offersSize + " offers.");
 			// only add valid, unique records.
 			if (auxRecordId > -1)
 			{
-
-System.out.println("	  Adding offer #" + offerId + " - draw " + auxRecordId);
-
-
 				// record price
 				if (ModRedstoneJukebox.customRecordPriceMin != ModRedstoneJukebox.customRecordPriceMax)
 				{
@@ -410,7 +394,6 @@ System.out.println("	  Adding offer #" + offerId + " - draw " + auxRecordId);
 			// add to the offers list
 			if (offerDisc != null)
 			{
-//System.out.println("	  record added.");
 				storeCatalog.add(new MerchantRecipe(emptyDisc, price, offerDisc));
 			}
 
@@ -431,7 +414,6 @@ System.out.println("	  Adding offer #" + offerId + " - draw " + auxRecordId);
 
 		
 		
-System.out.println("	  buy trades = " + offersSize);
 
 
 		// add the selected number of offers (again)
@@ -440,7 +422,7 @@ System.out.println("	  buy trades = " + offersSize);
 			for (int offerId = 1; offerId <= offersSize; ++offerId)
 			{
 				// Loops to avoid adding the same record ID twice. Max loop is 10 to avoid infinite loop if random is not random enough to get unique ids.
-				for (int tryCOnt = 1; tryCOnt < 10; ++tryCOnt)
+				for (int tryCont = 1; tryCont < 10; ++tryCont)
 				{
 					// Draws a record to sell. 0 to 11 is vanilla records, above that is custom records
 					auxRecordId = rand.nextInt(totalRecordsAmout);
@@ -490,6 +472,8 @@ System.out.println("	  buy trades = " + offersSize);
 	{
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
 		{
+			// Actually, this add multiple "uses" to the recipe, so a record trade will 
+			// lock after 1-3 trades. 
 			Random rand = new Random();
 			int uses = rand.nextInt(6) + 2;		// draws a number from 2 to 8
 
@@ -513,10 +497,8 @@ System.out.println("	  buy trades = " + offersSize);
 	 *
 	 * ====================================================================================== */
 
-	public static boolean playRecordAt(String songID, int x, int y, int z)
+	public static boolean playRecordAt(String songID, int x, int y, int z, boolean showName)
 	{
-System.out.println("	playStreamAt: [" + songID + "], " + x + ",  " + y + ",  " + z );
-
 		if (songID != "")
 		{
     		Minecraft mc = Minecraft.getMinecraft();
@@ -524,28 +506,16 @@ System.out.println("	playStreamAt: [" + songID + "], " + x + ",  " + y + ",  " +
     		if (isVanillaRecord(songID))
 			{
 				// Minecraft vanilla records, same code as the "PlayRecord" of RenderGlobal
-		        // ItemRecord record = ItemRecord.getRecord(songID);
-		        // if (record != null) { mc.ingameGUI.setRecordPlayingMessage(record.getRecordTitle()); }
-System.out.println("	Vanilla");
-
     			mc.sndManager.playStreaming(songID, (float)x, (float)y, (float)z);
-		        //showRecordPlayingMessage(songID);
+    			if (showName) { showRecordPlayingMessage(songID); }
     			return true;
-    			
 			}
 
     		else
 			{
     			// Redstone Jukebox Custom Record
-    			/*
-    	    	String songTitle = "";
-	    		if (songTitle != "") { mc.ingameGUI.setRecordPlayingMessage(songTitle); }
-	    		if (songTitle == "") { mc.ingameGUI.setRecordPlayingMessage("Custom record"); }
-	    		*/
-System.out.println("	Custom");
-
     			mc.sndManager.playStreaming("redstonejukebox." + songID, (float)x, (float)y, (float)z);
-		        //showRecordPlayingMessage(songID);
+		        if (showName) { showRecordPlayingMessage(songID); }
     			return true;
 			}
 
@@ -561,7 +531,7 @@ System.out.println("	Custom");
  	 * Plays a record as background music (same volume everywhere)
 	 * return TRUE if the record was found, false otherwise
 	 */
-	public static boolean playRecord(String songID)
+	public static boolean playRecord(String songID, boolean showName)
 	{
 		if (songID != "")
 		{
@@ -598,12 +568,10 @@ System.out.println("	Custom");
 	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
 	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
 	            mc.sndManager.sndSystem.play("BgMusic");
+	            
+	            if (showName) { showRecordPlayingMessage(songID); }
 
 	            return true;
-	        }
-	        else
-	        {
-	        	// No record found
 	        }
 
 
@@ -668,10 +636,10 @@ System.out.println("	Custom");
 	/*
 	 * Shows the message with the record name, like a Jukebox
 	 */
-	public static void showRecordPlayingMessage(String recordID)
+	private static void showRecordPlayingMessage(String recordID)
 	{
 		String recordName = "";
-
+	
 
 		if (recordID != "")
 		{

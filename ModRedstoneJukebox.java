@@ -209,8 +209,8 @@ public class ModRedstoneJukebox {
 		// Blocks and Items
 		recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
 		customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord");
-		redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setBlockName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setCreativeTab(CreativeTabs.tabRedstone);
-		redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setBlockName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setRequiresSelfNotify().setLightValue(0.75F);
+		redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setCreativeTab(CreativeTabs.tabRedstone);
+		redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setLightValue(0.75F);
 
 		
 		// Crafting Recipes

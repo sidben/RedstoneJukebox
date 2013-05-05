@@ -31,7 +31,7 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0.0F, 1.0F, 0.0F);
-		renderblocks.renderTopFace(block, 0.0D, 0.0D, 0.0D, ModRedstoneJukebox.texJukeboxDisc);
+		renderblocks.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, block.getIcon(7, metadata));
 		tessellator.draw();
 
 		GL11.glTranslatef(0.5F, 0.5F, 0.5F);
@@ -46,32 +46,32 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0.0F, -1.0F, 0.0F);
-		renderblocks.renderBottomFace(block, 0.0D, 0.0D, 0.0D, block.getBlockTextureFromSideAndMetadata(0, metadata));
+		renderblocks.renderFaceYNeg(block, 0.0D, 0.0D, 0.0D, block.getIcon(0, metadata));
 		tessellator.draw();
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0.0F, 1.0F, 0.0F);
-		renderblocks.renderTopFace(block, 0.0D, 0.0D, 0.0D, block.getBlockTextureFromSideAndMetadata(1, metadata));
+		renderblocks.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, block.getIcon(1, metadata));
 		tessellator.draw();
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0.0F, 0.0F, -1.0F);
-		renderblocks.renderEastFace(block, 0.0D, 0.0D, 0.0D, block.getBlockTextureFromSideAndMetadata(2, metadata));
+		renderblocks.renderFaceZNeg(block, 0.0D, 0.0D, 0.0D, block.getIcon(2, metadata));
 		tessellator.draw();
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(0.0F, 0.0F, 1.0F);
-		renderblocks.renderWestFace(block, 0.0D, 0.0D, 0.0D, block.getBlockTextureFromSideAndMetadata(3, metadata));
+		renderblocks.renderFaceZPos(block, 0.0D, 0.0D, 0.0D, block.getIcon(3, metadata));
 		tessellator.draw();
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-		renderblocks.renderNorthFace(block, 0.0D, 0.0D, 0.0D, block.getBlockTextureFromSideAndMetadata(4, metadata));
+		renderblocks.renderFaceXNeg(block, 0.0D, 0.0D, 0.0D, block.getIcon(4, metadata));
 		tessellator.draw();
 
 		tessellator.startDrawingQuads();
 		tessellator.setNormal(1.0F, 0.0F, 0.0F);
-		renderblocks.renderSouthFace(block, 0.0D, 0.0D, 0.0D, block.getBlockTextureFromSideAndMetadata(5, metadata));
+		renderblocks.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, block.getIcon(5, metadata));
 		tessellator.draw();
 
 		GL11.glTranslatef(0.5F, 0.5F, 0.5F);
@@ -115,15 +115,16 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
         
         
 		// Regular faces
-		renderblocks.renderBottomFace(	block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 0));
-		renderblocks.renderTopFace(		block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 1));
-		renderblocks.renderEastFace(	block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 2));
-		renderblocks.renderWestFace(	block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 3));
-		renderblocks.renderNorthFace(	block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 4));
-		renderblocks.renderSouthFace(	block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 5));
+        // renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 0));
+		renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 0));
+		renderblocks.renderFaceYPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 1));
+		renderblocks.renderFaceZNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 2));
+		renderblocks.renderFaceZPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 3));
+		renderblocks.renderFaceXNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 4));
+		renderblocks.renderFaceXPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 5));
 
 		// Disc face
-		renderblocks.renderTopFace(		block, (double)x, (double)(y-0.251), (double)z, block.getBlockTexture(world, x, y, z, 7));		// 7 = my special texture
+		renderblocks.renderFaceYPos(block, (double)x, (double)(y-0.251), (double)z, block.getBlockTexture(world, x, y, z, 7));		// 7 = my special texture
 		
 		
 		return true;

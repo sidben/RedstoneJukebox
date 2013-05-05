@@ -70,8 +70,8 @@ public class GuiRecordTrading  extends GuiContainer
         super.initGui();
         int var1 = (this.width - this.xSize) / 2;
         int var2 = (this.height - this.ySize) / 2;
-        this.controlList.add(this.nextRecipeButtonIndex = new GuiButtonMerchant(1, var1 + 120 + 27, var2 + 24 - 1, true));
-        this.controlList.add(this.previousRecipeButtonIndex = new GuiButtonMerchant(2, var1 + 36 - 19, var2 + 24 - 1, false));
+        this.buttonList.add(this.nextRecipeButtonIndex = new GuiButtonMerchant(1, var1 + 120 + 27, var2 + 24 - 1, true));
+        this.buttonList.add(this.previousRecipeButtonIndex = new GuiButtonMerchant(2, var1 + 36 - 19, var2 + 24 - 1, false));
         this.nextRecipeButtonIndex.enabled = false;
         this.previousRecipeButtonIndex.enabled = false;
     }
@@ -161,9 +161,10 @@ public class GuiRecordTrading  extends GuiContainer
      */
     protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
     {
-    	int var4 = this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui);
+    	//int var4 = this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.renderEngine.bindTexture(var4);
+        //this.mc.renderEngine.bindTexture(var4);
+        this.mc.renderEngine.bindTexture(CommonProxy.recordTradeGui);
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);

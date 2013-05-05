@@ -744,6 +744,28 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
 	}
+
+
+
+
+    /**
+     * If this returns false, the inventory name will be used as an unlocalized name, and translated into the player's
+     * language. Otherwise it will be used directly.
+     */
+	@Override
+	public boolean isInvNameLocalized() {
+		return false;
+	}
+
+
+    /**
+     * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
+     */
+	@Override
+	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+		// return false;
+		return (Item.itemsList[itemstack.itemID] instanceof ItemRecord);
+	}
 	
 	
 	

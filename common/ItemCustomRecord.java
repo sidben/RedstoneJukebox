@@ -7,12 +7,15 @@ import cpw.mods.fml.common.asm.*;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCloth;
 import net.minecraft.block.BlockJukeBox;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.src.*;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
 
@@ -24,7 +27,7 @@ public class ItemCustomRecord extends ItemRecord
 	public ItemCustomRecord(int id, String name) {
 		super(id, name);
 		setMaxStackSize(1);
-		setItemName(name); 
+		setUnlocalizedName(name); 
         setCreativeTab(CreativeTabs.tabMisc);
 
 		this.setMaxDamage(0);
@@ -32,21 +35,48 @@ public class ItemCustomRecord extends ItemRecord
 	}
 
 
+	/*
 	@Override
-	public String getTextureFile () 
+	public String getTextureFile() 
 	{
 		return CommonProxy.textureSheet;
 	}
+	*/
 
+	@SideOnly(Side.CLIENT)
+    /**
+     * When this method is called, your block should register all the icons it needs with the given IconRegister. This
+     * is the only chance you get to register icons.
+     */
+    public void registerIcons(IconRegister iconRegister)
+    {
+        // this.itemIcon = iconRegister.registerIcon("record_" + this.recordName);
+		/*
+        this.iconArray = new Icon[16];
+
+        for (int i = 0; i < this.iconArray.length; ++i)
+        {
+            this.iconArray[i] = par1IconRegister.registerIcon("cloth_" + i);
+        }
+        */
+		this.itemIcon = iconRegister.registerIcon("redstonejukebox:customRecord_002");
+    }
+
+    
 	
 	@SideOnly(Side.CLIENT)
-	public int getIconFromDamage(int damage)
+	public Icon getIconFromDamage(int damage)
 	{
 		// OBS: DamageValue is used to set the custom record icon.
+		/*
 		int texIndex = 0;
 		texIndex = 48 + damage;
 		if (texIndex > 126) { texIndex = 126; }
 		return texIndex;
+		*/
+		
+		// return Block.cloth.getIcon(2, BlockCloth.getBlockFromDye(par1));
+		return this.itemIcon;
 	}
 
 	

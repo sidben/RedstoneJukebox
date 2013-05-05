@@ -12,8 +12,12 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.*;
+import net.minecraft.util.Icon;
 import net.minecraft.world.*;
 import net.minecraftforge.client.MinecraftForgeClient;
 
@@ -44,7 +48,8 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	--------------------------------------------------------------------*/
 
     public BlockRedstoneJukebox(int blockID, boolean active) {
-		super(blockID, ModRedstoneJukebox.texJukeboxBottom, Material.wood);
+		//super(blockID, ModRedstoneJukebox.texJukeboxBottom, Material.wood);
+    	super(blockID, Material.wood);
         this.isActive = active;
 	}
 
@@ -94,12 +99,36 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	/*--------------------------------------------------------------------
 		Textures and Rendering
 	--------------------------------------------------------------------*/
-	
+    @SideOnly(Side.CLIENT)
+    private Icon theIcon;
+
+    /*
 	@Override
 	public String getTextureFile () {
 		return CommonProxy.textureSheet;
 	}
-	
+	*/
+    @SideOnly(Side.CLIENT)
+    /**
+     * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
+     */
+    public Icon getIcon(int par1, int par2)
+    {
+        return par1 == 1 ? this.theIcon : this.blockIcon;
+    }
+
+    @SideOnly(Side.CLIENT)
+    /**
+     * When this method is called, your block should register all the icons it needs with the given IconRegister. This
+     * is the only chance you get to register icons.
+     */
+    public void registerIcons(IconRegister par1IconRegister)
+    {
+        this.blockIcon = par1IconRegister.registerIcon("musicBlock");
+        this.theIcon = par1IconRegister.registerIcon("jukebox_top");
+    }
+
+    
 	
     /**
      * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
@@ -122,15 +151,18 @@ public class BlockRedstoneJukebox extends BlockContainer {
     /**
      * Retrieves the block texture to use based on the display side. Args: iBlockAccess, x, y, z, side
      */
+    /*
     public int getBlockTexture(IBlockAccess access, int x, int y, int z, int side)
     {
 		return this.getBlockTextureFromSide(side);
     }
+    */
 
 
     /**
      * Returns the block texture based on the side being looked at.  Args: side
      */
+    /*
     public int getBlockTextureFromSide(int side)
     {
     	switch(side)
@@ -153,6 +185,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
 			return ModRedstoneJukebox.texJukeboxSideOff;
 		}
     }
+    */
     
     
     /**
@@ -222,7 +255,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void onNeighborBlockChange(World par1World, int x, int y, int z, int blockID)
     {
-
+    	/*
         if (!par1World.isRemote)
         {
 			// Only activates if powered from below
@@ -236,6 +269,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
                 startPlaying(par1World, x, y, z);
             }
         }
+        */
 
 
 		super.onNeighborBlockChange(par1World, x, y, z, blockID);
@@ -258,11 +292,13 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
         if (active)
         {
-            world.setBlockWithNotify(x, y, z, ModRedstoneJukebox.redstoneJukeboxActiveID);
+            // world.setBlockWithNotify(x, y, z, ModRedstoneJukebox.redstoneJukeboxActiveID);
+        	world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukeboxActiveID);
         }
         else
         {
-            world.setBlockWithNotify(x, y, z, ModRedstoneJukebox.redstoneJukeboxIdleID);
+            // world.setBlockWithNotify(x, y, z, ModRedstoneJukebox.redstoneJukeboxIdleID);
+        	world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukeboxIdleID);
         }
 
         keepMyInventory = false;
@@ -360,11 +396,14 @@ public class BlockRedstoneJukebox extends BlockContainer {
         return true;
     }
 
+    
+
     /**
      * Returns true if the block is emitting indirect/weak redstone power on the specified side. If isBlockNormalCube
      * returns true, standard redstone propagation rules will apply instead and this will not be called. 
      * Args: World, X, Y, Z, side
      */
+    /*
     public boolean isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side)
     {
 		if (side == 0 || side == 1)
@@ -376,17 +415,39 @@ public class BlockRedstoneJukebox extends BlockContainer {
 			return this.isActive;
 		}
     }
+    */
 
     /**
      * Returns true if the block is emitting direct/strong redstone power on the specified side. 
      * Args: World, X, Y, Z, side
      */
-    public boolean isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
-    {
+    /*
+	public boolean isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
+	{
 		return false;
+	}
+    */
+
+    
+    /**
+     * If this returns true, then comparators facing away from this block will use the value from
+     * getComparatorInputOverride instead of the actual redstone signal strength.
+     */
+    public boolean hasComparatorInputOverride()
+    {
+        return true;
     }
 
-
+    /**
+     * If hasComparatorInputOverride returns true, the return value from this is used instead of the redstone signal
+     * strength when this block inputs to a comparator.
+     */
+    public int getComparatorInputOverride(World par1World, int par2, int par3, int par4, int par5)
+    {
+        // ItemStack itemstack = ((TileEntityRecordPlayer)par1World.getBlockTileEntity(par2, par3, par4)).func_96097_a();
+        // return itemstack == null ? 0 : itemstack.itemID + 1 - Item.record13.itemID;
+    	return 8;
+    }
 
 
 

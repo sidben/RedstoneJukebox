@@ -76,7 +76,7 @@ public class CustomRecordHelper
 
     		if (propAuxRecord != null)
     		{
-    			recordsConfigList.add(recordID + ";" + propAuxRecord.value);
+    			recordsConfigList.add(recordID + ";" + propAuxRecord.getString());
     		}
     	}
 

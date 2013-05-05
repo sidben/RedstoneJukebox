@@ -49,9 +49,9 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super.initGui();
 
-        this.controlList.add(new GuiRedstoneJukeboxButtonLoop(0, this.guiLeft + 7,  this.guiTop + 41));
-        this.controlList.add(new GuiRedstoneJukeboxButtonLoop(1, this.guiLeft + 32, this.guiTop + 41));
-        this.controlList.add(new GuiRedstoneJukeboxButtonPlayMode(2, this.guiLeft + 77, this.guiTop + 41));
+        this.buttonList.add(new GuiRedstoneJukeboxButtonLoop(0, this.guiLeft + 7,  this.guiTop + 41));
+        this.buttonList.add(new GuiRedstoneJukeboxButtonLoop(1, this.guiLeft + 32, this.guiTop + 41));
+        this.buttonList.add(new GuiRedstoneJukeboxButtonPlayMode(2, this.guiLeft + 77, this.guiTop + 41));
     }
 
 
@@ -144,9 +144,9 @@ public class GuiRedstoneJukebox extends GuiContainer
         this.fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
 
         // Tooltips
-        GuiButton btPlayOnce = (GuiButton)this.controlList.get(0);
-        GuiButton btPlayLoop = (GuiButton)this.controlList.get(1);
-        GuiButton btPlaymode = (GuiButton)this.controlList.get(2);
+        GuiButton btPlayOnce = (GuiButton)this.buttonList.get(0);
+        GuiButton btPlayLoop = (GuiButton)this.buttonList.get(1);
+        GuiButton btPlaymode = (GuiButton)this.buttonList.get(2);
 
         if (btPlayOnce.func_82252_a())
         {
@@ -190,9 +190,10 @@ public class GuiRedstoneJukebox extends GuiContainer
 		*/
 
 
-		int i = this.mc.renderEngine.getTexture(CommonProxy.redstoneJukeboxGui);
+		//int i = this.mc.renderEngine.getTexture(CommonProxy.redstoneJukeboxGui);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(i);
+        //mc.renderEngine.bindTexture(i);
+        mc.renderEngine.bindTexture(CommonProxy.redstoneJukeboxGui);
         int j = (width - xSize) / 2;
         int k = (height - ySize) / 2;
         drawTexturedModalRect(j, k, 0, 0, xSize, ySize);
@@ -247,14 +248,14 @@ public class GuiRedstoneJukebox extends GuiContainer
 				// normal
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeWood), 		j + pStartX + (spacer * 0), k + pStartY);
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeStone), 		j + pStartX + (spacer * 1), k + pStartY);
-				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeSteel), 		j + pStartX + (spacer * 2), k + pStartY);
+				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeIron), 		j + pStartX + (spacer * 2), k + pStartY);
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeGold), 		j + pStartX + (spacer * 3), k + pStartY);
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeDiamond),		j + pStartX + (spacer * 4), k + pStartY);
 				break;
 
 			case 1:
 				// shuffle
-				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.shovelSteel), 		j + pStartX + (spacer * 0), k + pStartY - 1);
+				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.shovelIron), 		j + pStartX + (spacer * 0), k + pStartY - 1);
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeDiamond),		j + pStartX + (spacer * 1), k + pStartY + 4);
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.axeGold), 			j + pStartX + (spacer * 2), k + pStartY - 3);
 				itemRenderer.renderItemIntoGUI(this.fontRenderer, this.mc.renderEngine, new ItemStack(Item.pickaxeWood), 		j + pStartX + (spacer * 3), k + pStartY + 1);

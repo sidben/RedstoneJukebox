@@ -66,13 +66,18 @@ public class ModRedstoneJukebox {
 	public static final String jukeboxChannel = "chRSJukebox";		// OBS TODO: move this to a "config" class, along with the ModID
 	
 	
-	// Textures and Models IDs
+	// Models IDs
 	public static int redstoneJukeboxModelID;
-	public final static int texJukeboxDisc = 0;
-    public final static int texJukeboxBottom = 1;
-	public final static int texJukeboxTop = 2;
-    public final static int texJukeboxSideOff = 3;
-    public final static int texJukeboxSideOn = 4;
+
+	
+	// Textures and Icons paths
+	public static String blankRecordIcon = "redstonejukebox:blankRecord";
+	public static String customRecordIconArray = "redstonejukebox:customRecord_";
+	public static String jukeboxDiscIcon = "redstonejukebox:redstoneJukebox_Disc";
+	public static String jukeboxTopIcon = "redstonejukebox:redstoneJukebox_Top";
+	public static String jukeboxBottomIcon = "redstonejukebox:redstoneJukebox_Bottom";
+	public static String jukeboxSideOnIcon = "redstonejukebox:redstoneJukebox_SideOn";
+	public static String jukeboxSideOffIcon = "redstonejukebox:redstoneJukebox_SideOff";
 
 	
 	// GUI IDs
@@ -94,13 +99,17 @@ public class ModRedstoneJukebox {
 	public static Block redstoneJukeboxActive; 
 	
 	
-	// Global variable
+	// Global variables
 	public final static String sourceName = "streaming";	// music discs are called "streaming" 
-	public static Vec3 lastSoundSource;						// holds the position of the last sound source (used so only 1 redstone jukebox is active at a time)
 	public final static int maxCustomRecords = 32;			// Limit of custom records accepted
-	public final static int maxCustomRecordIcon = 63;		// Limit of icon IDs for the records. This is stored on the metadata of the item. Start at zero.
+	public final static int maxCustomRecordIcon = 77;		// Limit of icon IDs for the records. This is stored on the metadata of the item. Start at zero.
 	public final static int maxStores = 16;					// Number of "record stores" available. Each "store" is a random selection of records for trade.
+	public final static int maxOffers = 8;					// Maximum number of record offers a villager have
 	public static String customRecordsFolder = "jukebox";  	// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
+	public static Vec3 lastSoundSource;						// holds the position of the last sound source (used so only 1 redstone jukebox is active at a time)
+
+	
+	// Config variables
 	public static int customRecordOffersMin;				// Minimal of custom records a villager can offer
 	public static int customRecordOffersMax;				// Maximum of custom records a villager can offer
 	public static int customRecordPriceMin;					// Minimal value of custom records in emeralds
@@ -141,7 +150,7 @@ public class ModRedstoneJukebox {
         	// Extra validation on the merchant config (min and max values)
         	if (this.customRecordOffersMin < 1) this.customRecordOffersMin = 1;
         	if (this.customRecordOffersMax < this.customRecordOffersMin) this.customRecordOffersMax = this.customRecordOffersMin;
-        	if (this.customRecordOffersMax > 8) this.customRecordOffersMax = 8;
+        	if (this.customRecordOffersMax > this.maxOffers) this.customRecordOffersMax = this.maxOffers;
         	if (this.customRecordOffersMin < 1) this.customRecordPriceMin = 1;
         	if (this.customRecordPriceMax < this.customRecordPriceMin) this.customRecordPriceMax = this.customRecordPriceMin;
         	
@@ -161,7 +170,7 @@ public class ModRedstoneJukebox {
         	helpComment				+= br;
         	helpComment				+= "S:record###=ICON_ID;SONG_FILE;SONG_NAME" + br;
         	helpComment				+= "    ###       = A number between 000 and 0" + (maxCustomRecords - 1) + ". Do not repeat numbers. The numbers don't need to be in order." + br;
-        	helpComment				+= "    ICON_ID   = The icon of the this record. Must be a number between 1 and 63." + br;
+        	helpComment				+= "    ICON_ID   = The icon of the this record. Must be a number between 1 and " + maxCustomRecordIcon +  "." + br;
         	helpComment				+= "    SONG_FILE = The name of the song file that should be on the 'mods/jukebox' folder. Only OGG files are accepted." + br;
         	helpComment				+= "    SONG_NAME = The title of the song. Plain text, avoid using unicode characters. Max of 64 characters.";
         	helpComment				+= br;

@@ -2,6 +2,8 @@ package sidben.redstonejukebox.common;
 
 import java.util.List;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -23,14 +25,6 @@ public class ItemBlankRecord extends Item {
 	}
 
 	
-	/*
-	@Override
-	public String getTextureFile () {
-		return CommonProxy.textureSheet;
-	}
-	*/
-
-
 	@SideOnly(Side.CLIENT)
     /**
      * When this method is called, your block should register all the icons it needs with the given IconRegister. This
@@ -38,7 +32,7 @@ public class ItemBlankRecord extends Item {
      */
     public void registerIcons(IconRegister iconRegister)
     {
-		this.itemIcon = iconRegister.registerIcon("redstonejukebox:blankRecord");
+		this.itemIcon = iconRegister.registerIcon(ModRedstoneJukebox.blankRecordIcon);
     }
 	
 	

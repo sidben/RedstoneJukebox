@@ -2,6 +2,8 @@ package sidben.redstonejukebox.common;
 
 import java.util.List;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
+
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.asm.*;
 import cpw.mods.fml.relauncher.Side;
@@ -22,6 +24,9 @@ import net.minecraft.world.World;
 public class ItemCustomRecord extends ItemRecord
 {
 
+    @SideOnly(Side.CLIENT)
+    private Icon[] iconArray;
+    
     
 	
 	public ItemCustomRecord(int id, String name) {
@@ -35,13 +40,6 @@ public class ItemCustomRecord extends ItemRecord
 	}
 
 
-	/*
-	@Override
-	public String getTextureFile() 
-	{
-		return CommonProxy.textureSheet;
-	}
-	*/
 
 	@SideOnly(Side.CLIENT)
     /**
@@ -50,16 +48,12 @@ public class ItemCustomRecord extends ItemRecord
      */
     public void registerIcons(IconRegister iconRegister)
     {
-        // this.itemIcon = iconRegister.registerIcon("record_" + this.recordName);
-		/*
-        this.iconArray = new Icon[16];
-
+		this.iconArray = new Icon[ModRedstoneJukebox.maxCustomRecordIcon];
+		
         for (int i = 0; i < this.iconArray.length; ++i)
         {
-            this.iconArray[i] = par1IconRegister.registerIcon("cloth_" + i);
+        	this.iconArray[i] = iconRegister.registerIcon(ModRedstoneJukebox.customRecordIconArray + String.format("%03d", i));
         }
-        */
-		this.itemIcon = iconRegister.registerIcon("redstonejukebox:customRecord_002");
     }
 
     
@@ -68,15 +62,7 @@ public class ItemCustomRecord extends ItemRecord
 	public Icon getIconFromDamage(int damage)
 	{
 		// OBS: DamageValue is used to set the custom record icon.
-		/*
-		int texIndex = 0;
-		texIndex = 48 + damage;
-		if (texIndex > 126) { texIndex = 126; }
-		return texIndex;
-		*/
-		
-		// return Block.cloth.getIcon(2, BlockCloth.getBlockFromDye(par1));
-		return this.itemIcon;
+		return this.iconArray[damage];
 	}
 
 	

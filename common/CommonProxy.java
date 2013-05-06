@@ -12,9 +12,9 @@ import cpw.mods.fml.common.network.IGuiHandler;
 
 public class CommonProxy implements IGuiHandler {
 
-	public static String textureSheet = 		"/resources/redstonejukebox.png";
 	public static String redstoneJukeboxGui = 	"/resources/redstonejukebox-gui.png";
 	public static String recordTradeGui = 		"/resources/recordtrading-gui.png";
+	
 	
 	
 	

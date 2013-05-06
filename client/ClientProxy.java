@@ -22,8 +22,6 @@ public class ClientProxy extends CommonProxy {
 		ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 		
 		RenderingRegistry.registerBlockHandler(new RenderRedstoneJukebox()); 
-
-		MinecraftForgeClient.preloadTexture(textureSheet);
 	}
 	
 	

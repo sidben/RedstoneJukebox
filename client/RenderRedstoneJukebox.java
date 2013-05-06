@@ -93,38 +93,62 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
         
         Tessellator tessellator = Tessellator.instance;
         tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
-        float var6 = 1.0F;
-        int var7 = block.colorMultiplier(world, x, y, z);
-        float var8 = (float)(var7 >> 16 & 255) / 255.0F;
-        float var9 = (float)(var7 >> 8 & 255) / 255.0F;
-        float var10 = (float)(var7 & 255) / 255.0F;
-        float var12;
+        float f = 1.0F;
+        int l = block.colorMultiplier(world, x, y, z);
+        float f1 = (float)(l >> 16 & 255) / 255.0F;
+        float f2 = (float)(l >> 8 & 255) / 255.0F;
+        float f3 = (float)(l & 255) / 255.0F;
+        float f4;
 
         if (EntityRenderer.anaglyphEnable)
         {
-            float var11 = (var8 * 30.0F + var9 * 59.0F + var10 * 11.0F) / 100.0F;
-            var12 = (var8 * 30.0F + var9 * 70.0F) / 100.0F;
-            float var13 = (var8 * 30.0F + var10 * 70.0F) / 100.0F;
-            var8 = var11;
-            var9 = var12;
-            var10 = var13;
+            float f5 = (f1 * 30.0F + f2 * 59.0F + f3 * 11.0F) / 100.0F;
+            f4 = (f1 * 30.0F + f2 * 70.0F) / 100.0F;
+            float f6 = (f1 * 30.0F + f3 * 70.0F) / 100.0F;
+            f1 = f5;
+            f2 = f4;
+            f3 = f6;
         }
 
-        tessellator.setColorOpaque_F(var6 * var8, var6 * var9, var6 * var10);
+        tessellator.setColorOpaque_F(f * f1, f * f2, f * f3);
 
         
         
 		// Regular faces
-        // renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 0));
+        /*
 		renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 0));
 		renderblocks.renderFaceYPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 1));
 		renderblocks.renderFaceZNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 2));
 		renderblocks.renderFaceZPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 3));
 		renderblocks.renderFaceXNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 4));
 		renderblocks.renderFaceXPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 5));
+		*/
+        
+        /*
+         * Don't work with side on/off
+		renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(0));
+		renderblocks.renderFaceYPos(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(1));
+		renderblocks.renderFaceZNeg(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(2));
+		renderblocks.renderFaceZPos(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(3));
+		renderblocks.renderFaceXNeg(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(4));
+		renderblocks.renderFaceXPos(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(5));
+         */
 
+        renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 0));
+		renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 0));
+		renderblocks.renderFaceYPos(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 1));
+		renderblocks.renderFaceZNeg(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 2));
+		renderblocks.renderFaceZPos(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 3));
+		renderblocks.renderFaceXNeg(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 4));
+		renderblocks.renderFaceXPos(block, (double)x, (double)y, (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 5));
+
+        
 		// Disc face
+		/*
 		renderblocks.renderFaceYPos(block, (double)x, (double)(y-0.251), (double)z, block.getBlockTexture(world, x, y, z, 7));		// 7 = my special texture
+		renderblocks.renderFaceYPos(block, (double)x, (double)(y-0.251), (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(7));		// 7 = my special texture
+		*/
+		renderblocks.renderFaceYPos(block, (double)x, (double)(y-0.251), (double)z, renderblocks.getBlockIcon(block, world, x, y, z, 7));
 		
 		
 		return true;

@@ -346,7 +346,7 @@ public class CustomRecordHelper
 
 		// Extra validation for offers size. Can't be lower than 1 or higher than 8.
 		if (offersSize < 1) { offersSize = 1; }
-		if (offersSize > 8) { offersSize = 8; }
+		if (offersSize > ModRedstoneJukebox.maxOffers) { offersSize = ModRedstoneJukebox.maxOffers; }
 
 
 		// add the selected number of offers
@@ -404,13 +404,13 @@ public class CustomRecordHelper
 		
 
 		// random chance to add "buy" trades
-		int chance1 = rand.nextInt(20);			// chance to add 1 buy (20%)
-		int chance2 = rand.nextInt(20);			// chance to add another buy (5%)
+		int chance1 = rand.nextInt(20);			// chance to add 1 buy
+		int chance2 = rand.nextInt(20);			// chance to add another buy
 		int auxPos;
 		offersSize = 0;							// re-use the variable;
 		
-		if (chance1 <= 4 && storeCatalog.size() < 8) { ++offersSize; }
-		if (chance2 == 7 && storeCatalog.size() < 8) { ++offersSize; }
+		if (chance1 <= 4 && storeCatalog.size() < ModRedstoneJukebox.maxOffers) { ++offersSize; }		// 20% chance
+		if (chance2 == 7 && storeCatalog.size() < ModRedstoneJukebox.maxOffers) { ++offersSize; }		// 5% chance
 
 		
 		

@@ -48,7 +48,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	--------------------------------------------------------------------*/
 
     public BlockRedstoneJukebox(int blockID, boolean active) {
-		//super(blockID, ModRedstoneJukebox.texJukeboxBottom, Material.wood);
     	super(blockID, Material.wood);
         this.isActive = active;
 	}
@@ -71,6 +70,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public boolean isOpaqueCube()
     {
+    	// FALSE turns the block light-transparent
         return false;
     }
 
@@ -100,21 +100,47 @@ public class BlockRedstoneJukebox extends BlockContainer {
 		Textures and Rendering
 	--------------------------------------------------------------------*/
     @SideOnly(Side.CLIENT)
-    private Icon theIcon;
+    private Icon discIcon;
+    
+    @SideOnly(Side.CLIENT)
+    private Icon topIcon;
 
-    /*
-	@Override
-	public String getTextureFile () {
-		return CommonProxy.textureSheet;
-	}
-	*/
+    @SideOnly(Side.CLIENT)
+    private Icon bottomIcon;
+
+    @SideOnly(Side.CLIENT)
+    private Icon sideOnIcon;
+
+    @SideOnly(Side.CLIENT)
+    private Icon sideOffIcon;
+
+    
+    
     @SideOnly(Side.CLIENT)
     /**
      * From the specified side and block metadata retrieves the blocks texture. Args: side, metadata
      */
-    public Icon getIcon(int par1, int par2)
+    public Icon getIcon(int side, int metadata)
     {
-        return par1 == 1 ? this.theIcon : this.blockIcon;
+    	switch(side)
+    	{
+    	case 0:
+			//--- bottom
+            return this.bottomIcon;
+
+    	case 1:
+			//--- top
+			return this.topIcon;
+
+    	case 7:
+			//--- Extra texture (disc)
+			return this.discIcon;
+
+    	default:
+	        //--- sides
+			if (this.isActive) { return this.sideOnIcon; }
+			return this.sideOffIcon;
+		}    	
     }
 
     @SideOnly(Side.CLIENT)
@@ -122,14 +148,29 @@ public class BlockRedstoneJukebox extends BlockContainer {
      * When this method is called, your block should register all the icons it needs with the given IconRegister. This
      * is the only chance you get to register icons.
      */
-    public void registerIcons(IconRegister par1IconRegister)
+    public void registerIcons(IconRegister iconRegister)
     {
-        this.blockIcon = par1IconRegister.registerIcon("musicBlock");
-        this.theIcon = par1IconRegister.registerIcon("jukebox_top");
+    	this.discIcon = iconRegister.registerIcon(ModRedstoneJukebox.jukeboxDiscIcon);
+    	this.topIcon = iconRegister.registerIcon(ModRedstoneJukebox.jukeboxTopIcon);
+    	this.bottomIcon = iconRegister.registerIcon(ModRedstoneJukebox.jukeboxBottomIcon);
+    	this.sideOnIcon = iconRegister.registerIcon(ModRedstoneJukebox.jukeboxSideOnIcon);
+    	this.sideOffIcon = iconRegister.registerIcon(ModRedstoneJukebox.jukeboxSideOffIcon);
     }
 
     
-	
+    @SideOnly(Side.CLIENT)
+    /**
+     * Returns true if the given side of this block type should be rendered, if the adjacent block is at the given
+     * coordinates.  Args: blockAccess, x, y, z, side
+     */
+    public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int x, int y, int z, int side)
+    {
+        //return super.shouldSideBeRendered(par1IBlockAccess, par2, par3, par4, par5);
+    	return true;
+    }
+
+    
+    
     /**
      * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
      */
@@ -147,45 +188,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
         return ModRedstoneJukebox.redstoneJukeboxModelID;
     }
 
-    
-    /**
-     * Retrieves the block texture to use based on the display side. Args: iBlockAccess, x, y, z, side
-     */
-    /*
-    public int getBlockTexture(IBlockAccess access, int x, int y, int z, int side)
-    {
-		return this.getBlockTextureFromSide(side);
-    }
-    */
-
-
-    /**
-     * Returns the block texture based on the side being looked at.  Args: side
-     */
-    /*
-    public int getBlockTextureFromSide(int side)
-    {
-    	switch(side)
-    	{
-    	case 0:
-			//--- bottom
-            return ModRedstoneJukebox.texJukeboxBottom;
-
-    	case 1:
-			//--- top
-			return ModRedstoneJukebox.texJukeboxTop;
-
-    	case 7:
-			//--- Extra texture (disc)
-			return ModRedstoneJukebox.texJukeboxDisc;
-
-    	default:
-	        //--- sides
-			if (this.isActive) { return ModRedstoneJukebox.texJukeboxSideOn; }
-			return ModRedstoneJukebox.texJukeboxSideOff;
-		}
-    }
-    */
     
     
     /**
@@ -255,22 +257,17 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void onNeighborBlockChange(World par1World, int x, int y, int z, int blockID)
     {
-    	/*
         if (!par1World.isRemote)
         {
-			// Only activates if powered from below
-			// 		isBlockIndirectlyProvidingPowerTo - Args: x, y, z, direction
-            if (!par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5))
-            {
-                stopPlaying(par1World, x, y, z);
-            }
-            else if (par1World.isBlockIndirectlyProvidingPowerTo(x, y-1, z, 5))
+        	if (par1World.isBlockIndirectlyGettingPowered(x, y, z))
             {
                 startPlaying(par1World, x, y, z);
             }
+            else 
+            {
+                stopPlaying(par1World, x, y, z);
+            }
         }
-        */
-
 
 		super.onNeighborBlockChange(par1World, x, y, z, blockID);
     }
@@ -288,19 +285,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z)
     {
 		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
+		int auxBlockId;
         keepMyInventory = true;
 
-        if (active)
-        {
-            // world.setBlockWithNotify(x, y, z, ModRedstoneJukebox.redstoneJukeboxActiveID);
-        	world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukeboxActiveID);
-        }
-        else
-        {
-            // world.setBlockWithNotify(x, y, z, ModRedstoneJukebox.redstoneJukeboxIdleID);
-        	world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukeboxIdleID);
-        }
 
+        auxBlockId = (active ? ModRedstoneJukebox.redstoneJukeboxActiveID : ModRedstoneJukebox.redstoneJukeboxIdleID);
+        world.setBlock(x, y, z, auxBlockId);
         keepMyInventory = false;
 
 
@@ -309,6 +299,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
             teJukebox.validate();
             world.setBlockTileEntity(x, y, z, teJukebox);
         }
+        
     }
 
     
@@ -393,40 +384,8 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public boolean canProvidePower()
     {
-        return true;
+    	return false;
     }
-
-    
-
-    /**
-     * Returns true if the block is emitting indirect/weak redstone power on the specified side. If isBlockNormalCube
-     * returns true, standard redstone propagation rules will apply instead and this will not be called. 
-     * Args: World, X, Y, Z, side
-     */
-    /*
-    public boolean isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side)
-    {
-		if (side == 0 || side == 1)
-		{
-			return false;
-		}
-		else
-		{
-			return this.isActive;
-		}
-    }
-    */
-
-    /**
-     * Returns true if the block is emitting direct/strong redstone power on the specified side. 
-     * Args: World, X, Y, Z, side
-     */
-    /*
-	public boolean isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
-	{
-		return false;
-	}
-    */
 
     
     /**
@@ -444,9 +403,8 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public int getComparatorInputOverride(World par1World, int par2, int par3, int par4, int par5)
     {
-        // ItemStack itemstack = ((TileEntityRecordPlayer)par1World.getBlockTileEntity(par2, par3, par4)).func_96097_a();
-        // return itemstack == null ? 0 : itemstack.itemID + 1 - Item.record13.itemID;
-    	return 8;
+    	TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)par1World.getBlockTileEntity(par2, par3, par4);
+    	return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
     }
 
 

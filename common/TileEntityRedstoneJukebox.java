@@ -281,7 +281,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     public void resync()
     {
-		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+    	this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
     }
     
     
@@ -481,6 +481,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 		this.isPlaying = true;
 		this.delay = this.maxDelay;
 
+		this.onInventoryChanged();
         BlockRedstoneJukebox.updateJukeboxBlockState(true, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 	}
 
@@ -490,7 +491,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.currentPlaySlot = -1;
     	this.nextPlaySlot = -1;
         this.delay = this.maxDelay;
-
+        
+		this.onInventoryChanged();
         BlockRedstoneJukebox.updateJukeboxBlockState(false, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 	}
 	

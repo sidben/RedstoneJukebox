@@ -627,6 +627,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	{
 		int checkedSlot;
 		boolean playSuccess = false;
+		int extraVolume = BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 
 
 		while (this.nextPlaySlot > -1) {
@@ -704,7 +705,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 						
 					
 					//-- Try to play the record on the selected slot
-					playSuccess = CustomRecordHelper.playRecordAt(recordName, this.xCoord, this.yCoord, this.zCoord, true);
+					playSuccess = CustomRecordHelper.playRecordAt(recordName, this.xCoord, this.yCoord, this.zCoord, true, extraVolume);
 					
 
 					// Only updates if the play command was successful

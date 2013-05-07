@@ -87,7 +87,7 @@ public class ItemCustomRecord extends ItemRecord
             {
                 ((BlockJukeBox)Block.jukebox).insertRecord(par3World, x, y, z, par1ItemStack);
                 songID = getSongID(par1ItemStack);
-                CustomRecordHelper.playRecordAt(songID, x, y, z, true);
+                CustomRecordHelper.playRecordAt(songID, x, y, z, true, 0);
                 --par1ItemStack.stackSize;
                 return true;
             }

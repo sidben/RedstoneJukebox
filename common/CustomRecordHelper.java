@@ -18,8 +18,11 @@ import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.sound.PlayBackgroundMusicEvent;
+import net.minecraftforge.client.event.sound.PlayStreamingEvent;
+import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
 import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -497,7 +500,11 @@ public class CustomRecordHelper
 	 *
 	 * ====================================================================================== */
 
-	public static boolean playRecordAt(String songID, int x, int y, int z, boolean showName)
+	/**
+ 	 * Plays a record as at a specific position.
+	 * Return TRUE if the record was found, false otherwise
+	 */
+	public static boolean playRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender)
 	{
 		if (songID != "")
 		{
@@ -506,7 +513,7 @@ public class CustomRecordHelper
     		if (isVanillaRecord(songID))
 			{
 				// Minecraft vanilla records, same code as the "PlayRecord" of RenderGlobal
-    			mc.sndManager.playStreaming(songID, (float)x, (float)y, (float)z);
+    			innerPlaySreaming(songID, (float)x, (float)y, (float)z, volumeExtender);
     			if (showName) { showRecordPlayingMessage(songID); }
     			return true;
 			}
@@ -514,7 +521,7 @@ public class CustomRecordHelper
     		else
 			{
     			// Redstone Jukebox Custom Record
-    			mc.sndManager.playStreaming("redstonejukebox." + songID, (float)x, (float)y, (float)z);
+    			innerPlaySreaming("redstonejukebox." + songID, (float)x, (float)y, (float)z, volumeExtender);
 		        if (showName) { showRecordPlayingMessage(songID); }
     			return true;
 			}
@@ -527,7 +534,7 @@ public class CustomRecordHelper
 
 
 
-	/*
+	/**
  	 * Plays a record as background music (same volume everywhere)
 	 * return TRUE if the record was found, false otherwise
 	 */
@@ -586,7 +593,7 @@ public class CustomRecordHelper
 
 
 
-	/*
+	/**
  	 * Plays a vanilla background song.
 	 * return TRUE if the song was found, false otherwise
 	 */
@@ -631,9 +638,62 @@ public class CustomRecordHelper
 	}
 	
 	
+	
+	
+	
 
+	/**
+	 * Override of the playStreaming method on SoundManager. Here I can set the range.
+	 */
+	private static void innerPlaySreaming(String soundPoolId, float x, float y, float z, float volumeExtender)
+	{
+		Minecraft mc = Minecraft.getMinecraft();
+		float volumeRange = 64F;
 
-	/*
+		
+System.out.println("innerPlaySreaming");
+System.out.println("	volume = " + volumeExtender);
+
+		
+		// adjusts the volume range
+		if (volumeExtender >= 1 && volumeExtender <= 128)
+		{
+			volumeRange += volumeExtender;
+		}
+		
+		
+	    if (mc.gameSettings.soundVolume != 0.0F || soundPoolId == null)
+	    {
+	        if (mc.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
+	        {
+	        	mc.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
+	        }
+	
+	        if (soundPoolId != null)
+	        {
+	            SoundPoolEntry var6 = mc.sndManager.soundPoolStreaming.getRandomSoundFromSoundPool(soundPoolId);
+	            var6 = SoundEvent.getResult(new PlayStreamingEvent(mc.sndManager, var6, soundPoolId, x, y, z));
+	
+	            if (var6 != null)
+	            {
+	                if (mc.sndManager.sndSystem.playing("BgMusic"))
+	                {
+	                	mc.sndManager.sndSystem.stop("BgMusic");
+	                }
+	
+	                mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.soundUrl, var6.soundName, false, x, y, z, 2, volumeRange);
+	                mc.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * mc.gameSettings.soundVolume);
+	                MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(mc.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
+	                mc.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
+	            }
+	        }
+	    }
+	}
+
+    
+    
+    
+	/**
 	 * Shows the message with the record name, like a Jukebox
 	 */
 	private static void showRecordPlayingMessage(String recordID)

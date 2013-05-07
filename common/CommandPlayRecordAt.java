@@ -61,7 +61,7 @@ public class CommandPlayRecordAt  extends CommandBase
 			}
 
 			// Play the song
-           	sucess = CustomRecordHelper.playRecordAt(par2ArrayOfStr[0].toLowerCase(), parseInt(par1ICommandSender, par2ArrayOfStr[1]), parseInt(par1ICommandSender, par2ArrayOfStr[2]), parseInt(par1ICommandSender, par2ArrayOfStr[3]), showName);
+           	sucess = CustomRecordHelper.playRecordAt(par2ArrayOfStr[0].toLowerCase(), parseInt(par1ICommandSender, par2ArrayOfStr[1]), parseInt(par1ICommandSender, par2ArrayOfStr[2]), parseInt(par1ICommandSender, par2ArrayOfStr[3]), showName, 0);
 			if (!sucess)
 			{
 				// error message

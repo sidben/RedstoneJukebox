@@ -107,6 +107,7 @@ public class ModRedstoneJukebox {
 	public final static int maxOffers = 8;					// Maximum number of record offers a villager have
 	public static String customRecordsFolder = "jukebox";  	// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
 	public static Vec3 lastSoundSource;						// holds the position of the last sound source (used so only 1 redstone jukebox is active at a time)
+	public final static int maxExtraVolume = 128;			// Maximum amount of extra range for the custom jukebox
 
 	
 	// Config variables

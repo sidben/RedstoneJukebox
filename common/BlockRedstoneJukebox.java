@@ -40,6 +40,8 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     private static boolean keepMyInventory = false;
 
+
+
     
     
 	
@@ -301,6 +303,43 @@ public class BlockRedstoneJukebox extends BlockContainer {
         }
         
     }
+    
+    /**
+     * Return the amount of extra range the jukebox will receive from near noteblocks.
+     * 
+     * Each note block increases the range by 8. 
+     */
+    public static int getAmplifierPower(World world, int x, int y, int z)
+    {
+    	int amp = 0;
+    	
+    	
+    	// check an area of 5x5x3 around the block looking for note blocks
+        for (int i = x - 2; i <= x + 2; ++i)
+        {
+            for (int k = z - 2; k <= z + 2; ++k)
+            {
+            	for (int j = y - 1; j <= y + 1; ++j)
+            	{
+            		
+            		if (i!=0 || k != 0 || j != 0)
+            		{
+                    	// look for noteblocks
+	                    if (world.getBlockId(i, j, k) == Block.music.blockID)
+	                    {
+	                    	amp += 8;
+	                    	if (amp >= ModRedstoneJukebox.maxExtraVolume) { return ModRedstoneJukebox.maxExtraVolume; }
+	                    }
+                    }
+
+            	} // for j
+            } // for k
+        } // for i
+
+        
+        return amp;
+    }
+    
 
     
 
@@ -315,59 +354,110 @@ public class BlockRedstoneJukebox extends BlockContainer {
      * A randomly called display update to be able to add particles or other items for display
      */
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World par1World, int par2, int par3, int par4, Random par5Random)
+    public void randomDisplayTick(World par1World, int x, int y, int z, Random par5Random)
     {
         if (this.isActive)
         {
 			// redstone ore sparkles
-			Random var5 = par1World.rand;
-			double var6 = 0.0625D;
+        	this.showSparkles(par1World, x, y, z);
 
-			for (int var8 = 0; var8 < 6; ++var8)
-			{
-				double var9 = (double)((float)par2 + var5.nextFloat());
-				double var11 = (double)((float)par3 + var5.nextFloat());
-				double var13 = (double)((float)par4 + var5.nextFloat());
 
-				if (var8 == 0 && !par1World.isBlockOpaqueCube(par2, par3 + 1, par4))
-				{
-					var11 = (double)(par3 + 1) + var6;
-				}
+        	
+            // not always shows particles
+            if (par5Random.nextInt(2) == 0)		
+            {
 
-				if (var8 == 1 && !par1World.isBlockOpaqueCube(par2, par3 - 1, par4))
-				{
-					var11 = (double)(par3 + 0) - var6;
-				}
-
-				if (var8 == 2 && !par1World.isBlockOpaqueCube(par2, par3, par4 + 1))
-				{
-					var13 = (double)(par4 + 1) + var6;
-				}
-
-				if (var8 == 3 && !par1World.isBlockOpaqueCube(par2, par3, par4 - 1))
-				{
-					var13 = (double)(par4 + 0) - var6;
-				}
-
-				if (var8 == 4 && !par1World.isBlockOpaqueCube(par2 + 1, par3, par4))
-				{
-					var9 = (double)(par2 + 1) + var6;
-				}
-
-				if (var8 == 5 && !par1World.isBlockOpaqueCube(par2 - 1, par3, par4))
-				{
-					var9 = (double)(par2 + 0) - var6;
-				}
-
-				if (var9 < (double)par2 || var9 > (double)(par2 + 1) || var11 < 0.0D || var11 > (double)(par3 + 1) || var13 < (double)par4 || var13 > (double)(par4 + 1))
-				{
-					par1World.spawnParticle("reddust", var9, var11, var13, 0.0D, 0.0D, 0.0D);
-				}
-			}
-
+				// notes on note blocks
+	        	// check an area of 5x5 around the block looking for note block
+	            for (int i = x - 2; i <= x + 2; ++i)
+	            {
+	                for (int k = z - 2; k <= z + 2; ++k)
+	                {
+	                	for (int j = y - 1; j <= y + 1; ++j)
+	                	{
+	                		
+	                		// do not check the jukebox and below it
+	                		if (i!=0 || k != 0 || j == 1)
+	                		{
+		                    	// look for note blocks with space on the top
+			                    if (par1World.getBlockId(i, j, k) == Block.music.blockID && !par1World.isBlockOpaqueCube(i, j+1, k))
+			                    {
+			                    	this.showNote(par1World, i, j, k);
+			                    }
+		                    }
+		
+	                	} // for j
+	                } // for k
+	            } // for i
+            
+            }
         }
     }
+    
+    
+    /**
+     * Displays redstone sparkles on the block sides.
+     */
+    private void showSparkles(World world, int x, int y, int z)
+    {
+		Random var5 = world.rand;
+		double var6 = 0.0625D;
 
+		for (int var8 = 2; var8 < 6; ++var8)		// only shows particles on the sides
+		{
+			double var9 = (double)((float)x + var5.nextFloat());
+			double var11 = (double)((float)y + var5.nextFloat());
+			double var13 = (double)((float)z + var5.nextFloat());
+
+			/*
+			if (var8 == 0 && !world.isBlockOpaqueCube(x, y + 1, z))
+			{
+				var11 = (double)(y + 1) + var6;
+			}
+
+			if (var8 == 1 && !world.isBlockOpaqueCube(x, y - 1, z))
+			{
+				var11 = (double)(y + 0) - var6;
+			}
+			*/
+
+			if (var8 == 2 && !world.isBlockOpaqueCube(x, y, z + 1))
+			{
+				var13 = (double)(z + 1) + var6;
+			}
+
+			if (var8 == 3 && !world.isBlockOpaqueCube(x, y, z - 1))
+			{
+				var13 = (double)(z + 0) - var6;
+			}
+
+			if (var8 == 4 && !world.isBlockOpaqueCube(x + 1, y, z))
+			{
+				var9 = (double)(x + 1) + var6;
+			}
+
+			if (var8 == 5 && !world.isBlockOpaqueCube(x - 1, y, z))
+			{
+				var9 = (double)(x + 0) - var6;
+			}
+
+			if (var9 < (double)x || var9 > (double)(x + 1) || var11 < 0.0D || var11 > (double)(y + 1) || var13 < (double)z || var13 > (double)(z + 1))
+			{
+				world.spawnParticle("reddust", var9, var11, var13, 0.0D, 0.0D, 0.0D);
+			}
+		}    	
+    }
+
+    
+
+    /**
+     * Displays a random music note on the block.
+     */
+    private void showNote(World world, int x, int y, int z)
+    {
+    	int color = world.rand.nextInt(16);
+    	world.spawnParticle("note", (double)x + 0.5D, (double)y + 1.2D, (double)z + 0.5D, (double)color / 16.0D, 0.0D, 0.0D);
+    }
 
 
 

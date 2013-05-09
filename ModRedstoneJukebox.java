@@ -46,7 +46,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
 
-@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.0")
+@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.1")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
 public class ModRedstoneJukebox {
 

@@ -55,6 +55,7 @@ public class GuiRecordTrading  extends GuiContainer
         super(new ContainerRecordTrading(player, merchant, world));
         this.theIMerchant = merchant;
         this.storeId =  CustomRecordHelper.getStoreID(((Entity)merchant).entityId);
+        
 
 		//--DEBUG--// 
         // System.out.println("	GUI for store #" + storeId);        
@@ -261,5 +262,28 @@ public class GuiRecordTrading  extends GuiContainer
     }
     
 
+    
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
+    public void onGuiClosed()
+    {
+    	boolean madeTrade = false;
+    	
+    	// Check if a trade was made
+    	ContainerRecordTrading auxContainer = (ContainerRecordTrading)this.inventorySlots;
+    	if (auxContainer != null) { madeTrade = auxContainer.madeAnyTrade(); }
+    	
+
+    	super.onGuiClosed();
+    	
+    	
+    	// Spawns particles if a trade was made.
+        if (this.mc.thePlayer != null)
+        {
+			Entity auxVillager = (Entity)this.theIMerchant;
+			if (auxVillager != null && madeTrade) { CustomRecordHelper.spawnTradeParticles(this.mc.thePlayer.worldObj, auxVillager, this.rand); }
+        }
+    }
 
 }

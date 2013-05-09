@@ -9,6 +9,7 @@ import java.util.Set;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundPoolEntry;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
@@ -486,6 +487,25 @@ public class CustomRecordHelper
 			}
 		}
 	}
+	
+	
+	
+	
+	public static void spawnTradeParticles(World world, Entity entity, Random rand)
+	{
+		String s = "note";
+		
+		for (int i = 0; i < 3; ++i)
+		{
+		    double d0 = rand.nextGaussian();
+		    double d1 = rand.nextGaussian() * 0.02D;
+		    double d2 = rand.nextGaussian() * 0.02D;
+		    
+		    world.spawnParticle(s, entity.posX + (double)(rand.nextFloat() * entity.width * 2.0F) - (double)entity.width, entity.posY + 0.5D + (double)(rand.nextFloat() * entity.height), entity.posZ + (double)(rand.nextFloat() * entity.width * 2.0F) - (double)entity.width, d0, d1, d2);
+		}
+	}
+	
+	
 
 
 
@@ -649,10 +669,6 @@ public class CustomRecordHelper
 	{
 		Minecraft mc = Minecraft.getMinecraft();
 		float volumeRange = 64F;
-
-		
-System.out.println("innerPlaySreaming");
-System.out.println("	volume = " + volumeExtender);
 
 		
 		// adjusts the volume range

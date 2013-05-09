@@ -27,6 +27,9 @@ public class ContainerRecordTrading extends Container
 
     /** Instance of World. */
     private final World theWorld;
+    
+    
+    
 
     public ContainerRecordTrading(InventoryPlayer par1InventoryPlayer, IMerchant par2IMerchant, World par3World)
     {
@@ -181,5 +184,18 @@ public class ContainerRecordTrading extends Container
         }
     }
 
-	
+
+    /**
+     * Indicates if a trade was made;
+     */
+    public boolean madeAnyTrade()
+    {
+    	SlotRecordTradingResult auxSlot = (SlotRecordTradingResult)this.inventorySlots.get(2);
+    	if (auxSlot != null) {
+    		return auxSlot.traded;
+    	}
+
+    	return false;
+    }
+    
 }

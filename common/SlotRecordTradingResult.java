@@ -16,9 +16,10 @@ public class SlotRecordTradingResult extends Slot
     private final InventoryRecordTrading theMerchantInventory;
 
 
-    /** The Player whos trying to buy/sell stuff. */
+    /** The Player who's trying to buy/sell stuff. */
     private EntityPlayer thePlayer;
     private int field_75231_g;
+    boolean traded = false;					// Indicates if a trade was made;
 
 
     //public SlotMerchantResult(EntityPlayer par1EntityPlayer, IMerchant par2IMerchant, InventoryMerchant par3InventoryMerchant, int par4, int par5, int par6)
@@ -94,6 +95,7 @@ public class SlotRecordTradingResult extends Slot
 
                 this.theMerchantInventory.setInventorySlotContents(0, var4);
                 this.theMerchantInventory.setInventorySlotContents(1, var5);
+                traded = true;
 
                 CustomRecordHelper.useRecipe(slotRecipe, theMerchantInventory.storeId);
             }

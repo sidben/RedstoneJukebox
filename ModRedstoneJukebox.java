@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.resources.ResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -46,7 +47,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
 
-@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.1")
+@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.2")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
 public class ModRedstoneJukebox {
 
@@ -71,13 +72,16 @@ public class ModRedstoneJukebox {
 
 	
 	// Textures and Icons paths
-	public static String blankRecordIcon = "redstonejukebox:blankRecord";
-	public static String customRecordIconArray = "redstonejukebox:customRecord_";
-	public static String jukeboxDiscIcon = "redstonejukebox:redstoneJukebox_Disc";
-	public static String jukeboxTopIcon = "redstonejukebox:redstoneJukebox_Top";
-	public static String jukeboxBottomIcon = "redstonejukebox:redstoneJukebox_Bottom";
-	public static String jukeboxSideOnIcon = "redstonejukebox:redstoneJukebox_SideOn";
-	public static String jukeboxSideOffIcon = "redstonejukebox:redstoneJukebox_SideOff";
+	public static String blankRecordIcon = "redstonejukebox:blank_record";
+	public static String customRecordIconArray = "redstonejukebox:custom_record_";
+	public static String jukeboxDiscIcon = "redstonejukebox:redstone_jukebox_disc";
+	public static String jukeboxTopIcon = "redstonejukebox:redstone_jukebox_top";
+	public static String jukeboxBottomIcon = "redstonejukebox:redstone_jukebox_bottom";
+	public static String jukeboxSideOnIcon = "redstonejukebox:redstone_jukebox_on";
+	public static String jukeboxSideOffIcon = "redstonejukebox:redstone_jukebox_off";
+
+	public static final ResourceLocation redstoneJukeboxGui = new ResourceLocation("redstonejukebox", "/textures/gui/redstonejukebox-gui.png");
+	public static final ResourceLocation recordTradeGui = new ResourceLocation("redstonejukebox", "/textures/gui/recordtrading-gui.png");
 
 	
 	// GUI IDs
@@ -121,7 +125,7 @@ public class ModRedstoneJukebox {
 
 	
 	
-	@PreInit
+	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
         // Config file (ref: http://www.minecraftforge.net/wiki/How_to_make_an_advanced_configuration_file)
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -210,19 +214,46 @@ public class ModRedstoneJukebox {
 		
 		// resets the sound source reference
 		ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
+
+	
+	
+		// Blocks and Items
+		recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, blankRecordIcon).func_111206_d("record_blank");
+		customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord").func_111206_d("record_custom");
+		redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setCreativeTab(CreativeTabs.tabRedstone).func_111022_d("redstone_jukebox_off");
+		redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setLightValue(0.75F).func_111022_d("redstone_jukebox_on");
+
+		
+		
+		// Blocks
+		GameRegistry.registerBlock(redstoneJukebox, "sidbenRedstoneJukebox");
+
+
+		// Tile Entities
+		GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
+		
+		
+		// GUIs
+		NetworkRegistry.instance().registerGuiHandler(this, this.proxy);
+
+		
+		// Names
+		LanguageRegistry.addName(recordBlank, "Blank Record");
+		LanguageRegistry.addName(customRecord, "Music Disc");
+		LanguageRegistry.addName(redstoneJukebox, "Redstone Jukebox");
+		
+		
+		
+		proxy.registerRenderers();
+
+		
 	}
 	
 	
-	@Init
+	@Mod.EventHandler
 	public void load(FMLInitializationEvent event) {
 
-		// Blocks and Items
-		recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, "recordBlank");
-		customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord");
-		redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setCreativeTab(CreativeTabs.tabRedstone);
-		redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("redstoneJukebox").setStepSound(Block.soundStoneFootstep).setLightValue(0.75F);
 
-		
 		// Crafting Recipes
 		ItemStack recordStack0 = new ItemStack(recordBlank, 1);
 		ItemStack recordStack1 = new ItemStack(Item.record11);
@@ -267,41 +298,20 @@ public class ModRedstoneJukebox {
 
 		// Recipe: Redstone Jukebox
 		GameRegistry.addRecipe(new ItemStack(redstoneJukebox), "ggg", "tjt", "www", 'g', glassStack, 't', redstoneTorchStack, 'j', jukeboxStack, 'w', woodStack);
-		
-		
-		// Blocks
-		GameRegistry.registerBlock(redstoneJukebox, "redstoneJukebox");
 
+	}
+	
+	
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
 
-		// Tile Entities
-		GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
-		
-		
-		// GUIs
-		NetworkRegistry.instance().registerGuiHandler(this, this.proxy);
-
-		
-		// Names
-		LanguageRegistry.addName(recordBlank, "Blank Record");
-		LanguageRegistry.addName(customRecord, "Music Disc");
-		LanguageRegistry.addName(redstoneJukebox, "Redstone Jukebox");
-		
-		
 		// Custom Trades
 		CustomRecordHelper.InitializeAllStores();		
 
-		
-		proxy.registerRenderers();
-	}
-	
-	
-	@PostInit
-	public void postInit(FMLPostInitializationEvent event) {
-		// Stub Method
 	}
 
 	
-	@ServerStarting
+	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event) {
 		// register custom commands
 		event.registerServerCommand(new CommandPlayRecord());

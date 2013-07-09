@@ -29,7 +29,8 @@ public class SoundEventHandler
 		for (CustomRecordObject record: CustomRecordHelper.getRecordList())
 		{
 			// custom records are added under "redstonejukebox", so it won't mix with vanilla
-			event.manager.soundPoolStreaming.addSound("redstonejukebox/" + record.songID + ".ogg", new File(record.filePath));
+			// event.manager.soundPoolStreaming.addSound("redstonejukebox/" + record.songID + ".ogg", new File(record.filePath));
+			// I'll need to check this later with resource packs
 		}
 
 	}

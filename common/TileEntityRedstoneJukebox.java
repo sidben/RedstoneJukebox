@@ -8,6 +8,7 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundManager;
 import net.minecraft.entity.item.*;
 import net.minecraft.entity.player.EntityPlayer;
@@ -512,7 +513,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 		{
 
 			//-- check if there is anything playing
-			if (!SoundManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
+			
+			//if (!SoundManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
+			Minecraft mc = Minecraft.getMinecraft();
+			if (!mc.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
 			{
 				if (!this.playlistInitialized)
 				{
@@ -765,7 +769,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
      */
 	@Override
-	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		// return false;
 		return (Item.itemsList[itemstack.itemID] instanceof ItemRecord);
 	}

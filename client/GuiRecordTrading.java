@@ -164,8 +164,8 @@ public class GuiRecordTrading  extends GuiContainer
     {
     	//int var4 = this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        //this.mc.renderEngine.bindTexture(var4);
-        this.mc.renderEngine.bindTexture(CommonProxy.recordTradeGui);
+        // this.mc.renderEngine.bindTexture(CommonProxy.recordTradeGui);
+        this.mc.func_110434_K().func_110577_a(ModRedstoneJukebox.recordTradeGui);
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
@@ -182,7 +182,8 @@ public class GuiRecordTrading  extends GuiContainer
 
             if (var9.func_82784_g())
             {
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui));
+                // GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui));
+            	this.mc.func_110434_K().func_110577_a(ModRedstoneJukebox.recordTradeGui);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 GL11.glDisable(GL11.GL_LIGHTING);
                 this.drawTexturedModalRect(this.guiLeft + 83, this.guiTop + 21, 212, 0, 28, 21);

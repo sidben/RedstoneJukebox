@@ -266,7 +266,7 @@ public class InventoryRecordTrading implements IInventory
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
      */
 	@Override
-	public boolean isStackValidForSlot(int i, ItemStack itemstack) {
+	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		return true;
 	}
 

@@ -39,7 +39,8 @@ public class CommandPlayRecord  extends CommandBase
 
     public String getCommandUsage(ICommandSender par1ICommandSender)
     {
-        return par1ICommandSender.translateString(myUsage, new Object[0]);
+        //return par1ICommandSender.translateString(myUsage, new Object[0]);
+    	return myUsage;
     }
 
     public void processCommand(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)

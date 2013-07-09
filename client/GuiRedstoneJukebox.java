@@ -190,10 +190,8 @@ public class GuiRedstoneJukebox extends GuiContainer
 		*/
 
 
-		//int i = this.mc.renderEngine.getTexture(CommonProxy.redstoneJukeboxGui);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        //mc.renderEngine.bindTexture(i);
-        mc.renderEngine.bindTexture(CommonProxy.redstoneJukeboxGui);
+        mc.func_110434_K().func_110577_a(ModRedstoneJukebox.redstoneJukeboxGui);
         int j = (width - xSize) / 2;
         int k = (height - ySize) / 2;
         drawTexturedModalRect(j, k, 0, 0, xSize, ySize);

@@ -2,6 +2,7 @@ package sidben.redstonejukebox.client;
 
 import org.lwjgl.opengl.GL11;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.common.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -38,8 +39,7 @@ public class GuiRedstoneJukeboxButtonLoop extends GuiButton
 			if (isMouseOver)
 			{
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				//par1Minecraft.renderEngine.bindTexture(par1Minecraft.renderEngine.getTexture(CommonProxy.redstoneJukeboxGui));
-				par1Minecraft.renderEngine.bindTexture(CommonProxy.redstoneJukeboxGui);
+	            par1Minecraft.func_110434_K().func_110577_a(ModRedstoneJukebox.redstoneJukeboxGui);
 				this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 166, GuiRedstoneJukeboxButtonLoop.myWidth, GuiRedstoneJukeboxButtonLoop.myHeight);
 			}
         }

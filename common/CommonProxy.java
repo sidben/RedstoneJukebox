@@ -2,6 +2,7 @@ package sidben.redstonejukebox.common;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.client.GuiRecordTrading;
+import net.minecraft.client.resources.ResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.*;
@@ -12,9 +13,6 @@ import cpw.mods.fml.common.network.IGuiHandler;
 
 public class CommonProxy implements IGuiHandler {
 
-	public static String redstoneJukeboxGui = 	"/resources/redstonejukebox-gui.png";
-	public static String recordTradeGui = 		"/resources/recordtrading-gui.png";
-	
 	
 	
 	

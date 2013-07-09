@@ -157,13 +157,13 @@ public class ContainerRecordTrading extends Container
     }
 
     /**
-     * Callback for when the crafting gui is closed.
+     * Called when the container is closed.
      */
-    public void onCraftGuiClosed(EntityPlayer par1EntityPlayer)
+    public void onContainerClosed(EntityPlayer par1EntityPlayer)
     {
-        super.onCraftGuiClosed(par1EntityPlayer);
+        super.onContainerClosed(par1EntityPlayer);
         this.theMerchant.setCustomer((EntityPlayer)null);
-        super.onCraftGuiClosed(par1EntityPlayer);
+        super.onContainerClosed(par1EntityPlayer);
 
         if (!this.theWorld.isRemote)
         {

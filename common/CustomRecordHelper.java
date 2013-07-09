@@ -592,7 +592,8 @@ public class CustomRecordHelper
 	        if (seMusic != null)
 	        {
 	        	// Record found
-	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
+	            //mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
+	        	mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
 	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
 	            mc.sndManager.sndSystem.play("BgMusic");
 	            
@@ -643,7 +644,8 @@ public class CustomRecordHelper
     	        if (seMusic != null)
     	        {
     	        	// Music found
-    	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
+    	            // mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
+    	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
     	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
     	            mc.sndManager.sndSystem.play("BgMusic");
 
@@ -697,7 +699,8 @@ public class CustomRecordHelper
 	                	mc.sndManager.sndSystem.stop("BgMusic");
 	                }
 	
-	                mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.soundUrl, var6.soundName, false, x, y, z, 2, volumeRange);
+	                //mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.soundUrl, var6.soundName, false, x, y, z, 2, volumeRange);
+	                mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.func_110457_b(), var6.func_110458_a(), false, x, y, z, 2, volumeRange);
 	                mc.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * mc.gameSettings.soundVolume);
 	                MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(mc.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
 	                mc.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);

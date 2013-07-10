@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundPoolEntry;
@@ -27,6 +28,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 
@@ -73,7 +75,7 @@ public class CustomRecordHelper
     	Property propAuxRecord;
     	String recordID;													// internal record ID. All custom records go from 'record000' to 'recordNNN'. The counter is automatic.
 
-    	for(int c = 0; c < ModRedstoneJukebox.maxCustomRecords; c++)	// look for record from ID 000 to NNN
+    	for(int c = 0; c < ModRedstoneJukebox.maxCustomRecords; c++)		// look for record from ID 000 to NNN
     	{
     		recordID = "record" + String.format("%03d", c);
     		propAuxRecord = config.get(customRecordCategory, recordID, (String)null, (String)null, Property.Type.STRING);
@@ -100,6 +102,8 @@ public class CustomRecordHelper
 
 		if (configArray != null)
 		{
+			ModRedstoneJukebox.logDebugInfo("Found " + configArray.size() + " potential custom records. Initializing list:");
+			
 			// Valid config array
 			// converts the given list of string into a list of Custom Records (only if valid)
 			for (String configLine: configArray)
@@ -134,16 +138,23 @@ public class CustomRecordHelper
 								if (auxRecord.iconIndex > 63) auxRecord.iconIndex = 63;
 								recordList.add(auxRecord);
 								recordNames += ";" + lineArray[0];
+								
+								ModRedstoneJukebox.logDebugInfo("Loaded custom record ID [" + auxRecord.songID + "], title [" + auxRecord.songTitle + "], file [" + auxRecord.filePath + "].");
 							}
 
+						}
+						else
+						{
+							ModRedstoneJukebox.logDebug("Song file [" + songFilePath + "] not found. Custom record will not be loaded.", Level.WARNING);							
 						}
 
 					}
 
 				}
 
-
 			}
+
+			ModRedstoneJukebox.logDebugInfo("" + recordList.size() + " custom records initialized.");
 		}
 
 
@@ -528,6 +539,8 @@ public class CustomRecordHelper
 	{
 		if (songID != "")
 		{
+			ModRedstoneJukebox.logDebugInfo("Calling playRecordAt(" +songID+ ", " +x+ ", " +y+ ", " +z+ ", " +showName+ ", " +volumeExtender+ ")");
+			
     		Minecraft mc = Minecraft.getMinecraft();
 
     		if (isVanillaRecord(songID))
@@ -562,6 +575,8 @@ public class CustomRecordHelper
 	{
 		if (songID != "")
 		{
+			ModRedstoneJukebox.logDebugInfo("Calling playRecord(" +songID+ ", " +showName+ ")");
+			
     		Minecraft mc = Minecraft.getMinecraft();
     		String songPoolName = "";
 
@@ -591,15 +606,21 @@ public class CustomRecordHelper
 
 	        if (seMusic != null)
 	        {
-	        	// Record found
-	            //mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
-	        	mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
-	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
-	            mc.sndManager.sndSystem.play("BgMusic");
-	            
-	            if (showName) { showRecordPlayingMessage(songID); }
-
-	            return true;
+                try 
+                {
+		        	// Record found
+		        	mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
+		            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
+		            mc.sndManager.sndSystem.play("BgMusic");
+		            
+		            if (showName) { showRecordPlayingMessage(songID); }
+	
+		            return true;
+                }
+                catch (Exception e) 
+                {
+                	ModRedstoneJukebox.logDebug("Error playing BgMusic. Error message: " + e.getMessage(), Level.SEVERE);
+                } 
 	        }
 
 
@@ -622,7 +643,9 @@ public class CustomRecordHelper
 	{
 		if (songID != "")
 		{
-    		Minecraft mc = Minecraft.getMinecraft();
+			ModRedstoneJukebox.logDebugInfo("Calling playBgMusic(" +songID+ ")");
+			
+			Minecraft mc = Minecraft.getMinecraft();
     		String songPoolName = songID;
 
 
@@ -643,13 +666,20 @@ public class CustomRecordHelper
 
     	        if (seMusic != null)
     	        {
-    	        	// Music found
-    	            // mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.soundUrl, seMusic.soundName, false);
-    	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
-    	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
-    	            mc.sndManager.sndSystem.play("BgMusic");
+	                try 
+	                {
+	    	        	// Music found
+	    	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
+	    	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
+	    	            mc.sndManager.sndSystem.play("BgMusic");
 
-    	            return true;
+	    	            return true;
+	                }
+	                catch (Exception e) 
+	                {
+	                	ModRedstoneJukebox.logDebug("Error playing BgMusic. Error message: " + e.getMessage(), Level.SEVERE);
+	                } 
+
     	        }
     		}
 
@@ -682,13 +712,17 @@ public class CustomRecordHelper
 		
 	    if (mc.gameSettings.soundVolume != 0.0F || soundPoolId == null)
 	    {
-	        if (mc.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
+	    	ModRedstoneJukebox.logDebugInfo("Atempt to play stream Pool ID [" +soundPoolId+ "]");
+	    	
+	    	
+	    	if (mc.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
 	        {
 	        	mc.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
 	        }
 	
 	        if (soundPoolId != null)
 	        {
+	        	// TODO: Add my own method to get a soundpoolentry. The file URL is messed up with resource packs
 	            SoundPoolEntry var6 = mc.sndManager.soundPoolStreaming.getRandomSoundFromSoundPool(soundPoolId);
 	            var6 = SoundEvent.getResult(new PlayStreamingEvent(mc.sndManager, var6, soundPoolId, x, y, z));
 	
@@ -699,11 +733,25 @@ public class CustomRecordHelper
 	                	mc.sndManager.sndSystem.stop("BgMusic");
 	                }
 	
-	                //mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.soundUrl, var6.soundName, false, x, y, z, 2, volumeRange);
-	                mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.func_110457_b(), var6.func_110458_a(), false, x, y, z, 2, volumeRange);
-	                mc.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * mc.gameSettings.soundVolume);
-	                MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(mc.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
-	                mc.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
+	                ModRedstoneJukebox.logDebugInfo("Setting new stream source, name [" +ModRedstoneJukebox.sourceName+ "], url [" +var6.func_110457_b()+  "], id [" +var6.func_110458_a()+ "].");
+	                try 
+	                {
+	                	// OBS: this try..ctach does not get the sound exception, 
+		                // mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.func_110457_b(), var6.func_110458_a(), false, x, y, z, 2, volumeRange);
+	                	
+	                	// Hard-coded debug
+	                	mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName,  new File(mc.mcDataDir + "/mods/jukebox/tje-theme.ogg").toURI().toURL(), var6.func_110458_a(), false, x, y, z, 2, volumeRange);
+	                	
+	                	
+		                mc.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * mc.gameSettings.soundVolume);
+		                MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(mc.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
+		                mc.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
+	                }
+	                catch (Exception e) 
+	                {
+	                	ModRedstoneJukebox.logDebug("Error playing Streaming. Error message: " + e.getMessage(), Level.SEVERE);
+	                }
+
 	            }
 	        }
 	    }

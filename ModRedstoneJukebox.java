@@ -29,6 +29,7 @@ import sidben.redstonejukebox.common.ItemBlankRecord;
 import sidben.redstonejukebox.common.ItemCustomRecord;
 import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
@@ -120,6 +121,10 @@ public class ModRedstoneJukebox {
 	public static int customRecordPriceMin;					// Minimal value of custom records in emeralds
 	public static int customRecordPriceMax;					// Maximum value of custom records in emeralds
 	
+	
+	// Debug mode
+	public static boolean onDebug;							// Indicates if the MOD is on debug.
+	
 		
 	
 
@@ -140,6 +145,9 @@ public class ModRedstoneJukebox {
         	config.load();
         	
         	
+        	// Debug
+        	this.onDebug 					= config.get(customRecordCategory, "onDebug", false).getBoolean(false);
+
         	// Load blocks and items IDs
         	this.redstoneJukeboxIdleID 		= config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
         	this.redstoneJukeboxActiveID 	= config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
@@ -184,17 +192,10 @@ public class ModRedstoneJukebox {
         	helpComment				+= "  - if the config line is incorrect, the record won't be added;" + br;
         	
         	config.addCustomCategoryComment(customRecordCategory, helpComment);
-
-			//--DEBUG--// 
-			/*
-			System.out.println("Loading RedstoneJukebox config:");
-			System.out.println("	Record List size: " + CustomRecordHelper.getRecordList().size());
-			*/
-
         } 
         catch (Exception e) 
         {
-        	FMLCommonHandler.instance().getFMLLogger().log(Level.SEVERE, "Error loading the configuration of the Redstone Jukebox Mod. Error message: " + e.getMessage() + " / " + e.toString());
+        	FMLLog.log(Level.SEVERE, "Error loading the configuration of the Redstone Jukebox Mod. Error message: " + e.getMessage() + " / " + e.toString());
         } 
         finally 
         {
@@ -320,4 +321,19 @@ public class ModRedstoneJukebox {
 	}
 
 	
+	
+	
+	public static void logDebugInfo(String info)
+	{
+		logDebug(info, Level.INFO);
+	}
+
+	public static void logDebug(String info, Level level)
+	{
+		if (onDebug || level != Level.INFO) {
+			FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
+		}
+	}
+	
+
 }

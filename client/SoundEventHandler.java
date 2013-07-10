@@ -25,12 +25,18 @@ public class SoundEventHandler
 	@ForgeSubscribe
 	public void onSoundLoad(SoundLoadEvent event)
 	{
+		String songNick;
+		
         // Load the custom records to the sound pool
 		for (CustomRecordObject record: CustomRecordHelper.getRecordList())
 		{
 			// custom records are added under "redstonejukebox", so it won't mix with vanilla
 			// event.manager.soundPoolStreaming.addSound("redstonejukebox/" + record.songID + ".ogg", new File(record.filePath));
-			// I'll need to check this later with resource packs
+			songNick = "redstonejukebox/" + record.songID + ".ogg";
+			ModRedstoneJukebox.logDebugInfo("Adding " + record.songID + " to the soundPoolStreaming under the ID " + songNick + ".");
+			event.manager.soundPoolStreaming.addSound(songNick);
+			
+			// OBS: This method may need to go away, soundpool is messed up with no file URL
 		}
 
 	}
@@ -45,6 +51,7 @@ public class SoundEventHandler
 		// Updates the position of the last streaming source. The if is not really needed, but this may change in the future.
 		if (event.name == ModRedstoneJukebox.sourceName)
 		{
+			ModRedstoneJukebox.logDebugInfo("Updating sound source to " + event.x + ", " + event.y + ", " + event.z + ".");
 			ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)event.x, (double)event.y, (double)event.z);
 		}
 	}

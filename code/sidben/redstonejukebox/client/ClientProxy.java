@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.client;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
@@ -48,5 +49,11 @@ public class ClientProxy extends CommonProxy {
 		return null;
 	}
 	
-	
+
+    @Override
+    public World getClientWorld()
+    {
+        return FMLClientHandler.instance().getClient().theWorld;
+    }
+
 }

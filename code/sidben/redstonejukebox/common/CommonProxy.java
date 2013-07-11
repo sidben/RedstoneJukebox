@@ -60,5 +60,10 @@ public class CommonProxy implements IGuiHandler {
 		return null;
 	}
 
+    
+    public World getClientWorld()
+    {
+        return null;
+    }
 	
 }

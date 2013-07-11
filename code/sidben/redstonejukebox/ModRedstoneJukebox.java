@@ -49,7 +49,7 @@ public class ModRedstoneJukebox {
 	
 	
 	// Says where the client and server 'proxy' code is loaded.
-	@SidedProxy(clientSide="sidben.redstonejukebox.client.ClientProxy", serverSide="sidben.redstonejukebox.CommonProxy")
+	@SidedProxy(clientSide="sidben.redstonejukebox.client.ClientProxy", serverSide="sidben.redstonejukebox.common.CommonProxy")
 	public static CommonProxy proxy;
 
 	
@@ -160,7 +160,8 @@ public class ModRedstoneJukebox {
         			
 
         	// Load the custom records
-        	CustomRecordHelper.LoadCustomRecordsConfig(config, customRecordCategory);
+        	// TODO: Fix this for SMP
+        	//CustomRecordHelper.LoadCustomRecordsConfig(config, customRecordCategory);
         	
 
         	// Custom records config help
@@ -195,14 +196,6 @@ public class ModRedstoneJukebox {
         
         
         
-        // Register my custom sound handler
-		SoundEventHandler soundEventHandler = new SoundEventHandler();
-		MinecraftForge.EVENT_BUS.register(soundEventHandler);
-		
-		// Register my custom player event handler
-		PlayerEventHandler playerEventHandler = new PlayerEventHandler();
-		MinecraftForge.EVENT_BUS.register(playerEventHandler);
-		
 		// resets the sound source reference
 		ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
 
@@ -220,12 +213,6 @@ public class ModRedstoneJukebox {
 		GameRegistry.registerBlock(redstoneJukebox, "sidbenRedstoneJukebox");
 
 
-		// Tile Entities
-		GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
-		
-		
-		// GUIs
-		NetworkRegistry.instance().registerGuiHandler(this, ModRedstoneJukebox.proxy);
 
 		
 		// Names
@@ -234,16 +221,29 @@ public class ModRedstoneJukebox {
 		LanguageRegistry.addName(redstoneJukebox, "Redstone Jukebox");
 		
 		
-		
-		proxy.registerRenderers();
-
-		
 	}
 	
 	
 	@Mod.EventHandler
 	public void load(FMLInitializationEvent event) {
 
+        // Register my custom sound handler
+		SoundEventHandler soundEventHandler = new SoundEventHandler();
+		MinecraftForge.EVENT_BUS.register(soundEventHandler);
+		
+		// Register my custom player event handler
+		PlayerEventHandler playerEventHandler = new PlayerEventHandler();
+		MinecraftForge.EVENT_BUS.register(playerEventHandler);
+		
+		// Tile Entities
+		GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
+		
+		// GUIs
+		NetworkRegistry.instance().registerGuiHandler(this, ModRedstoneJukebox.proxy);
+
+		
+		proxy.registerRenderers();
+		
 
 		// Crafting Recipes
 		ItemStack recordStack0 = new ItemStack(recordBlank, 1);
@@ -297,7 +297,8 @@ public class ModRedstoneJukebox {
 	public void postInit(FMLPostInitializationEvent event) {
 
 		// Custom Trades
-		CustomRecordHelper.InitializeAllStores();		
+		// TODO: Fix this for SMP
+		// CustomRecordHelper.InitializeAllStores();		
 
 	}
 

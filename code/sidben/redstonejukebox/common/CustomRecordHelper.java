@@ -28,6 +28,7 @@ import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 
 /*
@@ -65,6 +66,7 @@ public class CustomRecordHelper
 	 *
 	 * ====================================================================================== */
 
+	//@SideOnly(Side.CLIENT)		-- did not fix
 	// Load the custom records from the config file (main mod class)
 	public static void LoadCustomRecordsConfig(Configuration config, String customRecordCategory)
 	{
@@ -88,6 +90,7 @@ public class CustomRecordHelper
     	CustomRecordHelper.InitializeList(recordsConfigList);
 	}
 
+	//@SideOnly(Side.CLIENT)		-- did not fix
 	public static void InitializeList(ArrayList<String> configArray)
 	{
 		Minecraft mc = Minecraft.getMinecraft();

@@ -1,7 +1,5 @@
 package sidben.redstonejukebox.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.Player;
@@ -19,7 +17,7 @@ public class ClientPacketHandler  implements IPacketHandler
 		//--DEBUG--// 
 		// System.out.println("	ClientPacketHandler.onPacketData");
 
-		DataInputStream data = new DataInputStream(new ByteArrayInputStream(payload.data));
+		// DataInputStream data = new DataInputStream(new ByteArrayInputStream(payload.data));
 	}
 	
 }

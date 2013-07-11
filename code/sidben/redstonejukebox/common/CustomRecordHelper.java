@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundPoolEntry;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
@@ -28,8 +27,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 
 
@@ -117,6 +114,7 @@ public class CustomRecordHelper
 					// where ICON_INDEX is integer and all others are Strings
 					if (lineArray[1].matches("\\d+"))
 					{
+						// OBS: will this cause a problem on Macs/Linux?
 						songFilePath = mc.mcDataDir + "/mods/" + ModRedstoneJukebox.customRecordsFolder + "/" + lineArray[2];
 
 						// check to see if the file exists, otherwise the code will cause a crash or stop all game sounds.
@@ -541,8 +539,6 @@ public class CustomRecordHelper
 		{
 			ModRedstoneJukebox.logDebugInfo("Calling playRecordAt(" +songID+ ", " +x+ ", " +y+ ", " +z+ ", " +showName+ ", " +volumeExtender+ ")");
 			
-    		Minecraft mc = Minecraft.getMinecraft();
-
     		if (isVanillaRecord(songID))
 			{
 				// Minecraft vanilla records, same code as the "PlayRecord" of RenderGlobal

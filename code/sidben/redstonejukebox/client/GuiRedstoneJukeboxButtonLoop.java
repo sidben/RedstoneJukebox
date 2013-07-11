@@ -3,7 +3,6 @@ package sidben.redstonejukebox.client;
 import org.lwjgl.opengl.GL11;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.common.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 

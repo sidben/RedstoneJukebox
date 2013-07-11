@@ -4,9 +4,7 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.src.*;
 import net.minecraft.world.World;
-import net.minecraftforge.client.MinecraftForgeClient;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.common.*;
 
@@ -18,14 +16,14 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void registerRenderers() 
 	{
-		// Needed because of the special way the Jukebox is rendered (multiple textures)
+		// Needed because of the special way the jukebox is rendered (multiple textures)
 		ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 		
 		RenderingRegistry.registerBlockHandler(new RenderRedstoneJukebox()); 
 	}
 	
 	
-	// returns an instance of the Gui 
+	// returns an instance of the GUI 
 	@Override
 	public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
 	{

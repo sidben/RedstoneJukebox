@@ -6,10 +6,8 @@ import org.lwjgl.opengl.GL11;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.*;
-import net.minecraft.src.*;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
 
 
 

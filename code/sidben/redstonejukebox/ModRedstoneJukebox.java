@@ -1,22 +1,16 @@
 package sidben.redstonejukebox;
 
 
-import java.util.ArrayList;
-import java.util.Random;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.resources.ResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraft.village.MerchantRecipe;
-import net.minecraft.village.MerchantRecipeList;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.client.PlayerEventHandler;
 import sidben.redstonejukebox.client.SoundEventHandler;
 import sidben.redstonejukebox.common.BlockRedstoneJukebox;
@@ -28,14 +22,9 @@ import sidben.redstonejukebox.common.CustomRecordHelper;
 import sidben.redstonejukebox.common.ItemBlankRecord;
 import sidben.redstonejukebox.common.ItemCustomRecord;
 import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
-import cpw.mods.fml.common.Mod.ServerStarting;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -81,6 +70,7 @@ public class ModRedstoneJukebox {
 	public static String jukeboxSideOnIcon = "redstonejukebox:redstone_jukebox_on";
 	public static String jukeboxSideOffIcon = "redstonejukebox:redstone_jukebox_off";
 
+	// OBS: this don't belong here, almost sure of it
 	public static final ResourceLocation redstoneJukeboxGui = new ResourceLocation("redstonejukebox", "/textures/gui/redstonejukebox-gui.png");
 	public static final ResourceLocation recordTradeGui = new ResourceLocation("redstonejukebox", "/textures/gui/recordtrading-gui.png");
 
@@ -146,26 +136,26 @@ public class ModRedstoneJukebox {
         	
         	
         	// Debug
-        	this.onDebug 					= config.get(customRecordCategory, "onDebug", false).getBoolean(false);
+        	ModRedstoneJukebox.onDebug 					= config.get(customRecordCategory, "onDebug", false).getBoolean(false);
 
         	// Load blocks and items IDs
-        	this.redstoneJukeboxIdleID 		= config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
-        	this.redstoneJukeboxActiveID 	= config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
-        	this.blankRecordItemID 			= config.getItem(config.CATEGORY_ITEM, "blankRecordItemID", 7200).getInt(7200);
-        	this.customRecordItemID 		= config.getItem(config.CATEGORY_ITEM, "customRecordItemID", 7201).getInt(7201);
+        	ModRedstoneJukebox.redstoneJukeboxIdleID 	= config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
+        	ModRedstoneJukebox.redstoneJukeboxActiveID 	= config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
+        	ModRedstoneJukebox.blankRecordItemID 		= config.getItem(Configuration.CATEGORY_ITEM, "blankRecordItemID", 7200).getInt(7200);
+        	ModRedstoneJukebox.customRecordItemID 		= config.getItem(Configuration.CATEGORY_ITEM, "customRecordItemID", 7201).getInt(7201);
 
         	// Merchant config
-        	this.customRecordOffersMin		= config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);
-        	this.customRecordOffersMax		= config.get(customRecordCategory, "customRecordOffersMax", 4).getInt(4);
-        	this.customRecordPriceMin		= config.get(customRecordCategory, "customRecordPriceMin", 5).getInt(5);
-        	this.customRecordPriceMax		= config.get(customRecordCategory, "customRecordPriceMax", 9).getInt(9);
+        	ModRedstoneJukebox.customRecordOffersMin	= config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);
+        	ModRedstoneJukebox.customRecordOffersMax	= config.get(customRecordCategory, "customRecordOffersMax", 4).getInt(4);
+        	ModRedstoneJukebox.customRecordPriceMin		= config.get(customRecordCategory, "customRecordPriceMin", 5).getInt(5);
+        	ModRedstoneJukebox.customRecordPriceMax		= config.get(customRecordCategory, "customRecordPriceMax", 9).getInt(9);
         	
         	// Extra validation on the merchant config (min and max values)
-        	if (this.customRecordOffersMin < 1) this.customRecordOffersMin = 1;
-        	if (this.customRecordOffersMax < this.customRecordOffersMin) this.customRecordOffersMax = this.customRecordOffersMin;
-        	if (this.customRecordOffersMax > this.maxOffers) this.customRecordOffersMax = this.maxOffers;
-        	if (this.customRecordOffersMin < 1) this.customRecordPriceMin = 1;
-        	if (this.customRecordPriceMax < this.customRecordPriceMin) this.customRecordPriceMax = this.customRecordPriceMin;
+        	if (ModRedstoneJukebox.customRecordOffersMin < 1) ModRedstoneJukebox.customRecordOffersMin = 1;
+        	if (ModRedstoneJukebox.customRecordOffersMax < ModRedstoneJukebox.customRecordOffersMin) ModRedstoneJukebox.customRecordOffersMax = ModRedstoneJukebox.customRecordOffersMin;
+        	if (ModRedstoneJukebox.customRecordOffersMax > ModRedstoneJukebox.maxOffers) ModRedstoneJukebox.customRecordOffersMax = ModRedstoneJukebox.maxOffers;
+        	if (ModRedstoneJukebox.customRecordOffersMin < 1) ModRedstoneJukebox.customRecordPriceMin = 1;
+        	if (ModRedstoneJukebox.customRecordPriceMax < ModRedstoneJukebox.customRecordPriceMin) ModRedstoneJukebox.customRecordPriceMax = ModRedstoneJukebox.customRecordPriceMin;
         	
         			
 
@@ -235,7 +225,7 @@ public class ModRedstoneJukebox {
 		
 		
 		// GUIs
-		NetworkRegistry.instance().registerGuiHandler(this, this.proxy);
+		NetworkRegistry.instance().registerGuiHandler(this, ModRedstoneJukebox.proxy);
 
 		
 		// Names

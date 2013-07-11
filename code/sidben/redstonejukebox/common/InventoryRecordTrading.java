@@ -1,13 +1,10 @@
 package sidben.redstonejukebox.common;
 
-import sidben.redstonejukebox.ModRedstoneJukebox;
-import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.*;
-import net.minecraft.src.*;
 import net.minecraft.village.*;
 
 
@@ -16,7 +13,6 @@ public class InventoryRecordTrading implements IInventory
 	
     private final IMerchant theMerchant;
     private ItemStack[] theInventory = new ItemStack[3];
-    private final EntityPlayer thePlayer;
     private MerchantRecipe currentRecipe;
     private int currentRecipeIndex;
     int storeId = 0;
@@ -29,7 +25,6 @@ public class InventoryRecordTrading implements IInventory
     
     public InventoryRecordTrading(EntityPlayer par1EntityPlayer, IMerchant merchant)
     {
-        this.thePlayer = par1EntityPlayer;
         this.theMerchant = merchant;
         this.storeId =  CustomRecordHelper.getStoreID(((Entity)merchant).entityId);
     }
@@ -192,7 +187,7 @@ public class InventoryRecordTrading implements IInventory
 		this.currentRecipeIndex = par1;
 
 		MerchantRecipeList offersList = CustomRecordHelper.getStoreCatalog(this.storeId);
-		MerchantRecipe slotRecipe = (MerchantRecipe)offersList.get(this.currentRecipeIndex);
+		offersList.get(this.currentRecipeIndex);
 
 		this.resetRecipeAndSlots();
     }

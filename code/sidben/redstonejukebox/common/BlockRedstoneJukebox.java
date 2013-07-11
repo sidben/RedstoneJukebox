@@ -4,22 +4,16 @@ import java.util.Random;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.asm.*;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.Icon;
 import net.minecraft.world.*;
-import net.minecraftforge.client.MinecraftForgeClient;
 
 
 public class BlockRedstoneJukebox extends BlockContainer {
@@ -28,8 +22,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	/*--------------------------------------------------------------------
 		Constants and Variables
 	--------------------------------------------------------------------*/
-
-    private Random random = new Random();
 
     // True if this is an active jukebox, false if idle 
     private final boolean isActive;

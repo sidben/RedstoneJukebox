@@ -1,6 +1,5 @@
 package sidben.redstonejukebox.client;
 
-import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,7 +16,6 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.src.*;
 import net.minecraft.util.StatCollector;
 import net.minecraft.village.*;
 import net.minecraft.world.World;

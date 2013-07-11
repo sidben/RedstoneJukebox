@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
-import net.minecraft.src.*;
 
 
 public class ItemBlankRecord extends Item {
@@ -20,7 +19,6 @@ public class ItemBlankRecord extends Item {
 		super(id);
 		setMaxStackSize(16);
 		setCreativeTab(tab);
-		//setIconIndex(48);
 		setUnlocalizedName(name); 
 	}
 
@@ -39,6 +37,7 @@ public class ItemBlankRecord extends Item {
 	
 
 	// allows items to add custom lines of information to the mouseover description
+	@Override
 	public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
 	{
 		if (debugActive)

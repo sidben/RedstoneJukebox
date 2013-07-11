@@ -4,18 +4,14 @@ import java.util.List;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.asm.*;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockJukeBox;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
-import net.minecraft.src.*;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
@@ -41,7 +37,8 @@ public class ItemCustomRecord extends ItemRecord
 
 
 	@SideOnly(Side.CLIENT)
-    /**
+	@Override
+	/**
      * When this method is called, your block should register all the icons it needs with the given IconRegister. This
      * is the only chance you get to register icons.
      */
@@ -58,6 +55,7 @@ public class ItemCustomRecord extends ItemRecord
     
 	
 	@SideOnly(Side.CLIENT)
+	@Override
 	public Icon getIconFromDamage(int damage)
 	{
 		// OBS: DamageValue is used to set the custom record icon.
@@ -70,7 +68,8 @@ public class ItemCustomRecord extends ItemRecord
      * Callback for item usage. If the item does something special on right clicking, he will have one of those. Return
      * True if something happen and false if it don't. This is for ITEMS, not BLOCKS
      */
-    public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int x, int y, int z, int par7, float par8, float par9, float par10)
+	@Override
+	public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
     	String songID = "";
     	
@@ -100,7 +99,8 @@ public class ItemCustomRecord extends ItemRecord
     
     
     // allows items to add custom lines of information to the mouseover description
-   public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
+    @Override
+    public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
    {
 	   String songTitle = "";
 	   String songID = getSongID(par1ItemStack);

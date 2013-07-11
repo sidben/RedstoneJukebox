@@ -1,16 +1,12 @@
 package sidben.redstonejukebox.client;
 
-import java.io.File;
-
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.common.CustomRecordHelper;
 import sidben.redstonejukebox.common.CustomRecordObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.Vec3;
 
 import net.minecraftforge.client.event.sound.*;
 import net.minecraftforge.event.ForgeSubscribe;
-import cpw.mods.fml.common.*;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

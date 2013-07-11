@@ -1,19 +1,10 @@
 package sidben.redstonejukebox.common;
 
 import java.util.List;
-import java.util.Random;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SoundPoolEntry;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.*;
-import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.client.event.sound.PlayBackgroundMusicEvent;
-import net.minecraftforge.client.event.sound.SoundEvent;
 
 
 

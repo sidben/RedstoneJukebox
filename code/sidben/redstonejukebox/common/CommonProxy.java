@@ -1,12 +1,9 @@
 package sidben.redstonejukebox.common;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.client.GuiRecordTrading;
-import net.minecraft.client.resources.ResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.*;
-import net.minecraft.src.*;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 

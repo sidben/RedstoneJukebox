@@ -1,15 +1,11 @@
 package sidben.redstonejukebox.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.Random;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SoundManager;
 import net.minecraft.entity.item.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,7 +13,6 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.network.*;
 import net.minecraft.network.packet.*;
-import net.minecraft.src.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.world.World;
 
@@ -93,7 +88,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         currentPlaySlot = -1;
         nextPlaySlot = -1;
         isLoop = false;
-        this.delay = this.maxDelay;
+        this.delay = TileEntityRedstoneJukebox.maxDelay;
         playlistInitialized = false;
     }
 
@@ -480,7 +475,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	private void markAsPlaying()
 	{
 		this.isPlaying = true;
-		this.delay = this.maxDelay;
+		this.delay = TileEntityRedstoneJukebox.maxDelay;
 
 		this.onInventoryChanged();
         BlockRedstoneJukebox.updateJukeboxBlockState(true, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
@@ -491,7 +486,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 		this.isPlaying = false;
         this.currentPlaySlot = -1;
     	this.nextPlaySlot = -1;
-        this.delay = this.maxDelay;
+        this.delay = TileEntityRedstoneJukebox.maxDelay;
         
 		this.onInventoryChanged();
         BlockRedstoneJukebox.updateJukeboxBlockState(false, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
@@ -506,7 +501,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//   is this Jukebox. If not, update everything.
 	private void checkIfStillPlaying()
 	{
-		this.delay = this.maxDelay;
+		this.delay = TileEntityRedstoneJukebox.maxDelay;
         
 
 		if (!worldObj.isRemote && this.isPlaying)

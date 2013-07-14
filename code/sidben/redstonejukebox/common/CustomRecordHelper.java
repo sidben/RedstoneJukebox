@@ -1,6 +1,8 @@
 package sidben.redstonejukebox.common;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.src.ModLoader;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
@@ -27,6 +30,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -51,7 +55,7 @@ public class CustomRecordHelper
 	private static String[] bgMusicNamesList;
 
 	// used to check if the record name is from vanilla (isVanillaRecord method)
-	private final static Set<String> vanillaRecords = new HashSet<String>(Arrays.asList(new String[] {"13","cat","blocks","chirp","far","mall","mellohi","stal","strad","ward","11","wait"}));
+//	private final static Set<String> vanillaRecords = new HashSet<String>(Arrays.asList(new String[] {"13","cat","blocks","chirp","far","mall","mellohi","stal","strad","ward","11","wait"}));
 
 	// used to check if the music name is from vanilla background songs
 	private final static Set<String> vanillaBgSongs = new HashSet<String>(Arrays.asList(new String[] {"calm","hal","nuance","piano"}));
@@ -66,13 +70,12 @@ public class CustomRecordHelper
 	 *
 	 * ====================================================================================== */
 
-	//@SideOnly(Side.CLIENT)		-- did not fix
-	// Load the custom records from the config file (main mod class)
-	public static void LoadCustomRecordsConfig(Configuration config, String customRecordCategory)
+	// Load the custom records from the config file
+	public static void LoadCustomRecordsConfig(Configuration config, String customRecordCategory) 
 	{
     	ArrayList<String> recordsConfigList = new ArrayList<String>();		// array of config lines, like SONG_ID;ICON_INDEX;FILE_NAME;SONG_TITLE,
-    	Property propAuxRecord;
     	String recordID;													// internal record ID. All custom records go from 'record000' to 'recordNNN'. The counter is automatic.
+    	Property propAuxRecord;												// Config group
 
     	for(int c = 0; c < ModRedstoneJukebox.maxCustomRecords; c++)		// look for record from ID 000 to NNN
     	{
@@ -90,24 +93,30 @@ public class CustomRecordHelper
     	CustomRecordHelper.InitializeList(recordsConfigList);
 	}
 
-	//@SideOnly(Side.CLIENT)		-- did not fix
-	public static void InitializeList(ArrayList<String> configArray)
+
+	private static void InitializeList(ArrayList<String> configArray)
 	{
-		Minecraft mc = Minecraft.getMinecraft();
-		recordList = new ArrayList<CustomRecordObject>();
 		String recordNames = "13;cat;blocks;chirp;far;mall;mellohi;stal;strad;ward;11;wait";		// start with vanilla records
 		CustomRecordObject auxRecord = null;
-		String songFilePath;
+		File auxFile;
+		URL songURL;
+
+		// Resets the internal list of custom records
+		recordList = new ArrayList<CustomRecordObject>();
 
 
+		// Starts validating the custom records list, based on the config info loaded
 		if (configArray != null)
 		{
-			ModRedstoneJukebox.logDebugInfo("Found " + configArray.size() + " potential custom records. Initializing list:");
+			ModRedstoneJukebox.logDebugInfo("Found " + configArray.size() + " potential custom records. Initializing list...");
+
 			
-			// Valid config array
-			// converts the given list of string into a list of Custom Records (only if valid)
+			// Converts the given list of string into a list of Custom Records (only valid lines)
 			for (String configLine: configArray)
 			{
+				songURL = null;
+				auxFile = null;
+
 				// Check each line if the config. Splits to check each 'column'
 				String[] lineArray = configLine.split(";");
 				if (lineArray.length == 4)
@@ -117,36 +126,69 @@ public class CustomRecordHelper
 					// where ICON_INDEX is integer and all others are Strings
 					if (lineArray[1].matches("\\d+"))
 					{
-						// OBS: will this cause a problem on Macs/Linux?
-						songFilePath = mc.mcDataDir + "/mods/" + ModRedstoneJukebox.customRecordsFolder + "/" + lineArray[2];
-
-						// check to see if the file exists, otherwise the code will cause a crash or stop all game sounds.
-						if (new File(songFilePath).isFile())
+						
+						/* 
+						 * Try to create the record URL. 
+						 * 
+						 * This used to be done by vanilla code on the [onSoundLoad] event, using
+						 * event.manager.soundPoolStreaming.addSound(RECORDNAME, RECORD_FILE), but after 
+						 * Resource Packs (MC 1.6.2), we no longer can pass file paths to that method.
+						 * 
+						 * Now I create a URL that represents the path of the record inside the [mods/jukebox] 
+						 * folder, that way I can load the records bypassing Resource Packs - the songs are 
+						 * always the same, no matter what resource pack the player is using.
+						 */
+						try
 						{
-							if (!recordNames.contains(lineArray[0]))
-							{
-								lineArray[3] = lineArray[3].trim();
-								if (lineArray[3].equals("")) { 
-									lineArray[3] = "(no name)"; 
-								} 
-								else if (lineArray[3].length() > 64) {
-									lineArray[3] = lineArray[3].substring(0, 63); 
-								}							
-								
-								auxRecord = new CustomRecordObject(lineArray[0], Integer.parseInt(lineArray[1]), songFilePath , lineArray[3]);
-								auxRecord.songID = auxRecord.songID.toLowerCase();
-								if (auxRecord.iconIndex < 1) auxRecord.iconIndex = 1;
-								if (auxRecord.iconIndex > 63) auxRecord.iconIndex = 63;
-								recordList.add(auxRecord);
-								recordNames += ";" + lineArray[0];
-								
-								ModRedstoneJukebox.logDebugInfo("Loaded custom record ID [" + auxRecord.songID + "], title [" + auxRecord.songTitle + "], file [" + auxRecord.filePath + "].");
-							}
-
+							songURL = new URL("file:"+ ModRedstoneJukebox.customRecordsPath  + lineArray[2]);
+							auxFile = new File(songURL.getFile());
 						}
-						else
+						catch (MalformedURLException e)
 						{
-							ModRedstoneJukebox.logDebug("Song file [" + songFilePath + "] not found. Custom record will not be loaded.", Level.WARNING);							
+							ModRedstoneJukebox.logDebug("Error creating song URL: " + e.getMessage(), Level.SEVERE);
+							ModRedstoneJukebox.logDebug("Config Line: [" +  configLine + "]", Level.SEVERE);
+						}
+						
+
+						if (auxFile != null)
+						{
+	
+							// Check to see if the file exists, otherwise the code will cause a crash or stop all game sounds.
+							if (auxFile.isFile())
+							{
+								if (!recordNames.contains(lineArray[0]))		// avoids adding the same song ID twice
+								{
+									// Load the record title. if empty, sets to "no name"
+									lineArray[3] = lineArray[3].trim();
+									if (lineArray[3].equals("")) { 
+										lineArray[3] = "(no name)"; 
+									} 
+									else if (lineArray[3].length() > 64) {
+										lineArray[3] = lineArray[3].substring(0, 63); 
+									}
+									
+									// Creates the custom record object
+									auxRecord = new CustomRecordObject(lineArray[0], Integer.parseInt(lineArray[1]), songURL, lineArray[3]);
+									
+									// Validates the icon ID
+									if (auxRecord.iconIndex < 1) auxRecord.iconIndex = 1;
+									if (auxRecord.iconIndex > ModRedstoneJukebox.maxCustomRecordIcon) auxRecord.iconIndex = ModRedstoneJukebox.maxCustomRecordIcon;
+									
+									// Adds the record to the internal custom records list
+									recordList.add(auxRecord);
+									
+									// Adds the songID to the list of record names
+									recordNames += ";" + lineArray[0];
+
+									// Debug
+									ModRedstoneJukebox.logDebugInfo("Loaded custom record ID [" + auxRecord.songID + "], title [" + auxRecord.songTitle + "], url [" + songURL + "].");
+								}
+	
+							}
+							else
+							{
+								ModRedstoneJukebox.logDebug("Song [" +songURL+ "] not found in [" +auxFile.getAbsolutePath()+ "]. Custom record will not be loaded.", Level.WARNING);							
+							}
 						}
 
 					}
@@ -162,7 +204,6 @@ public class CustomRecordHelper
 		// splits the records names list
 		recordNamesList = recordNames.split(";");
 		bgMusicNamesList = "calm;hal;nuance;piano".split(";");
-
 	}
 
 
@@ -178,6 +219,18 @@ public class CustomRecordHelper
 		return recordList;
 	}
 
+	public static CustomRecordObject getRecordObject(String songID)
+	{
+		if (songID != "")
+		{
+			for (CustomRecordObject record: CustomRecordHelper.getRecordList())
+			{
+				if (record.songID.equals(songID.trim().toLowerCase())) { return record; }
+			}
+		}
+		return null;
+	}
+
 	public static String[] getRecordNamesList()
 	{
 		return recordNamesList;
@@ -190,25 +243,15 @@ public class CustomRecordHelper
 	
 	public static String getSongTitle(String songID)
 	{
-		if (songID != "")
-		{
-			for (CustomRecordObject record: CustomRecordHelper.getRecordList())
-			{
-				if (record.songID.equals(songID.trim().toLowerCase())) { return record.songTitle; }
-			}
-		}
+		CustomRecordObject auxRecord = getRecordObject(songID);
+		if (auxRecord != null) return auxRecord.songTitle;
 		return "";
 	}
 
 	public static ItemStack getCustomRecord(String songID)
 	{
-		if (songID != null) {
-			for (CustomRecordObject record: CustomRecordHelper.getRecordList())
-			{
-				if (record.songID.equals(songID.trim().toLowerCase())) { return getCustomRecord(record); }
-			}
-		}
-
+		CustomRecordObject auxRecord = getRecordObject(songID);
+		if (auxRecord != null) return getCustomRecord(auxRecord);
 		return null;
 	}
 
@@ -227,13 +270,9 @@ public class CustomRecordHelper
 		return returnDisc;
 	}
 
-	public static boolean isVanillaRecord(String songID)
+	public static boolean isCustomRecord(String songID)
 	{
-		if (songID != "")
-		{
-			// Detects if it's a vanilla record
-			return vanillaRecords.contains(songID.trim().toLowerCase());
-		}
+		if (songID != "") if (songID.toLowerCase().startsWith("record")) return true;
     	return false;
 	}
 
@@ -532,267 +571,90 @@ public class CustomRecordHelper
 	 *
 	 * ====================================================================================== */
 
-	/**
- 	 * Plays a record as at a specific position.
-	 * Return TRUE if the record was found, false otherwise
-	 */
-	public static boolean playRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender)
+	@SideOnly(Side.CLIENT)
+	public static boolean playAnyRecord(String songID, int x, int y, int z, boolean showName, float volumeExtender)
 	{
-		if (songID != "")
-		{
-			ModRedstoneJukebox.logDebugInfo("Calling playRecordAt(" +songID+ ", " +x+ ", " +y+ ", " +z+ ", " +showName+ ", " +volumeExtender+ ")");
-			
-    		if (isVanillaRecord(songID))
-			{
-				// Minecraft vanilla records, same code as the "PlayRecord" of RenderGlobal
-    			innerPlaySreaming(songID, (float)x, (float)y, (float)z, volumeExtender);
-    			if (showName) { showRecordPlayingMessage(songID); }
-    			return true;
-			}
-
-    		else
-			{
-    			// Redstone Jukebox Custom Record
-    			innerPlaySreaming("redstonejukebox." + songID, (float)x, (float)y, (float)z, volumeExtender);
-		        if (showName) { showRecordPlayingMessage(songID); }
-    			return true;
-			}
-
-		}
-		
-		return false;
+		return false;		
 	}
 
-
-
-
-	/**
- 	 * Plays a record as background music (same volume everywhere)
-	 * return TRUE if the record was found, false otherwise
+	
+	/*
+	 * Re-implementation of the [RenderGlobal.playRecord] and [SoundManager.playStreaming].
+	 * 
+	 *  Only use this with custom records, vanilla records should use vanilla methods.
 	 */
-	public static boolean playRecord(String songID, boolean showName)
+	@SideOnly(Side.CLIENT)
+	public static boolean playRecord(String songID, int x, int y, int z, boolean showName, float volumeExtender)
 	{
-		if (songID != "")
-		{
-			ModRedstoneJukebox.logDebugInfo("Calling playRecord(" +songID+ ", " +showName+ ")");
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("CustomRecordHelper.playRecord");
+		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song ID: " + songID);
+		ModRedstoneJukebox.logDebugInfo("    Coords:  " + x + ", " + y + ", " + z);
+
+		
+		if ((songID != "") && (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT))
+    	{
+    		Minecraft auxMC = ModLoader.getMinecraftInstance();
+    		CustomRecordObject auxRecord = CustomRecordHelper.getRecordObject(songID);
+
+    		
+    		// adjusts the volume range
+    		float volumeRange = 64F;
+    		if (volumeExtender > ModRedstoneJukebox.maxExtraVolume) volumeExtender = ModRedstoneJukebox.maxExtraVolume;
+    		if (volumeExtender >= 1) volumeRange += volumeExtender;
+
+
+    		if (auxRecord != null)
+    		{
+	    		// Debug
+	    		ModRedstoneJukebox.logDebugInfo("    Song Name: " + auxRecord.songTitle);
+		
+	    		// Show record's name
+	    		if (auxRecord.songTitle != "" && showName) auxMC.ingameGUI.setRecordPlayingMessage(auxRecord.songTitle);
+	
+	    		
+	    		// Play the record - Adaptation of the [SoundManager.playStreaming]
+				if (auxMC.gameSettings.soundVolume != 0.0F)
+			    {
+			        if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
+			        if (auxMC.sndManager.sndSystem.playing("BgMusic")) auxMC.sndManager.sndSystem.stop("BgMusic");
 			
-    		Minecraft mc = Minecraft.getMinecraft();
-    		String songPoolName = "";
-
-    		// finds out the song name on the Sound Pool. Custom records have an extra prefix.
-    		if (isVanillaRecord(songID))
-    		{
-    			songPoolName = songID;
-    		}
-    		else
-    		{
-    			songPoolName = "redstonejukebox." + songID;
-    		}
-
-
-    		// Stop all music
-        	mc.sndManager.stopAllSounds();
-            if (mc.sndManager.sndSystem.playing("BgMusic"))
-            {
-            	mc.sndManager.sndSystem.stop("BgMusic");
-            }
-
-
-    		// gets the sound from the pool
-	        SoundPoolEntry seMusic = mc.sndManager.soundPoolStreaming.getRandomSoundFromSoundPool(songPoolName);
-	        seMusic = SoundEvent.getResult(new PlayBackgroundMusicEvent(mc.sndManager, seMusic));
-
-
-	        if (seMusic != null)
-	        {
-                try 
-                {
-		        	// Record found
-		        	mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
-		            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
-		            mc.sndManager.sndSystem.play("BgMusic");
+			        auxMC.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, auxRecord.songURL, getRecordIdentifier(auxRecord.songID), false, x, y, z, 2, volumeRange);
+			        auxMC.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * auxMC.gameSettings.soundVolume);
+		            MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(auxMC.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
+		            auxMC.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
 		            
-		            if (showName) { showRecordPlayingMessage(songID); }
-	
 		            return true;
-                }
-                catch (Exception e) 
-                {
-                	ModRedstoneJukebox.logDebug("Error playing BgMusic. Error message: " + e.getMessage(), Level.SEVERE);
-                } 
-	        }
-
-
-		}
-
-		return false;
-	}
-
-	
-	
-
-
-
-
-	/**
- 	 * Plays a vanilla background song.
-	 * return TRUE if the song was found, false otherwise
-	 */
-	public static boolean playBgMusic(String songID)
-	{
-		if (songID != "")
-		{
-			ModRedstoneJukebox.logDebugInfo("Calling playBgMusic(" +songID+ ")");
-			
-			Minecraft mc = Minecraft.getMinecraft();
-    		String songPoolName = songID;
-
-
-    		// Stop all music
-        	mc.sndManager.stopAllSounds();
-            if (mc.sndManager.sndSystem.playing("BgMusic"))
-            {
-            	mc.sndManager.sndSystem.stop("BgMusic");
-            }
-
-            
-    		// if is a valid song name, play it.
-    		if (vanillaBgSongs.contains(songID.trim().toLowerCase()))
-    		{
-        		// gets the sound from the pool
-    	        SoundPoolEntry seMusic = mc.sndManager.soundPoolMusic.getRandomSoundFromSoundPool(songPoolName);
-    	        seMusic = SoundEvent.getResult(new PlayBackgroundMusicEvent(mc.sndManager, seMusic));
-
-    	        if (seMusic != null)
-    	        {
-	                try 
-	                {
-	    	        	// Music found
-	    	            mc.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
-	    	            mc.sndManager.sndSystem.setVolume("BgMusic", mc.gameSettings.musicVolume);
-	    	            mc.sndManager.sndSystem.play("BgMusic");
-
-	    	            return true;
-	                }
-	                catch (Exception e) 
-	                {
-	                	ModRedstoneJukebox.logDebug("Error playing BgMusic. Error message: " + e.getMessage(), Level.SEVERE);
-	                } 
-
-    	        }
-    		}
-
-
-		}
-
-		return false;
-	}
-	
-	
-	
-	
-	
-
-	/**
-	 * Override of the playStreaming method on SoundManager. Here I can set the range.
-	 */
-	private static void innerPlaySreaming(String soundPoolId, float x, float y, float z, float volumeExtender)
-	{
-		Minecraft mc = Minecraft.getMinecraft();
-		float volumeRange = 64F;
-
-		
-		// adjusts the volume range
-		if (volumeExtender >= 1 && volumeExtender <= 128)
-		{
-			volumeRange += volumeExtender;
-		}
-		
-		
-	    if (mc.gameSettings.soundVolume != 0.0F || soundPoolId == null)
-	    {
-	    	ModRedstoneJukebox.logDebugInfo("Atempt to play stream Pool ID [" +soundPoolId+ "]");
-	    	
-	    	
-	    	if (mc.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
-	        {
-	        	mc.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
-	        }
-	
-	        if (soundPoolId != null)
-	        {
-	        	// TODO: Add my own method to get a soundpoolentry. The file URL is messed up with resource packs
-	            SoundPoolEntry var6 = mc.sndManager.soundPoolStreaming.getRandomSoundFromSoundPool(soundPoolId);
-	            var6 = SoundEvent.getResult(new PlayStreamingEvent(mc.sndManager, var6, soundPoolId, x, y, z));
-	
-	            if (var6 != null)
-	            {
-	                if (mc.sndManager.sndSystem.playing("BgMusic"))
-	                {
-	                	mc.sndManager.sndSystem.stop("BgMusic");
-	                }
-	
-	                ModRedstoneJukebox.logDebugInfo("Setting new stream source, name [" +ModRedstoneJukebox.sourceName+ "], url [" +var6.func_110457_b()+  "], id [" +var6.func_110458_a()+ "].");
-	                try 
-	                {
-	                	// OBS: this try..ctach does not get the sound exception, 
-		                // mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, var6.func_110457_b(), var6.func_110458_a(), false, x, y, z, 2, volumeRange);
-	                	
-	                	// Hard-coded debug
-	                	mc.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName,  new File(mc.mcDataDir + "/mods/jukebox/tje-theme.ogg").toURI().toURL(), var6.func_110458_a(), false, x, y, z, 2, volumeRange);
-	                	
-	                	
-		                mc.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * mc.gameSettings.soundVolume);
-		                MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(mc.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
-		                mc.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
-	                }
-	                catch (Exception e) 
-	                {
-	                	ModRedstoneJukebox.logDebug("Error playing Streaming. Error message: " + e.getMessage(), Level.SEVERE);
-	                }
-
-	            }
-	        }
-	    }
-	}
-
-    
-    
-    
-	/**
-	 * Shows the message with the record name, like a Jukebox
-	 */
-	private static void showRecordPlayingMessage(String recordID)
-	{
-		String recordName = "";
-	
-
-		if (recordID != "")
-		{
-    		// finds out the song name.
-			if (isVanillaRecord(recordID))
-    		{
-				// vanilla record, gets the name
-				ItemRecord record1 = ItemRecord.getRecord(recordID);
-    			recordName = record1.getRecordTitle();
+			    }
     		}
     		else
     		{
-    			// try to check the custom records list
-    			recordName = getSongTitle(recordID);
+    			ModRedstoneJukebox.logDebug("    Custom record not found. ID: [" + songID + "]", Level.SEVERE);
     		}
 
+    	}    		
 
-			// Show the song title, if found
-			if (recordName != "")
-			{
-				Minecraft mc = Minecraft.getMinecraft();
-				mc.ingameGUI.setRecordPlayingMessage(recordName);
-			}
-		}
+		return false;
 	}
 
+	
 
+	
+	/* ======================================================================================
+	 *
+	 * 									Helper Methods
+	 *
+	 * ====================================================================================== */
 
+	protected static String getRecordIdentifier(String songID)
+    {
+    	/*
+    	 * Must end with OGG or else will cause exception:
+    	 *     Error in class 'SourceLWJGL OpenAL'
+		 *     Decoder null in method 'play'
+    	 */
+        return "sidbenredstonejukebox." + songID + ".ogg";
+    }
 
 }

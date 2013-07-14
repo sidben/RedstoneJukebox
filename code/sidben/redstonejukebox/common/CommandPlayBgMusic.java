@@ -38,6 +38,9 @@ public class CommandPlayBgMusic  extends CommandBase
     {
 		boolean sucess;
     	
+		throw new CommandException("Command disabled", new Object[0]);
+		
+/*
     	if (par2ArrayOfStr.length < 1)
         {
             throw new WrongUsageException(myUsage, new Object[0]);
@@ -52,6 +55,7 @@ public class CommandPlayBgMusic  extends CommandBase
 			}
 
         }
+*/        
     }
 
     

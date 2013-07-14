@@ -1,6 +1,10 @@
 package sidben.redstonejukebox;
 
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Properties;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
@@ -96,13 +100,14 @@ public class ModRedstoneJukebox {
 	
 	// Global variables
 	public final static String sourceName = "streaming";	// music discs are called "streaming" 
-	public final static int maxCustomRecords = 32;			// Limit of custom records accepted
+	public final static int maxCustomRecords = 32;			// Limit of custom records accepted TODO: make this a config
 	public final static int maxCustomRecordIcon = 77;		// Limit of icon IDs for the records. This is stored on the metadata of the item. Start at zero.
 	public final static int maxStores = 16;					// Number of "record stores" available. Each "store" is a random selection of records for trade.
 	public final static int maxOffers = 8;					// Maximum number of record offers a villager have
-	public static String customRecordsFolder = "jukebox";  	// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
 	public static Vec3 lastSoundSource;						// holds the position of the last sound source (used so only 1 redstone jukebox is active at a time)
 	public final static int maxExtraVolume = 128;			// Maximum amount of extra range for the custom jukebox
+	public static String customRecordsFolder = "jukebox";  	// Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
+	public static String customRecordsPath;					// Path of the custom records folder (used in URL creation)
 
 	
 	// Config variables
@@ -113,11 +118,10 @@ public class ModRedstoneJukebox {
 	
 	
 	// Debug mode
-	public static boolean onDebug;							// Indicates if the MOD is on debug.
-	
-		
-	
+	public static boolean onDebug;							// Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
 
+	
+	
 	
 	
 	@Mod.EventHandler
@@ -128,6 +132,10 @@ public class ModRedstoneJukebox {
         // Custom records config
     	String customRecordCategory = "custom_records";
 
+
+    	// Custom records folder path
+    	customRecordsPath = "./mods/" + ModRedstoneJukebox.customRecordsFolder + "/";
+    	
     	
         try 
         {
@@ -141,8 +149,8 @@ public class ModRedstoneJukebox {
         	// Load blocks and items IDs
         	ModRedstoneJukebox.redstoneJukeboxIdleID 	= config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
         	ModRedstoneJukebox.redstoneJukeboxActiveID 	= config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
-        	ModRedstoneJukebox.blankRecordItemID 		= config.getItem(Configuration.CATEGORY_ITEM, "blankRecordItemID", 7200).getInt(7200);
-        	ModRedstoneJukebox.customRecordItemID 		= config.getItem(Configuration.CATEGORY_ITEM, "customRecordItemID", 7201).getInt(7201);
+        	ModRedstoneJukebox.blankRecordItemID 		= config.getItem("blankRecordItemID", 7200).getInt(7200);
+        	ModRedstoneJukebox.customRecordItemID 		= config.getItem("customRecordItemID", 7201).getInt(7201);
 
         	// Merchant config
         	ModRedstoneJukebox.customRecordOffersMin	= config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);
@@ -160,8 +168,7 @@ public class ModRedstoneJukebox {
         			
 
         	// Load the custom records
-        	// TODO: Fix this for SMP
-        	//CustomRecordHelper.LoadCustomRecordsConfig(config, customRecordCategory);
+        	CustomRecordHelper.LoadCustomRecordsConfig(config, customRecordCategory);
         	
 
         	// Custom records config help
@@ -173,7 +180,7 @@ public class ModRedstoneJukebox {
         	helpComment				+= "For each custom record, add a line below like this:" + br;
         	helpComment				+= br;
         	helpComment				+= "S:record###=ICON_ID;SONG_FILE;SONG_NAME" + br;
-        	helpComment				+= "    ###       = A number between 000 and 0" + (maxCustomRecords - 1) + ". Do not repeat numbers. The numbers don't need to be in order." + br;
+        	helpComment				+= "    ###       = A number between 000 and " + String.format("%03d", (maxCustomRecords - 1)) + ". Do not repeat numbers. The numbers don't need to be in order." + br;
         	helpComment				+= "    ICON_ID   = The icon of the this record. Must be a number between 1 and " + maxCustomRecordIcon +  "." + br;
         	helpComment				+= "    SONG_FILE = The name of the song file that should be on the 'mods/jukebox' folder. Only OGG files are accepted." + br;
         	helpComment				+= "    SONG_NAME = The title of the song. Plain text, avoid using unicode characters. Max of 64 characters.";
@@ -181,6 +188,7 @@ public class ModRedstoneJukebox {
         	helpComment				+= "Extra notes:" + br;
         	helpComment				+= "  - if the game can't find the song file, the record won't be added;" + br;
         	helpComment				+= "  - if the config line is incorrect, the record won't be added;" + br;
+        	helpComment				+= "  - if you still have trouble, set onDebug to 'true', restart the game, try playing a custom record and post your log on the Minecraft Forums;" + br;
         	
         	config.addCustomCategoryComment(customRecordCategory, helpComment);
         } 
@@ -297,8 +305,7 @@ public class ModRedstoneJukebox {
 	public void postInit(FMLPostInitializationEvent event) {
 
 		// Custom Trades
-		// TODO: Fix this for SMP
-		// CustomRecordHelper.InitializeAllStores();		
+		CustomRecordHelper.InitializeAllStores();		
 
 	}
 
@@ -321,9 +328,7 @@ public class ModRedstoneJukebox {
 
 	public static void logDebug(String info, Level level)
 	{
-		if (onDebug || level != Level.INFO) {
-			FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
-		}
+		if (onDebug || level != Level.INFO) FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
 	}
 	
 

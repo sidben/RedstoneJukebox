@@ -39,7 +39,9 @@ public class CommandPlayRecordAt  extends CommandBase
 		boolean sucess = false;
 		boolean showName = false; 
 		
-    	
+		throw new CommandException("Command disabled", new Object[0]);
+
+		/*
     	if (par2ArrayOfStr.length < 4)
         {
             throw new WrongUsageException(myUsage, new Object[0]);
@@ -61,6 +63,7 @@ public class CommandPlayRecordAt  extends CommandBase
 			}
 
         }
+        */
     }
 
     

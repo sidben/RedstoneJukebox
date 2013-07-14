@@ -1,16 +1,21 @@
 package sidben.redstonejukebox.common;
 
 import java.util.Random;
+import java.util.logging.Level;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.Icon;
 import net.minecraft.world.*;
@@ -253,13 +258,29 @@ public class BlockRedstoneJukebox extends BlockContainer {
     {
         if (!par1World.isRemote)
         {
+        	ModRedstoneJukebox.logDebug("onNeighborBlockChange - Pre", Level.WARNING);
+        	ModRedstoneJukebox.logDebug("GetSide:      " + FMLCommonHandler.instance().getSide(), Level.WARNING);
+        	ModRedstoneJukebox.logDebug("GetEffecSide: " + FMLCommonHandler.instance().getEffectiveSide(), Level.WARNING);
+        	
+        	if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) 
+        	{
+            	// Minecraft mc = Minecraft.getMinecraft();
+            	// Minecraft mc = ModLoader.getMinecraftInstance();
+            	Minecraft mc = FMLClientHandler.instance().getClient();
+            	ModRedstoneJukebox.logDebug("   sound: " + mc.gameSettings.soundVolume, Level.WARNING);
+        	}
+        	ModRedstoneJukebox.logDebug("onNeighborBlockChange - Pos", Level.WARNING);
+        	
+        	
         	if (par1World.isBlockIndirectlyGettingPowered(x, y, z))
             {
-                startPlaying(par1World, x, y, z);
+        		ModRedstoneJukebox.logDebug("- StartPlaying()", Level.WARNING);
+                //startPlaying(par1World, x, y, z);
             }
             else 
             {
-                stopPlaying(par1World, x, y, z);
+            	ModRedstoneJukebox.logDebug("- StopPlaying()", Level.WARNING);
+                //stopPlaying(par1World, x, y, z);
             }
         }
 

@@ -704,7 +704,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 						
 					
 					//-- Try to play the record on the selected slot
-					playSuccess = CustomRecordHelper.playRecordAt(recordName, this.xCoord, this.yCoord, this.zCoord, true, extraVolume);
+					playSuccess = CustomRecordHelper.playAnyRecord(recordName, this.xCoord, this.yCoord, this.zCoord, true, extraVolume);
 					
 
 					// Only updates if the play command was successful

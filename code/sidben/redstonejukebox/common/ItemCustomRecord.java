@@ -1,9 +1,11 @@
 package sidben.redstonejukebox.common;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.util.List;
-
 import sidben.redstonejukebox.ModRedstoneJukebox;
-
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -12,6 +14,7 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
@@ -71,9 +74,14 @@ public class ItemCustomRecord extends ItemRecord
 	@Override
 	public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
-    	String songID = "";
+    	String songID = "";				// Custom record song ID. Will be sent by the custom package.
+
     	
-    	
+		ModRedstoneJukebox.logDebugInfo("itemCustomRecord.onItemUse");
+		ModRedstoneJukebox.logDebugInfo("    Side:   " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Remote: " + par3World.isRemote);
+		
+
     	// Make this compatible with regular jukeboxes
     	if (par3World.getBlockId(x, y, z) == Block.jukebox.blockID && par3World.getBlockMetadata(x, y, z) == 0)
         {
@@ -83,10 +91,45 @@ public class ItemCustomRecord extends ItemRecord
             }
             else
             {
-                ((BlockJukeBox)Block.jukebox).insertRecord(par3World, x, y, z, par1ItemStack);
-                songID = getSongID(par1ItemStack);
-                CustomRecordHelper.playRecordAt(songID, x, y, z, true, 0);
-                --par1ItemStack.stackSize;
+            	/*
+            	 * Emulates the [world.playAuxSFXAtEntity] method.
+            	 * 
+            	 * That method would end up firing [WorldManager.playAuxSFX], responsible for sending 
+            	 * a package to players around, and that would end up triggering [RenderGlobal.playAuxSFX]
+            	 * on each client, playing the sound itself.
+            	 * 
+            	 * Here I just send the a custom package without all that encapsulation.
+            	 */
+            	if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+            	{
+            		songID = getSongID(par1ItemStack);
+            		
+
+            		// Custom Packet
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+                    DataOutputStream outputStream = new DataOutputStream(bos);
+                    try 
+                    {
+                    	outputStream.writeInt(this.itemID);
+                    	outputStream.writeUTF(songID);
+                    	outputStream.writeBoolean(true);		// show music name
+                    	outputStream.writeInt(x);
+                    	outputStream.writeInt(y);
+                    	outputStream.writeInt(z);
+                    } 
+                    catch (Exception ex) {
+                    	ex.printStackTrace();
+                    }
+                    
+
+            		ModRedstoneJukebox.logDebugInfo("    Sending custom record package (songID: " +songID+ ")");
+            		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+        			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, 64.0D, par3World.provider.dimensionId, packet);        	
+            	}            	
+            	
+
+            	((BlockJukeBox)Block.jukebox).insertRecord(par3World, x, y, z, par1ItemStack);
+            	--par1ItemStack.stackSize;
                 return true;
             }
         }
@@ -94,6 +137,7 @@ public class ItemCustomRecord extends ItemRecord
         {
             return false;
         }
+
     }
 	
     
@@ -119,6 +163,10 @@ public class ItemCustomRecord extends ItemRecord
 	   
 	   par3List.add("\u00a7oCustom Record\u00a7r");
 	   
+	   /* 
+	    *  "DebugActive" is when the player press F3+H to see extra info, like durability of tools.
+	    *  Here I show the song ID.
+	    */
 	   if (debugActive)
 	   {
 		   if (songID == "") songID = "null";

@@ -75,8 +75,8 @@ public class ModRedstoneJukebox {
 	public static String jukeboxSideOffIcon = "redstonejukebox:redstone_jukebox_off";
 
 	// OBS: this don't belong here, almost sure of it
-	public static final ResourceLocation redstoneJukeboxGui = new ResourceLocation("redstonejukebox", "/textures/gui/redstonejukebox-gui.png");
-	public static final ResourceLocation recordTradeGui = new ResourceLocation("redstonejukebox", "/textures/gui/recordtrading-gui.png");
+	public static final ResourceLocation redstoneJukeboxGui = new ResourceLocation("redstonejukebox", "textures/gui/redstonejukebox-gui.png");
+	public static final ResourceLocation recordTradeGui = new ResourceLocation("redstonejukebox", "textures/gui/recordtrading-gui.png");
 
 	
 	// GUI IDs

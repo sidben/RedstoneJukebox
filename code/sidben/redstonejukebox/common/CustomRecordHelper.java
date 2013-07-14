@@ -1,5 +1,7 @@
 package sidben.redstonejukebox.common;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,11 +19,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.src.ModLoader;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.sound.PlayBackgroundMusicEvent;
 import net.minecraftforge.client.event.sound.PlayStreamingEvent;
 import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
 import net.minecraftforge.client.event.sound.SoundEvent;
@@ -30,7 +32,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -572,30 +574,39 @@ public class CustomRecordHelper
 	 * ====================================================================================== */
 
 	@SideOnly(Side.CLIENT)
-	public static boolean playAnyRecord(String songID, int x, int y, int z, boolean showName, float volumeExtender)
+	public static boolean playAnyRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender)
 	{
+		if (songID != "")
+		{
+			if (CustomRecordHelper.isCustomRecord(songID))
+				return CustomRecordHelper.playCustomRecordAt(songID, x, y, z, showName, volumeExtender);
+			else
+				return CustomRecordHelper.playVanillaRecordAt(songID, x, y, z, showName, volumeExtender);
+		}
+			
 		return false;		
 	}
 
 	
+	
+	
 	/*
 	 * Re-implementation of the [RenderGlobal.playRecord] and [SoundManager.playStreaming].
-	 * 
-	 *  Only use this with custom records, vanilla records should use vanilla methods.
 	 */
 	@SideOnly(Side.CLIENT)
-	public static boolean playRecord(String songID, int x, int y, int z, boolean showName, float volumeExtender)
+	private static boolean playCustomRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender)
 	{
 		// Debug
-		ModRedstoneJukebox.logDebugInfo("CustomRecordHelper.playRecord");
-		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
-		ModRedstoneJukebox.logDebugInfo("    Song ID: " + songID);
-		ModRedstoneJukebox.logDebugInfo("    Coords:  " + x + ", " + y + ", " + z);
+		ModRedstoneJukebox.logDebugInfo("CustomRecordHelper.playCustomRecordAt");
+		ModRedstoneJukebox.logDebugInfo("    Side:      " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song ID:   " + songID);
+		ModRedstoneJukebox.logDebugInfo("    Coords:    " + x + ", " + y + ", " + z);
+		ModRedstoneJukebox.logDebugInfo("    Show name: " + showName);
+		ModRedstoneJukebox.logDebugInfo("    Volume:    " + volumeExtender);
 
 		
 		if ((songID != "") && (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT))
     	{
-    		Minecraft auxMC = ModLoader.getMinecraftInstance();
     		CustomRecordObject auxRecord = CustomRecordHelper.getRecordObject(songID);
 
     		
@@ -607,8 +618,11 @@ public class CustomRecordHelper
 
     		if (auxRecord != null)
     		{
-	    		// Debug
+        		Minecraft auxMC = ModLoader.getMinecraftInstance();
+
+    			// Debug
 	    		ModRedstoneJukebox.logDebugInfo("    Song Name: " + auxRecord.songTitle);
+	    		ModRedstoneJukebox.logDebugInfo("    Settings volume: " + auxMC.gameSettings.soundVolume);
 		
 	    		// Show record's name
 	    		if (auxRecord.songTitle != "" && showName) auxMC.ingameGUI.setRecordPlayingMessage(auxRecord.songTitle);
@@ -637,7 +651,118 @@ public class CustomRecordHelper
 
 		return false;
 	}
+	
+	
+	/*
+	 * Re-implementation of the [RenderGlobal.playRecord] and [SoundManager.playStreaming].
+	 */
+	@SideOnly(Side.CLIENT)
+	private static boolean playVanillaRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("CustomRecordHelper.playVanillaRecordAt");
+		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song ID: " + songID);
+		ModRedstoneJukebox.logDebugInfo("    Coords:  " + x + ", " + y + ", " + z);
 
+		
+		if ((songID != "") && (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT))
+    	{
+    		ItemRecord auxRecord = ItemRecord.getRecord(songID);
+
+			// adjusts the volume range
+    		float volumeRange = 64F;
+    		if (volumeExtender > ModRedstoneJukebox.maxExtraVolume) volumeExtender = ModRedstoneJukebox.maxExtraVolume;
+    		if (volumeExtender >= 1) volumeRange += volumeExtender;
+
+    		
+    		
+    		if (auxRecord != null)
+    		{
+	    		Minecraft auxMC = ModLoader.getMinecraftInstance();
+	            SoundPoolEntry soundpoolentry = auxMC.sndManager.soundPoolStreaming.getRandomSoundFromSoundPool(songID);
+	            soundpoolentry = SoundEvent.getResult(new PlayStreamingEvent(auxMC.sndManager, soundpoolentry, songID, x, y, z));
+	
+	    		// Debug
+	    		ModRedstoneJukebox.logDebugInfo("    Song Name: " + auxRecord.getRecordTitle());
+		
+	    		// Show record's name
+	    		if (showName) auxMC.ingameGUI.setRecordPlayingMessage(auxRecord.getRecordTitle());
+	
+	    		
+	    		// Play the record - Adaptation of the [SoundManager.playStreaming]
+				if (auxMC.gameSettings.soundVolume != 0.0F && soundpoolentry != null)
+			    {
+			        if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
+			        if (auxMC.sndManager.sndSystem.playing("BgMusic")) auxMC.sndManager.sndSystem.stop("BgMusic");
+			
+			        auxMC.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, soundpoolentry.func_110457_b(), soundpoolentry.func_110458_a(), false, x, y, z, 2, volumeRange);
+			        auxMC.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * auxMC.gameSettings.soundVolume);
+		            MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(auxMC.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
+		            auxMC.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
+		            
+		            return true;
+			    }
+    		}
+    		else
+    		{
+    			ModRedstoneJukebox.logDebug("    Vanilla record not found. ID: [" + songID + "]", Level.SEVERE);
+    		}
+
+    	}    		
+
+		return false;
+	}	
+
+
+	
+	/*
+	 * Emulates the [world.playAuxSFXAtEntity] method.
+	 * 
+	 * That method would end up firing [WorldManager.playAuxSFX], responsible for sending 
+	 * a package to players around, and that would end up triggering [RenderGlobal.playAuxSFX]
+	 * on each client, playing the sound itself.
+	 * 
+	 * Here I just send the a custom package without all that encapsulation.
+	 */
+	protected static void sendPlayRecordPacket(String songID, int x, int y, int z, boolean showName, float volumeExtender, int dimensionId)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("CustomRecordHelper.sendPlayRecordPacket");
+		ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song ID:      " + songID);
+		ModRedstoneJukebox.logDebugInfo("    Coords:       " + x + ", " + y + ", " + z);
+		ModRedstoneJukebox.logDebugInfo("    Dimension:    " + dimensionId);
+		ModRedstoneJukebox.logDebugInfo("    Show name:    " + showName);
+		ModRedstoneJukebox.logDebugInfo("    Volume Extra: " + volumeExtender);
+
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+    	{
+    		// Custom Packet
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeUTF(songID);
+            	outputStream.writeInt(x);
+            	outputStream.writeInt(y);
+            	outputStream.writeInt(z);
+            	outputStream.writeBoolean(showName);
+            	outputStream.writeFloat(volumeExtender);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+
+    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		ModRedstoneJukebox.logDebugInfo("    Sending play record package (songID: " +songID+ ")");
+			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, (64.0D + volumeExtender), dimensionId, packet);        	
+    	}  
+	}
+
+	
 	
 
 	

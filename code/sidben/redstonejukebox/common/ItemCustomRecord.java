@@ -1,11 +1,8 @@
 package sidben.redstonejukebox.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.List;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -14,7 +11,6 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
@@ -74,7 +70,7 @@ public class ItemCustomRecord extends ItemRecord
 	@Override
 	public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int x, int y, int z, int par7, float par8, float par9, float par10)
     {
-    	String songID = "";				// Custom record song ID. Will be sent by the custom package.
+    	String songID = "";
 
     	
 		ModRedstoneJukebox.logDebugInfo("itemCustomRecord.onItemUse");
@@ -91,42 +87,8 @@ public class ItemCustomRecord extends ItemRecord
             }
             else
             {
-            	/*
-            	 * Emulates the [world.playAuxSFXAtEntity] method.
-            	 * 
-            	 * That method would end up firing [WorldManager.playAuxSFX], responsible for sending 
-            	 * a package to players around, and that would end up triggering [RenderGlobal.playAuxSFX]
-            	 * on each client, playing the sound itself.
-            	 * 
-            	 * Here I just send the a custom package without all that encapsulation.
-            	 */
-            	if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
-            	{
-            		songID = getSongID(par1ItemStack);
-            		
-
-            		// Custom Packet
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
-                    DataOutputStream outputStream = new DataOutputStream(bos);
-                    try 
-                    {
-                    	outputStream.writeInt(this.itemID);
-                    	outputStream.writeUTF(songID);
-                    	outputStream.writeBoolean(true);		// show music name
-                    	outputStream.writeInt(x);
-                    	outputStream.writeInt(y);
-                    	outputStream.writeInt(z);
-                    } 
-                    catch (Exception ex) {
-                    	ex.printStackTrace();
-                    }
-                    
-
-            		ModRedstoneJukebox.logDebugInfo("    Sending custom record package (songID: " +songID+ ")");
-            		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
-        			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, 64.0D, par3World.provider.dimensionId, packet);        	
-            	}            	
-            	
+        		songID = getSongID(par1ItemStack);
+            	CustomRecordHelper.sendPlayRecordPacket(songID, x, y, z, true, 0, par3World.provider.dimensionId);
 
             	((BlockJukeBox)Block.jukebox).insertRecord(par3World, x, y, z, par1ItemStack);
             	--par1ItemStack.stackSize;

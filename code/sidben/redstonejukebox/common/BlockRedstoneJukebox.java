@@ -164,7 +164,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int x, int y, int z, int side)
     {
-        //return super.shouldSideBeRendered(par1IBlockAccess, par2, par3, par4, par5);
     	return true;
     }
 
@@ -258,29 +257,13 @@ public class BlockRedstoneJukebox extends BlockContainer {
     {
         if (!par1World.isRemote)
         {
-        	ModRedstoneJukebox.logDebug("onNeighborBlockChange - Pre", Level.WARNING);
-        	ModRedstoneJukebox.logDebug("GetSide:      " + FMLCommonHandler.instance().getSide(), Level.WARNING);
-        	ModRedstoneJukebox.logDebug("GetEffecSide: " + FMLCommonHandler.instance().getEffectiveSide(), Level.WARNING);
-        	
-        	if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) 
-        	{
-            	// Minecraft mc = Minecraft.getMinecraft();
-            	// Minecraft mc = ModLoader.getMinecraftInstance();
-            	Minecraft mc = FMLClientHandler.instance().getClient();
-            	ModRedstoneJukebox.logDebug("   sound: " + mc.gameSettings.soundVolume, Level.WARNING);
-        	}
-        	ModRedstoneJukebox.logDebug("onNeighborBlockChange - Pos", Level.WARNING);
-        	
-        	
         	if (par1World.isBlockIndirectlyGettingPowered(x, y, z))
             {
-        		ModRedstoneJukebox.logDebug("- StartPlaying()", Level.WARNING);
-                //startPlaying(par1World, x, y, z);
+                startPlaying(par1World, x, y, z);
             }
             else 
             {
-            	ModRedstoneJukebox.logDebug("- StopPlaying()", Level.WARNING);
-                //stopPlaying(par1World, x, y, z);
+                stopPlaying(par1World, x, y, z);
             }
         }
 
@@ -523,8 +506,10 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	//-- Stop playing this jukebox
     private void stopPlaying(World world, int x, int y, int z)
     {
-        if (!world.isRemote)
+    	if (!world.isRemote)
         {
+        	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.stopPlaying");
+
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
             if (teJukebox != null)
             {
@@ -539,6 +524,8 @@ public class BlockRedstoneJukebox extends BlockContainer {
     {
         if (!world.isRemote)
         {
+        	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.startPlaying");
+        	
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
             if (teJukebox != null)
             {

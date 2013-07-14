@@ -1,10 +1,12 @@
 package sidben.redstonejukebox.common;
 
 import java.util.Random;
+import java.util.logging.Level;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.*;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,6 +15,8 @@ import net.minecraft.item.*;
 import net.minecraft.nbt.*;
 import net.minecraft.network.*;
 import net.minecraft.network.packet.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.*;
 import net.minecraft.world.World;
 
@@ -393,21 +397,24 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	
 	
 	
-	
     public void startPlaying()
     {
-		// System.out.println("    	TileEntityRedstoneJukebox=.startPlaying");
+    	ModRedstoneJukebox.logDebugInfo("TileEntityRedstoneJukebox.startPlaying");
+    	ModRedstoneJukebox.logDebugInfo("    isPlaying = " + this.isPlaying);
 
 		if (!this.isPlaying) {
 			this.setPlaylistOrder();
 			this.playNextRecord();
 		}
-
 	}
 
+    // TODO: SMP Support (?)
     public void stopPlaying()
     {
-		if (this.isPlaying) {
+    	ModRedstoneJukebox.logDebugInfo("TileEntityRedstoneJukebox.stopPlaying");
+    	ModRedstoneJukebox.logDebugInfo("    isPlaying = " + this.isPlaying);
+
+    	if (this.isPlaying) {
 			// Stop all records
 			this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
 			this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
@@ -502,17 +509,30 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	private void checkIfStillPlaying()
 	{
 		this.delay = TileEntityRedstoneJukebox.maxDelay;
-        
+
+		
+
+		ModRedstoneJukebox.logDebugInfo(" ");
+		ModRedstoneJukebox.logDebugInfo("checkIfStillPlaying");
+		ModRedstoneJukebox.logDebugInfo("    Side:      " + FMLCommonHandler.instance().getEffectiveSide());
+		
+		Minecraft mc1 = Minecraft.getMinecraft();
+		ModRedstoneJukebox.logDebugInfo("    Playing 1: " + mc1.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName));
+
+		ModRedstoneJukebox.logDebugInfo(" ");
+
+		
 
 		if (!worldObj.isRemote && this.isPlaying)
 		{
 
 			//-- check if there is anything playing
-			
-			//if (!SoundManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
 			Minecraft mc = Minecraft.getMinecraft();
 			if (!mc.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName))
 			{
+				ModRedstoneJukebox.logDebugInfo("Redstone Jukebox at " +this.xCoord+ ", " +this.yCoord+ ", " +this.zCoord+ " no longer playing a record.");
+				ModRedstoneJukebox.logDebugInfo("Side:      " + FMLCommonHandler.instance().getEffectiveSide());
+				
 				if (!this.playlistInitialized)
 				{
 					this.setPlaylistOrder();
@@ -526,6 +546,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				//-- check if the source is this jukebox (PS: I'm pretty sure there is some easier way to do this...
 				if (ModRedstoneJukebox.lastSoundSource.xCoord != this.xCoord || ModRedstoneJukebox.lastSoundSource.yCoord != this.yCoord || ModRedstoneJukebox.lastSoundSource.zCoord != this.zCoord)
 				{
+					ModRedstoneJukebox.logDebugInfo("Redstone Jukebox at " +this.xCoord+ ", " +this.yCoord+ ", " +this.zCoord+ " is no longer the source of music. Music is now at " +ModRedstoneJukebox.lastSoundSource.xCoord+ ", " +ModRedstoneJukebox.lastSoundSource.yCoord+ ", " +ModRedstoneJukebox.lastSoundSource.zCoord+ ".");
 					this.markAsStopped();
 				}
 				else
@@ -540,6 +561,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 						ItemStack r = this.getStackInSlot(this.getCurrentJukeboxPlaySlot());
 						if (r == null || !(Item.itemsList[r.itemID] instanceof ItemRecord))
 						{
+							ModRedstoneJukebox.logDebugInfo("Current record removed from slot " +this.getCurrentJukeboxPlaySlot()+ ".");
 							this.playNextRecord();
 						}
 					}
@@ -564,6 +586,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//-- Set the playlist order. Also, resets the NEXTPLAYSLOT to the first position.
 	private void setPlaylistOrder()
 	{
+		ModRedstoneJukebox.logDebugInfo("    Setting playlist order (shuffle = " +(this.playMode == 1)+ ").");
+
 		int totalRecords = 0;
 		boolean validRecord = false;
 		playlistInitialized = true;
@@ -597,6 +621,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			}
 
 		}
+		ModRedstoneJukebox.logDebugInfo("    Playlist size = " +totalRecords+ ".");
 
 				
 		// shuffle if needed
@@ -608,6 +633,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				playOrder[i] = playOrder[randomPosition];
 				playOrder[randomPosition] = temp;
 			}
+			
+			ModRedstoneJukebox.logDebugInfo("    Playlist order randomized. First slot is index " +playOrder[0]+ ".");
 		}
 
 
@@ -624,6 +651,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//-- Play the next record.
 	private void playNextRecord()
 	{
+		ModRedstoneJukebox.logDebugInfo("TileEntityRedstoneJukebox.playNextRecord()");
+		
+		
 		int checkedSlot;
 		boolean playSuccess = false;
 		int extraVolume = BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.xCoord, this.yCoord, this.zCoord);
@@ -648,6 +678,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 				// check for loop
 				if (this.isLoop) { mustLoop = true; }
 
+				ModRedstoneJukebox.logDebugInfo("    Playlist reached the end (loop = " +mustLoop+ ").");
 				if (mustLoop)
 				{
 					// re-do the sorting
@@ -676,35 +707,45 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			// check only if it's a valid index
 			if (playOrder[checkedSlot] != -1)
 			{
+				ModRedstoneJukebox.logDebugInfo("    Playing record in slot index " +playOrder[checkedSlot]+ ".");
+
+				
 				//check the slot for a record. If don't find, advance on the play list
 				ItemStack s = this.getStackInSlot(playOrder[checkedSlot]);
 				if (s != null && (Item.itemsList[s.itemID] instanceof ItemRecord))
 				{
 					
-					// gets the song name
-					String recordName = "(no name)";
+					/* 
+					 * gets the song ID.
+					 * 
+					 * Vanilla uses the record name, since every record have a unique ID. 
+					 * My mod uses just one ID, so I need to find that.
+					 */
+					String recordID = "";
 					if (Item.itemsList[s.itemID] instanceof ItemCustomRecord)
 					{
-						// Custom records stores the real songID on metaTags.
 						try 
 						{
-							recordName = ((ItemCustomRecord)Item.itemsList[s.itemID]).getSongID(s);
+							recordID = ((ItemCustomRecord)Item.itemsList[s.itemID]).getSongID(s);
 						} 
 						catch (java.lang.ClassCastException ex) 
 						{
 							// error casting record. Should not happen for real.
-							System.out.println("RedstoneJukebox - error getting record title [" + recordName + "]");
+					    	ModRedstoneJukebox.logDebug("Error getting custom record song ID for [" + s.toString() + "]", Level.WARNING);
 						}
 					}
 					else
 					{
 						// Vanilla records
-						recordName = ((ItemRecord)Item.itemsList[s.itemID]).recordName;
+						recordID = ((ItemRecord)Item.itemsList[s.itemID]).recordName;
 					}
+					
+					ModRedstoneJukebox.logDebugInfo("    Record found ID " + recordID);
 						
 					
 					//-- Try to play the record on the selected slot
-					playSuccess = CustomRecordHelper.playAnyRecord(recordName, this.xCoord, this.yCoord, this.zCoord, true, extraVolume);
+					playSuccess = true;		// TODO: found out if the play was ok (check if id exists on the server, each client could handle on PlayAnyRecordAt?) 
+					CustomRecordHelper.sendPlayRecordPacket(recordID, this.xCoord, this.yCoord, this.zCoord, true, extraVolume, this.worldObj.provider.dimensionId);
 					
 
 					// Only updates if the play command was successful
@@ -715,26 +756,19 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	
 						this.markAsPlaying();
 
-						/*
-						// This will force a getDescriptionPacket / onDataPacket combo to resync client and server
-						this.resync();
-						
-						OBS: as a test, I put this line outside the loop
-						*/
-
 						break;
 					}
 					
 				}
 				else
 				{
-					// System.out.println("    	no record found, moving next");
+					ModRedstoneJukebox.logDebugInfo("    No record found, moving next");
 				}
 
 			}
 			else
 			{
-				// System.out.println("    	no index found, moving next");
+				ModRedstoneJukebox.logDebugInfo("    No index found, moving next");
 			}
 
 

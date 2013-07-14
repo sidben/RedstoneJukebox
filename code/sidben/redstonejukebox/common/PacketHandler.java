@@ -28,7 +28,7 @@ public class PacketHandler implements IPacketHandler
 		
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
 		
-		if (payload.channel == ModRedstoneJukebox.jukeboxChannel)		
+		if (payload.channel.equals(ModRedstoneJukebox.jukeboxChannel))
 		{
             try
             {
@@ -93,25 +93,22 @@ public class PacketHandler implements IPacketHandler
                 	ModRedstoneJukebox.logDebugInfo("   -CustomRecord Play Packet-");
 
 					// Load data
-                	int itemID = data.readInt();
 					String songID = data.readUTF();
-					boolean showName = data.readBoolean();
 					int sourceX = data.readInt();
 					int sourceY = data.readInt();
 					int sourceZ = data.readInt();
+					boolean showName = data.readBoolean();
+					float volumeExtra = data.readFloat();
 					
 					// Debug
-					ModRedstoneJukebox.logDebugInfo("    [ItemID]:[" +itemID+ "]");
 					ModRedstoneJukebox.logDebugInfo("    [SongID]:[" +songID+ "]");
 					ModRedstoneJukebox.logDebugInfo("    [ShowName]:[" +showName+ "]");
+					ModRedstoneJukebox.logDebugInfo("    [VolumeExtra]:[" +volumeExtra+ "]");
 					ModRedstoneJukebox.logDebugInfo("    [Source]:[" +sourceX+ "],[" +sourceY+ "],[" +sourceZ+ "]");
 
 					
 					// Process data
-					if (itemID == ModRedstoneJukebox.customRecord.itemID) 
-					{
-						CustomRecordHelper.playRecord(songID, sourceX, sourceY, sourceZ, showName, 0);
-					}
+					CustomRecordHelper.playAnyRecordAt(songID, sourceX, sourceY, sourceZ, showName, volumeExtra);
 					
 				}
 			

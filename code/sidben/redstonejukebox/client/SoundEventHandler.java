@@ -7,8 +7,8 @@ import java.net.URL;
 import java.util.logging.Level;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.common.CustomRecordHelper;
-import sidben.redstonejukebox.common.CustomRecordObject;
+import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.CustomRecordObject;
 import net.minecraft.client.audio.SoundPoolEntry;
 import net.minecraft.src.ModLoader;
 import net.minecraft.util.Vec3;

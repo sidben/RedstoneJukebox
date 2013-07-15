@@ -1,6 +1,8 @@
 package sidben.redstonejukebox.common;
 
 import java.util.List;
+
+import sidben.redstonejukebox.helper.CustomRecordHelper;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

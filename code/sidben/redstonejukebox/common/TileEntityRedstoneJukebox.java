@@ -4,6 +4,8 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.PacketHelper;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -745,7 +747,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					
 					//-- Try to play the record on the selected slot
 					playSuccess = true;		// TODO: found out if the play was ok (check if id exists on the server, each client could handle on PlayAnyRecordAt?) 
-					CustomRecordHelper.sendPlayRecordPacket(recordID, this.xCoord, this.yCoord, this.zCoord, true, extraVolume, this.worldObj.provider.dimensionId);
+					PacketHelper.sendPlayRecordPacket(recordID, this.xCoord, this.yCoord, this.zCoord, true, extraVolume, this.worldObj.provider.dimensionId);
 					
 
 					// Only updates if the play command was successful

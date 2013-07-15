@@ -3,6 +3,8 @@ package sidben.redstonejukebox.common;
 import java.io.*;
 import java.util.logging.Level;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.PacketHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.*;
 import net.minecraft.network.packet.Packet250CustomPayload;
@@ -32,14 +34,19 @@ public class PacketHandler implements IPacketHandler
 		{
             try
             {
-            	if (side == Side.SERVER)
+				DataInputStream data = new DataInputStream(new ByteArrayInputStream(payload.data));
+				byte packetType =  data.readByte();
+				ModRedstoneJukebox.logDebugInfo("    Type: " + packetType);
+				
+
+				
+				if (side == Side.SERVER)
             	{
-					DataInputStream data = new DataInputStream(new ByteArrayInputStream(payload.data));
 					EntityPlayer sender = (EntityPlayer) player;
 
 					
 					// Jukebox GUI Packet
-					if (sender.openContainer instanceof ContainerRedstoneJukebox)
+					if (packetType == PacketHelper.JukeboxGUIUpdate && sender.openContainer instanceof ContainerRedstoneJukebox)
 					{
 						// Debug
 						ModRedstoneJukebox.logDebugInfo("   -Jukebox GUI Packet-");
@@ -66,7 +73,7 @@ public class PacketHandler implements IPacketHandler
 					}
 
 					// Record Trading GUI Packet
-					else if (sender.openContainer instanceof ContainerRecordTrading)
+					else if (packetType == PacketHelper.RecordTradingGUIUpdate && sender.openContainer instanceof ContainerRecordTrading)
 					{
 						// Debug
 						ModRedstoneJukebox.logDebugInfo("   -Record Trading GUI Packet (page change)-");
@@ -87,28 +94,29 @@ public class PacketHandler implements IPacketHandler
 				else if (side == Side.CLIENT)
 				{
 					// Custom Record Play Packet
-					DataInputStream data = new DataInputStream(new ByteArrayInputStream(payload.data));
-					
-					// Debug
-                	ModRedstoneJukebox.logDebugInfo("   -CustomRecord Play Packet-");
-
-					// Load data
-					String songID = data.readUTF();
-					int sourceX = data.readInt();
-					int sourceY = data.readInt();
-					int sourceZ = data.readInt();
-					boolean showName = data.readBoolean();
-					float volumeExtra = data.readFloat();
-					
-					// Debug
-					ModRedstoneJukebox.logDebugInfo("    [SongID]:[" +songID+ "]");
-					ModRedstoneJukebox.logDebugInfo("    [ShowName]:[" +showName+ "]");
-					ModRedstoneJukebox.logDebugInfo("    [VolumeExtra]:[" +volumeExtra+ "]");
-					ModRedstoneJukebox.logDebugInfo("    [Source]:[" +sourceX+ "],[" +sourceY+ "],[" +sourceZ+ "]");
-
-					
-					// Process data
-					CustomRecordHelper.playAnyRecordAt(songID, sourceX, sourceY, sourceZ, showName, volumeExtra);
+					if (packetType == PacketHelper.PlayRecord)
+					{
+						// Debug
+	                	ModRedstoneJukebox.logDebugInfo("   -Record Play Packet-");
+	
+						// Load data
+						String songID = data.readUTF();
+						int sourceX = data.readInt();
+						int sourceY = data.readInt();
+						int sourceZ = data.readInt();
+						boolean showName = data.readBoolean();
+						float volumeExtra = data.readFloat();
+						
+						// Debug
+						ModRedstoneJukebox.logDebugInfo("    [SongID]:[" +songID+ "]");
+						ModRedstoneJukebox.logDebugInfo("    [ShowName]:[" +showName+ "]");
+						ModRedstoneJukebox.logDebugInfo("    [VolumeExtra]:[" +volumeExtra+ "]");
+						ModRedstoneJukebox.logDebugInfo("    [Source]:[" +sourceX+ "],[" +sourceY+ "],[" +sourceZ+ "]");
+	
+						
+						// Process data
+						CustomRecordHelper.playAnyRecordAt(songID, sourceX, sourceY, sourceZ, showName, volumeExtra);
+					}
 					
 				}
 			

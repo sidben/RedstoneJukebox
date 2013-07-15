@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.common.*;
+import sidben.redstonejukebox.helper.PacketHelper;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -42,7 +43,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     /**
      * Adds the buttons (and other controls) to the screen in question.
      */
-    @Override
+	@Override
     public void initGui()
     {
         super.initGui();
@@ -109,22 +110,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 			// Packet code here
 			// Without this, it works for the client changing buttons, but the server doesn't save and when the world
 			// reloads, the buttons go back to default. Inventory works fine without it.
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
-            DataOutputStream outputStream = new DataOutputStream(bos);
-            try 
-            {
-            	outputStream.writeBoolean(this.jukeboxInventory.isLoop);
-            	outputStream.writeInt(this.jukeboxInventory.playMode);
-            } 
-            catch (Exception ex) {
-            	ex.printStackTrace();
-            }
-            
-			Packet250CustomPayload packet = new Packet250CustomPayload();
-			packet.channel = ModRedstoneJukebox.jukeboxChannel;
-			packet.data = bos.toByteArray();
-			packet.length = bos.size();
-			PacketDispatcher.sendPacketToServer(packet);
+			PacketHelper.sendJukeboxGUIPacket(this.jukeboxInventory.isLoop, this.jukeboxInventory.playMode);
 			
 		}
 

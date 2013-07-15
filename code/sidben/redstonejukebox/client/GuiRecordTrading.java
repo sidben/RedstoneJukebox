@@ -1,13 +1,8 @@
 package sidben.redstonejukebox.client;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.Random;
-
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -15,15 +10,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.StatCollector;
 import net.minecraft.village.*;
 import net.minecraft.world.World;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
 import sidben.redstonejukebox.common.*;
+import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.PacketHelper;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 
 
@@ -139,19 +133,7 @@ public class GuiRecordTrading  extends GuiContainer
 			((ContainerRecordTrading)this.inventorySlots).setCurrentRecipeIndex(this.currentRecipeIndex);
         	
         	// Packets
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
-            DataOutputStream outputStream = new DataOutputStream(bos);
-            try 
-            {
-            	outputStream.writeInt(this.currentRecipeIndex);
-            } 
-            catch (Exception ex) {
-            	ex.printStackTrace();
-            }
-            
-			Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
-			PacketDispatcher.sendPacketToServer(packet);        	
-
+			PacketHelper.sendRecordTradeGUIPacket(this.currentRecipeIndex);
         }
     }
 

@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.common;
 
+import sidben.redstonejukebox.helper.CustomRecordHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;

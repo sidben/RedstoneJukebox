@@ -2,6 +2,9 @@ package sidben.redstonejukebox.common;
 
 import java.util.List;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.CustomRecordObject;
+import sidben.redstonejukebox.helper.PacketHelper;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -88,7 +91,7 @@ public class ItemCustomRecord extends ItemRecord
             else
             {
         		songID = getSongID(par1ItemStack);
-            	CustomRecordHelper.sendPlayRecordPacket(songID, x, y, z, true, 0, par3World.provider.dimensionId);
+        		PacketHelper.sendPlayRecordPacket(songID, x, y, z, true, 0, par3World.provider.dimensionId);
 
             	((BlockJukeBox)Block.jukebox).insertRecord(par3World, x, y, z, par1ItemStack);
             	--par1ItemStack.stackSize;

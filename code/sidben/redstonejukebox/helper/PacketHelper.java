@@ -2,8 +2,10 @@ package sidben.redstonejukebox.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.util.HashMap;
 
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.util.Vec3;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
@@ -26,6 +28,10 @@ public class PacketHelper
 	public static final byte PlayRecord = 2;						// Server -> Client
 	public static final byte IsPlayingQuestion = 3;					// Server -> Client
 	public static final byte IsPlayingAnswer = 4;					// Client -> Server
+	
+	
+	// Holds all players that are playing some record (only TRUE values are stored)
+	public static HashMap<String, Boolean> isPlayingResponses = new HashMap<String, Boolean>();
 
 	
 	
@@ -109,6 +115,12 @@ public class PacketHelper
 		
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
     	{
+			// Updates the sound source on the server
+			ModRedstoneJukebox.logDebugInfo("Updating sound source to " + x + ", " + y + ", " + z + ".");
+			ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)x, (double)y, (double)z);
+			// TODO: add dimension
+
+			
     		// Custom Packet
             ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
             DataOutputStream outputStream = new DataOutputStream(bos);
@@ -134,5 +146,82 @@ public class PacketHelper
 	}	
 	
 	
+	
+	
+	/*
+	 * Send a request for players in a certain area to inform if they are playing any record (streaming).  
+	 */
+	public static void sendIsPlayingQuestionPacket(int x, int y, int z, double range, int dimensionId)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("PacketHelper.sendIsPlayingQuestionPacket");
+		ModRedstoneJukebox.logDebugInfo("    Side:      " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Coords:    " + x + ", " + y + ", " + z);
+		ModRedstoneJukebox.logDebugInfo("    Range:     " + range);
+		ModRedstoneJukebox.logDebugInfo("    Dimension: " + dimensionId);
+
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+    	{
+			if (range < 64.0D) range = 64.0D;
+			
+    		// Custom Packet
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeByte(PacketHelper.IsPlayingQuestion);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+            
+            PacketHelper.isPlayingResponses.clear();
+            
+
+    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		ModRedstoneJukebox.logDebugInfo("    Sending is playing question");
+			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, range, dimensionId, packet);        	
+    	}  
+	}	
+	
+	
+	
+	
+	/*
+	 * Send a answer to the server informing if a player is playing any record (streaming).  
+	 */
+	public static void sendIsPlayingAnswerPacket(String playerName, boolean isPlaying)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("PacketHelper.sendIsPlayingAnswerPacket");
+		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Player:  " + playerName);
+		ModRedstoneJukebox.logDebugInfo("    Playing: " + isPlaying);
+
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+    	{
+    		// Custom Packet
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeByte(PacketHelper.IsPlayingAnswer);
+            	outputStream.writeUTF(playerName);
+            	outputStream.writeBoolean(isPlaying);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+
+    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		ModRedstoneJukebox.logDebugInfo("    Sending is playing answer");
+    		PacketDispatcher.sendPacketToServer(packet);
+    	}  
+	}	
+
 	
 }

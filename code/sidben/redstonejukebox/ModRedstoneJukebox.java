@@ -1,10 +1,6 @@
 package sidben.redstonejukebox;
 
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Properties;
 import java.util.logging.Level;
 
 import net.minecraft.block.Block;
@@ -119,6 +115,7 @@ public class ModRedstoneJukebox {
 	
 	// Debug mode
 	public static boolean onDebug;							// Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
+	private static boolean forceDebug = true;				// Forces debug mode always on.
 
 	
 	
@@ -328,7 +325,11 @@ public class ModRedstoneJukebox {
 
 	public static void logDebug(String info, Level level)
 	{
-		if (onDebug || level != Level.INFO) FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
+		if (forceDebug) {
+			System.out.println(info);
+		} else {
+			if (onDebug || level != Level.INFO) FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
+		}
 	}
 	
 

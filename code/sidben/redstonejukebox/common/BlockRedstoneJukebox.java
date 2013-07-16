@@ -1,21 +1,16 @@
 package sidben.redstonejukebox.common;
 
 import java.util.Random;
-import java.util.logging.Level;
-
 import sidben.redstonejukebox.ModRedstoneJukebox;
 
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.Icon;
 import net.minecraft.world.*;
@@ -53,8 +48,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World var1) {
+		ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.createNewTileEntity()");
+		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
+		
 		return new TileEntityRedstoneJukebox();
 	}
+	
 
     
     
@@ -234,7 +233,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6)
     {
+    	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.breakBlock()");
+		ModRedstoneJukebox.logDebugInfo("    Side:          " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    keepInventory: " + keepMyInventory);
+		ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + par1World.loadedTileEntityList.size());
 
+		
     	if (!keepMyInventory)
 		{
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)par1World.getBlockTileEntity(x, y, z);
@@ -246,6 +250,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
 		}
 
         super.breakBlock(par1World, x, y, z, par5, par6);
+        ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + par1World.loadedTileEntityList.size());
     }    
     
 
@@ -253,10 +258,65 @@ public class BlockRedstoneJukebox extends BlockContainer {
      * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
      * their own) Args: x, y, z, neighbor blockID
      */
-    public void onNeighborBlockChange(World par1World, int x, int y, int z, int blockID)
+    public void onNeighborBlockChange(World world, int x, int y, int z, int blockID)
     {
-        if (!par1World.isRemote)
+    	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.onNeighborBlockChange()");
+		ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
+
+		
+		TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
+		if (teJukebox != null) { teJukebox.checkRedstonePower(); }
+		
+		
+		/*
+		if (!world.isRemote)
         {
+        	boolean active = (world.getBlockId(x, y, z) == ModRedstoneJukebox.redstoneJukeboxActive.blockID);
+        	boolean hasPower = world.isBlockIndirectlyGettingPowered(x, y, z); 
+        	
+        	
+        	ModRedstoneJukebox.logDebugInfo("    Active:       " + active);
+        	ModRedstoneJukebox.logDebugInfo("    Powered:      " + hasPower);
+        	
+
+    		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
+            keepMyInventory = true;
+            ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + world.loadedTileEntityList.size());
+            
+            boolean flag = false;
+
+        	
+            if (active && !hasPower)
+            {
+            	ModRedstoneJukebox.logDebugInfo("    TE Size 3a: " + world.loadedTileEntityList.size());
+            	world.scheduleBlockUpdate(x, y, z, this.blockID, 5);
+            	ModRedstoneJukebox.logDebugInfo("    TE Size 4a: " + world.loadedTileEntityList.size());
+            }
+            else if (!active && hasPower)
+            {
+            	ModRedstoneJukebox.logDebugInfo("    TE Size 3b: " + world.loadedTileEntityList.size());
+                world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukeboxActive.blockID, 0, 2);
+                ModRedstoneJukebox.logDebugInfo("    TE Size 4b: " + world.loadedTileEntityList.size());
+            	flag = true;
+            }
+
+            
+            world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+            ModRedstoneJukebox.logDebugInfo("    TE Size 5: " + world.loadedTileEntityList.size());
+	        keepMyInventory = false;
+
+
+	        if (teJukebox != null && flag)
+	        {
+	            teJukebox.validate();
+	            world.setBlockTileEntity(x, y, z, teJukebox);
+	            ModRedstoneJukebox.logDebugInfo("    TE Size 6: " + world.loadedTileEntityList.size());
+	        }
+
+            
+            
+            /*
         	if (par1World.isBlockIndirectlyGettingPowered(x, y, z))
             {
                 startPlaying(par1World, x, y, z);
@@ -265,11 +325,39 @@ public class BlockRedstoneJukebox extends BlockContainer {
             {
                 stopPlaying(par1World, x, y, z);
             }
-        }
+            */
+        //}
+    	
 
-		super.onNeighborBlockChange(par1World, x, y, z, blockID);
+		// super.onNeighborBlockChange(par1World, x, y, z, blockID);
     }
 
+    /**
+     * Ticks the block if it's been scheduled
+     */
+    public void updateTick(World world, int x, int y, int z, Random par5Random)
+    {
+		if (!world.isRemote)
+        {
+			/*
+	    	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateTick()");
+			ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
+			ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
+
+			
+        	boolean active = (world.getBlockId(x, y, z) == ModRedstoneJukebox.redstoneJukeboxActive.blockID);
+        	boolean hasPower = world.isBlockIndirectlyGettingPowered(x, y, z); 
+        	
+            if (active && !hasPower)
+            {
+            	world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukebox.blockID, 0, 2);
+            	ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + world.loadedTileEntityList.size());
+            }
+            */
+        }
+    }
+    
+    
     
     
     
@@ -282,22 +370,62 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z)
     {
-		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
-		int auxBlockId;
-        keepMyInventory = true;
+		ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateJukeboxBlockState");
+		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Active:  " + active);
+		ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
+		
+		
+		int targetBlockId = (active ? ModRedstoneJukebox.redstoneJukeboxActiveID : ModRedstoneJukebox.redstoneJukeboxIdleID);
+		int currentBlockId = world.getBlockId(x, y, z);
+
+	
+		ModRedstoneJukebox.logDebugInfo("    World block ID = " + currentBlockId);
+		ModRedstoneJukebox.logDebugInfo("    Target block ID = " + targetBlockId);
+        ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + world.loadedTileEntityList.size());
 
 
-        auxBlockId = (active ? ModRedstoneJukebox.redstoneJukeboxActiveID : ModRedstoneJukebox.redstoneJukeboxIdleID);
-        world.setBlock(x, y, z, auxBlockId);
-        keepMyInventory = false;
-
-
-        if (teJukebox != null)
-        {
-            teJukebox.validate();
-            world.setBlockTileEntity(x, y, z, teJukebox);
-        }
         
+        if (currentBlockId != targetBlockId)
+        {
+    		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
+            keepMyInventory = true;
+    		ModRedstoneJukebox.logDebugInfo("    TE Size 3: " + world.loadedTileEntityList.size());
+            ModRedstoneJukebox.logDebugInfo("    Setting block");
+	        world.setBlock(x, y, z, targetBlockId);
+        	
+
+	        ModRedstoneJukebox.logDebugInfo("    TE Size 4: " + world.loadedTileEntityList.size());
+
+	        // -- Progress - this only creates a new server tile entity when activated
+	        // world.scheduleBlockUpdate(x, y, z, ModRedstoneJukebox.redstoneJukebox.blockID, ModRedstoneJukebox.redstoneJukebox.tickRate(world));
+	        
+	        ModRedstoneJukebox.logDebugInfo("    Block setted");
+	        
+	        
+	        keepMyInventory = false;
+	        world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+	        
+	        
+	        ModRedstoneJukebox.logDebugInfo("    Meta data setted");
+	        ModRedstoneJukebox.logDebugInfo("    TE Size 5: " + world.loadedTileEntityList.size());
+
+	        
+	
+			//ModRedstoneJukebox.logDebugInfo("    teJukebox null = " + (teJukebox == null));
+	        if (teJukebox != null)
+	        {
+	            teJukebox.validate();
+	            world.setBlockTileEntity(x, y, z, teJukebox);
+	            ModRedstoneJukebox.logDebugInfo("    TE Size 6: " + world.loadedTileEntityList.size());
+	        }
+			/*
+	        */
+			
+			//ModRedstoneJukebox.logDebugInfo("    TE for coords= " + (world.getBlockTileEntity(x, y, z).toString()));
+			
+        }
+
     }
     
     /**
@@ -405,17 +533,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 			double var11 = (double)((float)y + var5.nextFloat());
 			double var13 = (double)((float)z + var5.nextFloat());
 
-			/*
-			if (var8 == 0 && !world.isBlockOpaqueCube(x, y + 1, z))
-			{
-				var11 = (double)(y + 1) + var6;
-			}
-
-			if (var8 == 1 && !world.isBlockOpaqueCube(x, y - 1, z))
-			{
-				var11 = (double)(y + 0) - var6;
-			}
-			*/
 
 			if (var8 == 2 && !world.isBlockOpaqueCube(x, y, z + 1))
 			{

@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.common;
 
+import java.util.Iterator;
 import java.util.List;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.CustomRecordHelper;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
@@ -100,6 +102,21 @@ public class ItemCustomRecord extends ItemRecord
         }
         else
         {
+    		ModRedstoneJukebox.logDebugInfo("---------------------------------------------");
+        	ModRedstoneJukebox.logDebugInfo("Loaded Tile Entities");
+        	ModRedstoneJukebox.logDebugInfo("    Size: " + par3World.loadedTileEntityList.size());
+
+        	@SuppressWarnings("rawtypes")
+			Iterator iterator = par3World.loadedTileEntityList.iterator();
+            while (iterator.hasNext())
+            {
+                TileEntity tileentity = (TileEntity)iterator.next();
+                ModRedstoneJukebox.logDebugInfo("        Item: " + tileentity.toString());
+            }
+            
+            ModRedstoneJukebox.logDebugInfo("---------------------------------------------");
+        	
+        	
             return false;
         }
 
@@ -108,7 +125,8 @@ public class ItemCustomRecord extends ItemRecord
     
     
     // allows items to add custom lines of information to the mouseover description
-    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
     public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
    {
 	   String songTitle = "";
@@ -145,6 +163,7 @@ public class ItemCustomRecord extends ItemRecord
    /**
     * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
     */
+   @SuppressWarnings({ "unchecked", "rawtypes" })
    public void getSubItems(int par1, CreativeTabs par2CreativeTabs, List par3List)
    {
 	   // returns only records being used, with the needed NBT data. This info is added on the Creative Menu.

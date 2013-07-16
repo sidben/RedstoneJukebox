@@ -58,7 +58,8 @@ public class GuiRecordTrading  extends GuiContainer
     /**
      * Adds the buttons (and other controls) to the screen in question.
      */
-    public void initGui()
+    @SuppressWarnings("unchecked")
+	public void initGui()
     {
         super.initGui();
         int var1 = (this.width - this.xSize) / 2;

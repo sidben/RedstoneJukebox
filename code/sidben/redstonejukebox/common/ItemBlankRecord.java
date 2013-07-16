@@ -37,6 +37,7 @@ public class ItemBlankRecord extends Item {
 	
 
 	// allows items to add custom lines of information to the mouseover description
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
 	{

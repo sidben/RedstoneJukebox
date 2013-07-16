@@ -72,6 +72,7 @@ public class CommandPlayRecordAt  extends CommandBase
     /**
      * Adds the strings available in this command to the given list of tab completion options.
      */
+    @SuppressWarnings("rawtypes")
     public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
     {
         return par2ArrayOfStr.length == 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, CustomRecordHelper.getRecordNamesList()): null;

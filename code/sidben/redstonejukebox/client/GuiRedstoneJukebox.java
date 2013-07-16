@@ -1,9 +1,7 @@
 package sidben.redstonejukebox.client;
 
-import java.io.*;
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.common.network.PacketDispatcher;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.common.*;
 import sidben.redstonejukebox.helper.PacketHelper;
@@ -11,7 +9,6 @@ import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.*;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.StatCollector;
 
 
@@ -43,6 +40,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     /**
      * Adds the buttons (and other controls) to the screen in question.
      */
+	@SuppressWarnings("unchecked")
 	@Override
     public void initGui()
     {

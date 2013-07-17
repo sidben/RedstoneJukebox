@@ -34,7 +34,26 @@ public class ItemBlankRecord extends Item {
     }
 	
 	
+
 	
+    /**
+     * Checks isDamagable and if it cannot be stacked
+     */
+    public boolean isItemTool(ItemStack par1ItemStack)
+    {
+        return par1ItemStack.stackSize == 1;
+    }
+    
+    /**
+     * Return the enchantability factor of the item, most of the time is based on material.
+     */
+    public int getItemEnchantability()
+    {
+        return 1;
+    }	
+    
+    
+    
 
 	// allows items to add custom lines of information to the mouseover description
 	@SuppressWarnings({ "unchecked", "rawtypes" })

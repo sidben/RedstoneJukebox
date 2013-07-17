@@ -5,6 +5,7 @@ import java.util.logging.Level;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -18,6 +19,7 @@ import sidben.redstonejukebox.common.CommandPlayBgMusic;
 import sidben.redstonejukebox.common.CommandPlayRecord;
 import sidben.redstonejukebox.common.CommandPlayRecordAt;
 import sidben.redstonejukebox.common.CommonProxy;
+import sidben.redstonejukebox.common.EnchantmentDummy;
 import sidben.redstonejukebox.common.ItemBlankRecord;
 import sidben.redstonejukebox.common.ItemCustomRecord;
 import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
@@ -92,6 +94,10 @@ public class ModRedstoneJukebox {
 	public static Item customRecord;
 	public static Block redstoneJukebox;
 	public static Block redstoneJukeboxActive; 
+	
+	
+	// Enchantments
+    public static Enchantment enchantDummy;
 	
 	
 	// Global variables
@@ -217,6 +223,9 @@ public class ModRedstoneJukebox {
 		// Blocks
 		GameRegistry.registerBlock(redstoneJukebox, "sidbenRedstoneJukebox");
 
+		
+		// Enchantments
+		enchantDummy = new EnchantmentDummy(200, 10);
 
 
 		

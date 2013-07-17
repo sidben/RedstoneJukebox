@@ -3,6 +3,7 @@ package sidben.redstonejukebox.common;
 import java.util.List;
 
 import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.PacketHelper;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -32,32 +33,37 @@ public class CommandPlayBgMusic  extends CommandBase
 
     public String getCommandUsage(ICommandSender par1ICommandSender)
     {
-        //return par1ICommandSender.translateString(myUsage, new Object[0]);
     	return myUsage;
     }
 
     public void processCommand(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
     {
-		boolean sucess;
+		boolean found = false;
+    	String songName = "";
+
     	
-		throw new CommandException("Command disabled", new Object[0]);
-		
-/*
-    	if (par2ArrayOfStr.length < 1)
+		if (par2ArrayOfStr.length < 1)
         {
             throw new WrongUsageException(myUsage, new Object[0]);
         }
         else
         {
-			sucess = CustomRecordHelper.playBgMusic(par2ArrayOfStr[0].toLowerCase());
-			if (!sucess)
+        	songName = par2ArrayOfStr[0].toLowerCase();
+			found = CustomRecordHelper.isBgMusic(songName); 
+			
+			
+			if (found)
+			{
+				PacketHelper.sendPlayBgMusicPacket(songName);
+			}	
+			else
 			{
 				// error message
 				throw new CommandException("Music not found", new Object[0]);
 			}
 
         }
-*/        
+  
     }
 
     

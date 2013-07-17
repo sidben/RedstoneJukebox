@@ -52,7 +52,9 @@ public class PacketHandler implements IPacketHandler
 					EntityPlayer sender = (EntityPlayer) player;
 
 					
+					//----------------------------------------------------------------------------
 					// Jukebox GUI Packet
+					//----------------------------------------------------------------------------
 					if (packetType == PacketHelper.JukeboxGUIUpdate && sender.openContainer instanceof ContainerRedstoneJukebox)
 					{
 						// Debug
@@ -79,7 +81,10 @@ public class PacketHandler implements IPacketHandler
 						teJukebox.resync();
 					}
 
+					
+					//----------------------------------------------------------------------------
 					// Record Trading GUI Packet
+					//----------------------------------------------------------------------------
 					else if (packetType == PacketHelper.RecordTradingGUIUpdate && sender.openContainer instanceof ContainerRecordTrading)
 					{
 						// Debug
@@ -97,18 +102,22 @@ public class PacketHandler implements IPacketHandler
 						myTrade.setCurrentRecipeIndex(currentRecipe);
 					}
 					
+					
+					//----------------------------------------------------------------------------					
 					// Response if is playing packet
+					//----------------------------------------------------------------------------
 					else if (packetType == PacketHelper.IsPlayingAnswer)
 					{
 						// Debug
 	                	ModRedstoneJukebox.logDebugInfo("   -Is playing answer-");
 						
 						// Load data
-						String playerName = data.readUTF();
+						String playerName = "";
+						if(ModRedstoneJukebox.onDebug || ModRedstoneJukebox.forceDebug) playerName = data.readUTF(); 
 						boolean isPlaying = data.readBoolean();
 	                	
 						// Debug
-						ModRedstoneJukebox.logDebugInfo("    [Name]:[" +playerName+ "]");
+						if(ModRedstoneJukebox.onDebug || ModRedstoneJukebox.forceDebug) ModRedstoneJukebox.logDebugInfo("    [Name]:[" +playerName+ "]");
 						ModRedstoneJukebox.logDebugInfo("    [Playing]:[" +isPlaying+ "]");
 
 						
@@ -118,15 +127,19 @@ public class PacketHandler implements IPacketHandler
 							// Only stores TRUE values
 							ModRedstoneJukebox.logDebugInfo("    Adding response to the list.");
 							PacketHelper.isPlayingResponses.put(playerName, isPlaying);
+							
+							// TODO: received no response, remove player, add list total responses vs true responses. 3(?) attempts to get response before stopping
 						}
-						ModRedstoneJukebox.logDebugInfo("    Total responses: " + PacketHelper.isPlayingResponses.size());
+						ModRedstoneJukebox.logDebugInfo("    Total TRUE responses: " + PacketHelper.isPlayingResponses.size());
 
 					}
 
 				}
 				else if (side == Side.CLIENT)
 				{
-					// Custom Record Play Packet
+					//----------------------------------------------------------------------------
+					// Record Play Packet
+					//----------------------------------------------------------------------------
 					if (packetType == PacketHelper.PlayRecord)
 					{
 						// Debug
@@ -151,7 +164,30 @@ public class PacketHandler implements IPacketHandler
 						CustomRecordHelper.playAnyRecordAt(songID, sourceX, sourceY, sourceZ, showName, volumeExtra);
 					}
 
+					
+					//----------------------------------------------------------------------------
+					// Play BgMusic Packet
+					//----------------------------------------------------------------------------
+					else if (packetType == PacketHelper.PlayBgMusic)
+					{
+						// Debug
+	                	ModRedstoneJukebox.logDebugInfo("   -Play BgMusic Packet-");
+	
+						// Load data
+						String songName = data.readUTF();
+						
+						// Debug
+						ModRedstoneJukebox.logDebugInfo("    [SongName]:[" +songName+ "]");
+	
+						
+						// Process data
+						CustomRecordHelper.playBgMusic(songName);
+					}
+
+					
+					//----------------------------------------------------------------------------
 					// Request if is playing packet
+					//----------------------------------------------------------------------------
 					else if (packetType == PacketHelper.IsPlayingQuestion)
 					{
 						// Debug

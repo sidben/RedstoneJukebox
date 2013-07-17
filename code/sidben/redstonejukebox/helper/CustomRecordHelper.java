@@ -21,6 +21,7 @@ import net.minecraft.src.ModLoader;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.sound.PlayBackgroundMusicEvent;
 import net.minecraftforge.client.event.sound.PlayStreamingEvent;
 import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
 import net.minecraftforge.client.event.sound.SoundEvent;
@@ -274,6 +275,11 @@ public class CustomRecordHelper
     	return false;
 	}
 
+	public static boolean isBgMusic(String songName)
+	{
+		if (songName != "") return vanillaBgSongs.contains(songName.trim().toLowerCase());
+    	return false;
+	}
 
 
 
@@ -619,20 +625,20 @@ public class CustomRecordHelper
 
     			// Debug
 	    		ModRedstoneJukebox.logDebugInfo("    Song Name: " + auxRecord.songTitle);
-	    		ModRedstoneJukebox.logDebugInfo("    Settings volume: " + auxMC.gameSettings.soundVolume);
+	    		ModRedstoneJukebox.logDebugInfo("    Settings volume: " + auxMC.gameSettings.musicVolume);
 		
 	    		// Show record's name
 	    		if (auxRecord.songTitle != "" && showName) auxMC.ingameGUI.setRecordPlayingMessage(auxRecord.songTitle);
 	
 	    		
 	    		// Play the record - Adaptation of the [SoundManager.playStreaming]
-				if (auxMC.gameSettings.soundVolume != 0.0F)
+				if (auxMC.gameSettings.musicVolume != 0.0F)
 			    {
 			        if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
 			        if (auxMC.sndManager.sndSystem.playing("BgMusic")) auxMC.sndManager.sndSystem.stop("BgMusic");
 			
 			        auxMC.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, auxRecord.songURL, getRecordIdentifier(auxRecord.songID), false, x, y, z, 2, volumeRange);
-			        auxMC.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * auxMC.gameSettings.soundVolume);
+			        auxMC.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * auxMC.gameSettings.musicVolume);
 		            MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(auxMC.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
 		            auxMC.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
 		            
@@ -688,13 +694,13 @@ public class CustomRecordHelper
 	
 	    		
 	    		// Play the record - Adaptation of the [SoundManager.playStreaming]
-				if (auxMC.gameSettings.soundVolume != 0.0F && soundpoolentry != null)
+				if (auxMC.gameSettings.musicVolume != 0.0F && soundpoolentry != null)
 			    {
 			        if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
 			        if (auxMC.sndManager.sndSystem.playing("BgMusic")) auxMC.sndManager.sndSystem.stop("BgMusic");
 			
 			        auxMC.sndManager.sndSystem.newStreamingSource(true, ModRedstoneJukebox.sourceName, soundpoolentry.func_110457_b(), soundpoolentry.func_110458_a(), false, x, y, z, 2, volumeRange);
-			        auxMC.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * auxMC.gameSettings.soundVolume);
+			        auxMC.sndManager.sndSystem.setVolume(ModRedstoneJukebox.sourceName, 0.5F * auxMC.gameSettings.musicVolume);
 		            MinecraftForge.EVENT_BUS.post(new PlayStreamingSourceEvent(auxMC.sndManager, ModRedstoneJukebox.sourceName, x, y, z));
 		            auxMC.sndManager.sndSystem.play(ModRedstoneJukebox.sourceName);
 		            
@@ -712,6 +718,51 @@ public class CustomRecordHelper
 	}	
 
 
+	@SideOnly(Side.CLIENT)
+	public static boolean playBgMusic(String songName)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("CustomRecordHelper.playBgMusic");
+		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song Name: " + songName);
+
+		
+		if ((songName != "") && (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT))
+    	{
+			
+    		Minecraft auxMC = ModLoader.getMinecraftInstance();
+
+    		
+    		// Stop all music
+            if (auxMC.sndManager.sndSystem.playing("BgMusic")) auxMC.sndManager.sndSystem.stop("BgMusic");
+            if (auxMC.sndManager.sndSystem.playing("streaming")) auxMC.sndManager.sndSystem.stop("streaming");
+
+            
+            // gets the sound from the pool
+	        SoundPoolEntry seMusic = auxMC.sndManager.soundPoolMusic.getRandomSoundFromSoundPool(songName);
+	        seMusic = SoundEvent.getResult(new PlayBackgroundMusicEvent(auxMC.sndManager, seMusic));
+            
+            
+
+	        if (seMusic != null)
+	        {
+	        	// Music found
+	        	// OBS: func_110457_b() = soundUrl | func_110458_a() = soundName
+	        	auxMC.sndManager.sndSystem.backgroundMusic("BgMusic", seMusic.func_110457_b(), seMusic.func_110458_a(), false);
+	        	auxMC.sndManager.sndSystem.setVolume("BgMusic", auxMC.gameSettings.musicVolume);
+	        	auxMC.sndManager.sndSystem.play("BgMusic");
+
+	            return true;
+	        }	        
+    		else
+    		{
+    			ModRedstoneJukebox.logDebug("    BgMusic not found on the soundpool. Name: [" + songName + "]", Level.SEVERE);
+    		}
+
+    	}    		
+
+		return false;
+	}	
 	
 
 

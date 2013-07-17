@@ -36,13 +36,13 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
-
 @Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.2")
 @NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
 public class ModRedstoneJukebox {
 
 	
-    // The instance of your mod that Forge uses.
+
+	// The instance of your mod that Forge uses.
 	// Obs: MUST BE THE VALUE OF MODIF ABOVE!!1!11!!one!
 	@Instance("SidbenRedstoneJukebox")
 	public static ModRedstoneJukebox instance;
@@ -115,7 +115,7 @@ public class ModRedstoneJukebox {
 	
 	// Debug mode
 	public static boolean onDebug;							// Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
-	private static boolean forceDebug = true;				// Forces debug mode always on.
+	public static boolean forceDebug = true;				// Forces debug mode always on.
 
 	
 	

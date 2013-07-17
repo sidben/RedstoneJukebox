@@ -28,6 +28,7 @@ public class PacketHelper
 	public static final byte PlayRecord = 2;						// Server -> Client
 	public static final byte IsPlayingQuestion = 3;					// Server -> Client
 	public static final byte IsPlayingAnswer = 4;					// Client -> Server
+	public static final byte PlayBgMusic = 5;						// Server -> Client
 	
 	
 	// Holds all players that are playing some record (only TRUE values are stored)
@@ -144,6 +145,40 @@ public class PacketHelper
 			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, (64.0D + volumeExtender), dimensionId, packet);        	
     	}  
 	}	
+
+	
+	/*
+	 * Sends a "PlayBgMusic" packet to all players (in all dimensions)
+	 */
+	public static void sendPlayBgMusicPacket(String songName)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("PacketHelper.sendPlayBgMusicPacket");
+		ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song Name:      " + songName);
+
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+    	{
+    		// Custom Packet
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeByte(PacketHelper.PlayBgMusic);
+            	outputStream.writeUTF(songName);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+
+    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		PacketDispatcher.sendPacketToAllPlayers(packet);
+    	}  
+	}
+	
+	
 	
 	
 	
@@ -209,7 +244,7 @@ public class PacketHelper
             try 
             {
             	outputStream.writeByte(PacketHelper.IsPlayingAnswer);
-            	outputStream.writeUTF(playerName);
+            	if(ModRedstoneJukebox.onDebug || ModRedstoneJukebox.forceDebug) outputStream.writeUTF(playerName);			// Only sends player name on debug
             	outputStream.writeBoolean(isPlaying);
             } 
             catch (Exception ex) {

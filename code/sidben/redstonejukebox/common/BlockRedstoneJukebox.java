@@ -264,98 +264,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
 		ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
 		ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
 
-		
+		// Forces the Tile Entity to update it's state (inspired by BuildCraft)
 		TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
 		if (teJukebox != null) { teJukebox.checkRedstonePower(); }
-		
-		
-		/*
-		if (!world.isRemote)
-        {
-        	boolean active = (world.getBlockId(x, y, z) == ModRedstoneJukebox.redstoneJukeboxActive.blockID);
-        	boolean hasPower = world.isBlockIndirectlyGettingPowered(x, y, z); 
-        	
-        	
-        	ModRedstoneJukebox.logDebugInfo("    Active:       " + active);
-        	ModRedstoneJukebox.logDebugInfo("    Powered:      " + hasPower);
-        	
-
-    		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
-            keepMyInventory = true;
-            ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + world.loadedTileEntityList.size());
-            
-            boolean flag = false;
-
-        	
-            if (active && !hasPower)
-            {
-            	ModRedstoneJukebox.logDebugInfo("    TE Size 3a: " + world.loadedTileEntityList.size());
-            	world.scheduleBlockUpdate(x, y, z, this.blockID, 5);
-            	ModRedstoneJukebox.logDebugInfo("    TE Size 4a: " + world.loadedTileEntityList.size());
-            }
-            else if (!active && hasPower)
-            {
-            	ModRedstoneJukebox.logDebugInfo("    TE Size 3b: " + world.loadedTileEntityList.size());
-                world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukeboxActive.blockID, 0, 2);
-                ModRedstoneJukebox.logDebugInfo("    TE Size 4b: " + world.loadedTileEntityList.size());
-            	flag = true;
-            }
-
-            
-            world.setBlockMetadataWithNotify(x, y, z, 0, 2);
-            ModRedstoneJukebox.logDebugInfo("    TE Size 5: " + world.loadedTileEntityList.size());
-	        keepMyInventory = false;
-
-
-	        if (teJukebox != null && flag)
-	        {
-	            teJukebox.validate();
-	            world.setBlockTileEntity(x, y, z, teJukebox);
-	            ModRedstoneJukebox.logDebugInfo("    TE Size 6: " + world.loadedTileEntityList.size());
-	        }
-
-            
-            
-            /*
-        	if (par1World.isBlockIndirectlyGettingPowered(x, y, z))
-            {
-                startPlaying(par1World, x, y, z);
-            }
-            else 
-            {
-                stopPlaying(par1World, x, y, z);
-            }
-            */
-        //}
-    	
-
-		// super.onNeighborBlockChange(par1World, x, y, z, blockID);
     }
 
-    /**
-     * Ticks the block if it's been scheduled
-     */
-    public void updateTick(World world, int x, int y, int z, Random par5Random)
-    {
-		if (!world.isRemote)
-        {
-			/*
-	    	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateTick()");
-			ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-			ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
 
-			
-        	boolean active = (world.getBlockId(x, y, z) == ModRedstoneJukebox.redstoneJukeboxActive.blockID);
-        	boolean hasPower = world.isBlockIndirectlyGettingPowered(x, y, z); 
-        	
-            if (active && !hasPower)
-            {
-            	world.setBlock(x, y, z, ModRedstoneJukebox.redstoneJukebox.blockID, 0, 2);
-            	ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + world.loadedTileEntityList.size());
-            }
-            */
-        }
-    }
     
     
     
@@ -366,7 +280,9 @@ public class BlockRedstoneJukebox extends BlockContainer {
 	--------------------------------------------------------------------*/
 	
     /**
-     * Update which block ID the jukebox is using depending on whether or not it is playing
+     * Update which block ID the jukebox is using depending on whether or not it is playing.
+     * 
+     * Triggered by the Tile Entity when it detects changes.
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z)
     {
@@ -388,31 +304,31 @@ public class BlockRedstoneJukebox extends BlockContainer {
         
         if (currentBlockId != targetBlockId)
         {
+        	// get the TileEntity so it won't be reset
     		TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
             keepMyInventory = true;
     		ModRedstoneJukebox.logDebugInfo("    TE Size 3: " + world.loadedTileEntityList.size());
             ModRedstoneJukebox.logDebugInfo("    Setting block");
+            
+            // change de block id (at this point, Tile Entity was reset)
 	        world.setBlock(x, y, z, targetBlockId);
         	
+	        keepMyInventory = false;
 
 	        ModRedstoneJukebox.logDebugInfo("    TE Size 4: " + world.loadedTileEntityList.size());
 
-	        // -- Progress - this only creates a new server tile entity when activated
-	        // world.scheduleBlockUpdate(x, y, z, ModRedstoneJukebox.redstoneJukebox.blockID, ModRedstoneJukebox.redstoneJukebox.tickRate(world));
 	        
 	        ModRedstoneJukebox.logDebugInfo("    Block setted");
 	        
-	        
-	        keepMyInventory = false;
+	        // Don't know what this does for sure. I think the flag "2" sends update to client 
 	        world.setBlockMetadataWithNotify(x, y, z, 0, 2);
 	        
 	        
 	        ModRedstoneJukebox.logDebugInfo("    Meta data setted");
 	        ModRedstoneJukebox.logDebugInfo("    TE Size 5: " + world.loadedTileEntityList.size());
 
-	        
 	
-			//ModRedstoneJukebox.logDebugInfo("    teJukebox null = " + (teJukebox == null));
+			// Recover the Tile Entity
 	        if (teJukebox != null)
 	        {
 	            teJukebox.validate();
@@ -607,7 +523,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     public int getComparatorInputOverride(World par1World, int par2, int par3, int par4, int par5)
     {
     	TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)par1World.getBlockTileEntity(par2, par3, par4);
-    	return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
+    	return teJukebox == null ? 0 : teJukebox.isActive() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
     }
 
 
@@ -615,41 +531,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
 
 
-
-	/*--------------------------------------------------------------------
-		Custom Methods
-	--------------------------------------------------------------------*/
-
-	//-- Stop playing this jukebox
-    private void stopPlaying(World world, int x, int y, int z)
-    {
-    	if (!world.isRemote)
-        {
-        	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.stopPlaying");
-
-            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
-            if (teJukebox != null)
-            {
-				teJukebox.stopPlaying();
-			}
-		}
-	}
-
-
-	//-- Start playing this jukebox
-    private void startPlaying(World world, int x, int y, int z)
-    {
-        if (!world.isRemote)
-        {
-        	ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.startPlaying");
-        	
-            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox)world.getBlockTileEntity(x, y, z);
-            if (teJukebox != null)
-            {
-				teJukebox.startPlaying();
-			}
-		}
-	}
 
     
 }

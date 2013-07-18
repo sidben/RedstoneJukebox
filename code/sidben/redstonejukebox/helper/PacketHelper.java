@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.util.HashMap;
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.Vec3;
 import sidben.redstonejukebox.ModRedstoneJukebox;
@@ -25,10 +26,11 @@ public class PacketHelper
 	// Possible packets types
 	public static final byte JukeboxGUIUpdate = 0;					// Client -> Server
 	public static final byte RecordTradingGUIUpdate = 1;			// Client -> Server
-	public static final byte PlayRecord = 2;						// Server -> Client
+	public static final byte PlayRecordAt = 2;						// Server -> Client
 	public static final byte IsPlayingQuestion = 3;					// Server -> Client
 	public static final byte IsPlayingAnswer = 4;					// Client -> Server
 	public static final byte PlayBgMusic = 5;						// Server -> Client
+	public static final byte PlayBgRecord = 6;						// Server -> Client
 	
 	
 	// Holds all players that are playing some record (only TRUE values are stored)
@@ -127,7 +129,7 @@ public class PacketHelper
             DataOutputStream outputStream = new DataOutputStream(bos);
             try 
             {
-            	outputStream.writeByte(PacketHelper.PlayRecord);
+            	outputStream.writeByte(PacketHelper.PlayRecordAt);
             	outputStream.writeUTF(songID);
             	outputStream.writeInt(x);
             	outputStream.writeInt(y);
@@ -145,6 +147,82 @@ public class PacketHelper
 			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, (64.0D + volumeExtender), dimensionId, packet);        	
     	}  
 	}	
+
+	
+	/*
+	 * Sends a "PlayRecord" packet to all players (in all dimensions)
+	 */
+	public static void sendPlayRecordPacket(String songID, boolean showName)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("PacketHelper.sendPlayRecordPacket");
+		ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song ID:      " + songID);
+		ModRedstoneJukebox.logDebugInfo("    Show name:    " + showName);
+
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+    	{
+		
+    		// Custom Packet
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeByte(PacketHelper.PlayBgRecord);
+            	outputStream.writeUTF(songID);
+            	outputStream.writeBoolean(showName);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+
+    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		PacketDispatcher.sendPacketToAllPlayers(packet);        	
+    	}  
+	}
+
+	
+	/*
+	 * Sends a "PlayRecord" packet to the defined player(s)
+	 */
+	public static void sendPlayRecordPacketTo(EntityPlayerMP player, String songID, int x, int y, int z, boolean showName, float volumeExtender)
+	{
+		// Debug
+		ModRedstoneJukebox.logDebugInfo("PacketHelper.sendPlayRecordPacketTo");
+		ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
+		ModRedstoneJukebox.logDebugInfo("    Song ID:      " + songID);
+		ModRedstoneJukebox.logDebugInfo("    Coords:       " + x + ", " + y + ", " + z);
+		ModRedstoneJukebox.logDebugInfo("    Show name:    " + showName);
+		ModRedstoneJukebox.logDebugInfo("    Volume Extra: " + volumeExtender);
+
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
+    	{
+    		// Custom Packet
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
+            DataOutputStream outputStream = new DataOutputStream(bos);
+            try 
+            {
+            	outputStream.writeByte(PacketHelper.PlayRecordAt);
+            	outputStream.writeUTF(songID);
+            	outputStream.writeInt(x);
+            	outputStream.writeInt(y);
+            	outputStream.writeInt(z);
+            	outputStream.writeBoolean(showName);
+            	outputStream.writeFloat(volumeExtender);
+            } 
+            catch (Exception ex) {
+            	ex.printStackTrace();
+            }
+            
+
+    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		player.playerNetServerHandler.sendPacketToPlayer(packet);
+    	}  
+	}	
+	
 
 	
 	/*

@@ -138,9 +138,9 @@ public class PacketHandler implements IPacketHandler
 				else if (side == Side.CLIENT)
 				{
 					//----------------------------------------------------------------------------
-					// Record Play Packet
+					// Play Record At Packet
 					//----------------------------------------------------------------------------
-					if (packetType == PacketHelper.PlayRecord)
+					if (packetType == PacketHelper.PlayRecordAt)
 					{
 						// Debug
 	                	ModRedstoneJukebox.logDebugInfo("   -Record Play Packet-");
@@ -166,6 +166,28 @@ public class PacketHandler implements IPacketHandler
 
 					
 					//----------------------------------------------------------------------------
+					// Play Record Packet (as background music)
+					//----------------------------------------------------------------------------
+					else if (packetType == PacketHelper.PlayBgRecord)
+					{
+						// Debug
+	                	ModRedstoneJukebox.logDebugInfo("   -Play BgRecord Packet-");
+	
+						// Load data
+						String songName = data.readUTF();
+						boolean showName = data.readBoolean();
+						
+						// Debug
+						ModRedstoneJukebox.logDebugInfo("    [SongName]:[" +songName+ "]");
+						ModRedstoneJukebox.logDebugInfo("    [ShowName]:[" +showName+ "]");
+	
+						
+						// Process data
+						CustomRecordHelper.playBgMusic(songName, true, showName);
+					}
+
+					
+					//----------------------------------------------------------------------------
 					// Play BgMusic Packet
 					//----------------------------------------------------------------------------
 					else if (packetType == PacketHelper.PlayBgMusic)
@@ -181,7 +203,7 @@ public class PacketHandler implements IPacketHandler
 	
 						
 						// Process data
-						CustomRecordHelper.playBgMusic(songName);
+						CustomRecordHelper.playBgMusic(songName, false, false);
 					}
 
 					

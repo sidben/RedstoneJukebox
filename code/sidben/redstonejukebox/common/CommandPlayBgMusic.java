@@ -14,6 +14,11 @@ import net.minecraft.command.WrongUsageException;
 public class CommandPlayBgMusic  extends CommandBase
 {
 	
+	/* 
+	 * Command syntax:
+	 *   <name> = required
+	 *   [name] = optional
+	 */
 	private static final String myUsage = "/playbgmusic <music name>"; 
 	
 	
@@ -49,7 +54,7 @@ public class CommandPlayBgMusic  extends CommandBase
         else
         {
         	songName = par2ArrayOfStr[0].toLowerCase();
-			found = CustomRecordHelper.isBgMusic(songName); 
+			found = CustomRecordHelper.isValidBgMusicName(songName); 
 			
 			
 			if (found)

@@ -48,9 +48,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World var1) {
-		ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.createNewTileEntity()");
-		ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
-		
 		return new TileEntityRedstoneJukebox();
 	}
 	

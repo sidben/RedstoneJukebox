@@ -103,6 +103,8 @@ public class PacketHelper
 	 * on each client, playing the sound itself.
 	 * 
 	 * Here I just send the a custom package without all that encapsulation.
+	 * 
+	 * OBS: The songID can be -, that would make sounds stop.
 	 */
 	public static void sendPlayRecordPacket(String songID, int x, int y, int z, boolean showName, float volumeExtender, int dimensionId)
 	{
@@ -119,10 +121,19 @@ public class PacketHelper
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
     	{
 			// Updates the sound source on the server
-			ModRedstoneJukebox.logDebugInfo("Updating sound source to " + x + ", " + y + ", " + z + ".");
-			ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)x, (double)y, (double)z);
-			// TODO: add dimension
+			if (songID == "-") {
+				ModRedstoneJukebox.logDebugInfo("Reseting sound source.");
+				ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
+			} else {
+				ModRedstoneJukebox.logDebugInfo("Updating sound source to " + x + ", " + y + ", " + z + ".");
+				ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)x, (double)y, (double)z);
+				// TODO: add dimension
+			}
 
+			// Range of the player check
+			double range = (64.0D + volumeExtender);
+			range = range * 1.5;		// adds 50% to the range of checked players, for those away, that come close to the jukebox
+			
 			
     		// Custom Packet
             ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
@@ -144,7 +155,7 @@ public class PacketHelper
 
     		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
     		ModRedstoneJukebox.logDebugInfo("    Sending play record package (songID: " +songID+ ")");
-			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, (64.0D + volumeExtender), dimensionId, packet);        	
+			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, range, dimensionId, packet);        	
     	}  
 	}	
 

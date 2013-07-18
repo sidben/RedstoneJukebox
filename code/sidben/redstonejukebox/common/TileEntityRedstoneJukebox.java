@@ -85,6 +85,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 	//-- Forces the playing of the next record.
     private boolean forceNextRecord = false;
 
+
+    //-- Forces the jukebox stop.
+    private boolean forceStop = false;
+
     
     // Inspired by BuildCraft
     public boolean isRedstonePowered = false;
@@ -271,7 +275,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         playMode = par1NBTTagCompound.getShort("PlayMode");
         isLoop = par1NBTTagCompound.getBoolean("Loop");
         isActive = par1NBTTagCompound.getBoolean("Active");
-        // isPlaying = par1NBTTagCompound.getBoolean("Playing");
         
     }
 
@@ -285,7 +288,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         par1NBTTagCompound.setShort("PlayMode", (short)playMode);
         par1NBTTagCompound.setBoolean("Loop", (boolean)isLoop);
         par1NBTTagCompound.setBoolean("Active", (boolean)isActive);
-        //par1NBTTagCompound.setBoolean("Playing", (boolean)isPlaying);
         NBTTagList nbttaglist = new NBTTagList();
 
         for (int i = 0; i < jukeboxPlaylist.length; i++)
@@ -395,10 +397,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 			}
 			else
 			{
+		    	ModRedstoneJukebox.logDebugInfo("Redstone.updateEntity() - " + FMLCommonHandler.instance().getEffectiveSide() + " - " + this.checkRequestMode);
+/*
 		    	ModRedstoneJukebox.logDebugInfo("Redstone.updateEntity() - " + FMLCommonHandler.instance().getEffectiveSide() + " - " + this.worldObj.isRemote);
 		    	ModRedstoneJukebox.logDebugInfo("    Request mode: " + this.checkRequestMode);
 		    	ModRedstoneJukebox.logDebugInfo("    Delay 2:      " + this.isPlayingDelay);
-/*
 		    	ModRedstoneJukebox.logDebugInfo("    TE Tick.");
 				ModRedstoneJukebox.logDebugInfo("        Init:     " + this.initialized);
 				ModRedstoneJukebox.logDebugInfo("        Active:  " + this.isActive());
@@ -417,10 +420,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					this.markAsPlaying();
 					this.startPlaying();
 				}
-				else if (!this.isRedstonePowered && this.isActive())
+				else if ((!this.isRedstonePowered && this.isActive()) || this.forceStop)
 				{
-					this.markAsStopped();
 					this.stopPlaying();
+					this.markAsStopped();
+					this.forceStop = false;
 				}
 				else if (this.isRedstonePowered && this.isActive())
 				{
@@ -598,11 +602,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     	ModRedstoneJukebox.logDebugInfo("    isActive = " + this.isActive);
     	ModRedstoneJukebox.logDebugInfo("    isPlayingNow = " + this.isPlayingNow);
     	ModRedstoneJukebox.logDebugInfo("    amISource = " + this.amITheSource());
+		ModRedstoneJukebox.logDebugInfo("    Side = " + FMLCommonHandler.instance().getEffectiveSide());
+    	ModRedstoneJukebox.logDebugInfo("    Coords = " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
 
 		// Stop all records
-		this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
-		this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
-
+    	PacketHelper.sendPlayRecordPacket("-", this.xCoord, this.yCoord, this.zCoord, true, 0, this.worldObj.provider.dimensionId);
 	}
 
     
@@ -742,16 +746,14 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					if (this.amITheSource())
 					{
 						ModRedstoneJukebox.logDebugInfo("Redstone Jukebox at " +this.xCoord+ ", " +this.yCoord+ ", " +this.zCoord+ " is no longer the source of music. Music is now at " +ModRedstoneJukebox.lastSoundSource.xCoord+ ", " +ModRedstoneJukebox.lastSoundSource.yCoord+ ", " +ModRedstoneJukebox.lastSoundSource.zCoord+ ".");
-						// this.markAsStopped();
-						this.isActive = false;
+						this.forceStop = true;
 					}
 					else
 					{
 						//-- check if there is a record on the current slot
 						if (this.getCurrentJukeboxPlaySlot() < 0)
 						{
-							// this.markAsStopped();
-							this.isActive = false;
+							this.forceStop = true;
 						}
 						else
 						{
@@ -883,20 +885,20 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					this.setPlaylistOrder();
 					checkedSlot = this.nextPlaySlot;
 					++this.nextPlaySlot;
+					if (checkedSlot < 0) { 
+						this.forceStop = true;
+						break;
+					}
 				}
 				else
 				{
+					this.forceStop = true;
+					/*
+					this.isActive = false;
 					this.stopPlaying();			// This stop playing, not just mark as stopped, because someone may remove the last record, causing a playNext
+					*/
 					break;
 				}
-			}
-
-
-
-			// another check, because of loop
-			if (checkedSlot < 0) {
-				this.stopPlaying();			// This stop playing, not just mark as stopped, because someone may remove the last record, causing a playNext
-				break;
 			}
 
 
@@ -951,9 +953,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 					{
 						this.currentPlaySlot = checkedSlot;
 						this.currentJukeboxPlaySlot= this.playOrder[checkedSlot];
-	
-						// this.markAsPlaying();
-						// this.isActive = true;
 						this.isPlayingNow = true;
 
 						break;

@@ -588,6 +588,21 @@ public class CustomRecordHelper
 	@SideOnly(Side.CLIENT)
 	public static boolean playAnyRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender)
 	{
+		if (songID == null) {
+			// Debug
+			ModRedstoneJukebox.logDebugInfo("playAnyRecordAt - stopping all sounds");
+			
+			// Stops playing sounds
+    		Minecraft auxMC = ModLoader.getMinecraftInstance();
+	        if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
+	        if (auxMC.sndManager.sndSystem.playing("BgMusic")) auxMC.sndManager.sndSystem.stop("BgMusic");
+			
+			//this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
+			//this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
+		
+			return true;
+		}
+		
 		if (songID != "")
 		{
 			if (CustomRecordHelper.isCustomRecord(songID))

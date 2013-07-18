@@ -161,6 +161,7 @@ public class PacketHandler implements IPacketHandler
 	
 						
 						// Process data
+						if (songID.equals("-")) songID = null;
 						CustomRecordHelper.playAnyRecordAt(songID, sourceX, sourceY, sourceZ, showName, volumeExtra);
 					}
 

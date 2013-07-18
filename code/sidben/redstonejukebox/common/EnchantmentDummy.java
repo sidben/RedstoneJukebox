@@ -1,6 +1,5 @@
 package sidben.redstonejukebox.common;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;

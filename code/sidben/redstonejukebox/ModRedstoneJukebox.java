@@ -278,7 +278,7 @@ public class ModRedstoneJukebox {
 		ItemStack redstoneStack = new ItemStack(Item.redstone);
 		ItemStack redstoneTorchStack = new ItemStack(Block.torchRedstoneActive);
 		ItemStack glassStack = new ItemStack(Block.glass);
-		ItemStack woodStack = new ItemStack(Block.planks);
+		Block woodStack = Block.planks;
 		ItemStack jukeboxStack = new ItemStack(Block.jukebox);
 				
 		

@@ -3,6 +3,7 @@ package sidben.redstonejukebox.common;
 import java.io.*;
 import java.util.logging.Level;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.Reference;
 import sidben.redstonejukebox.helper.CustomRecordHelper;
 import sidben.redstonejukebox.helper.PacketHelper;
 import net.minecraft.client.Minecraft;
@@ -37,7 +38,7 @@ public class PacketHandler implements IPacketHandler
 		
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
 		
-		if (payload.channel.equals(ModRedstoneJukebox.jukeboxChannel))
+		if (payload.channel.equals(Reference.Channel))
 		{
             try
             {
@@ -113,11 +114,11 @@ public class PacketHandler implements IPacketHandler
 						
 						// Load data
 						String playerName = "";
-						if(ModRedstoneJukebox.onDebug || ModRedstoneJukebox.forceDebug) playerName = data.readUTF(); 
+						if(ModRedstoneJukebox.onDebug || Reference.ForceDebug) playerName = data.readUTF(); 
 						boolean isPlaying = data.readBoolean();
 	                	
 						// Debug
-						if(ModRedstoneJukebox.onDebug || ModRedstoneJukebox.forceDebug) ModRedstoneJukebox.logDebugInfo("    [Name]:[" +playerName+ "]");
+						if(ModRedstoneJukebox.onDebug || Reference.ForceDebug) ModRedstoneJukebox.logDebugInfo("    [Name]:[" +playerName+ "]");
 						ModRedstoneJukebox.logDebugInfo("    [Playing]:[" +isPlaying+ "]");
 
 						

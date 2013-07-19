@@ -15,9 +15,8 @@ public class CommonProxy implements IGuiHandler {
 	
 	
 	/*-------------------------------------------------------------------
-		Server Logic
+        Server Logic
 	-------------------------------------------------------------------*/
-
 	
 	// returns an instance of the Container
 	@Override
@@ -48,13 +47,13 @@ public class CommonProxy implements IGuiHandler {
 	
 	
 	/*-------------------------------------------------------------------
-		Client Logic
+        Client Logic
 	-------------------------------------------------------------------*/
 	public void registerRenderers() {
 	}
 
 	
-	// returns an instance of the Gui 
+	// returns an instance of the GUI 
     @Override
 	public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
 	{

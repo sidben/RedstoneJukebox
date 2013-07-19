@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.util.Vec3;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.Reference;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
@@ -63,7 +64,7 @@ public class PacketHelper
         }
         
 		Packet250CustomPayload packet = new Packet250CustomPayload();
-		packet.channel = ModRedstoneJukebox.jukeboxChannel;
+		packet.channel = Reference.Channel;
 		packet.data = bos.toByteArray();
 		packet.length = bos.size();
 		PacketDispatcher.sendPacketToServer(packet);
@@ -88,7 +89,7 @@ public class PacketHelper
         	ex.printStackTrace();
         }
         
-		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
 		PacketDispatcher.sendPacketToServer(packet);        	
 	}
 	
@@ -153,7 +154,7 @@ public class PacketHelper
             }
             
 
-    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
     		ModRedstoneJukebox.logDebugInfo("    Sending play record package (songID: " +songID+ ")");
 			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, range, dimensionId, packet);        	
     	}  
@@ -189,7 +190,7 @@ public class PacketHelper
             }
             
 
-    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
     		PacketDispatcher.sendPacketToAllPlayers(packet);        	
     	}  
 	}
@@ -229,7 +230,7 @@ public class PacketHelper
             }
             
 
-    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
     		player.playerNetServerHandler.sendPacketToPlayer(packet);
     	}  
 	}	
@@ -262,7 +263,7 @@ public class PacketHelper
             }
             
 
-    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
     		PacketDispatcher.sendPacketToAllPlayers(packet);
     	}  
 	}
@@ -304,7 +305,7 @@ public class PacketHelper
             PacketHelper.isPlayingResponses.clear();
             
 
-    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
     		ModRedstoneJukebox.logDebugInfo("    Sending is playing question");
 			PacketDispatcher.sendPacketToAllAround((double)x, (double)y, (double)z, range, dimensionId, packet);        	
     	}  
@@ -333,7 +334,7 @@ public class PacketHelper
             try 
             {
             	outputStream.writeByte(PacketHelper.IsPlayingAnswer);
-            	if(ModRedstoneJukebox.onDebug || ModRedstoneJukebox.forceDebug) outputStream.writeUTF(playerName);			// Only sends player name on debug
+            	if(ModRedstoneJukebox.onDebug || Reference.ForceDebug) outputStream.writeUTF(playerName);			// Only sends player name on debug
             	outputStream.writeBoolean(isPlaying);
             } 
             catch (Exception ex) {
@@ -341,7 +342,7 @@ public class PacketHelper
             }
             
 
-    		Packet250CustomPayload packet = new Packet250CustomPayload(ModRedstoneJukebox.jukeboxChannel, bos.toByteArray());
+    		Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
     		ModRedstoneJukebox.logDebugInfo("    Sending is playing answer");
     		PacketDispatcher.sendPacketToServer(packet);
     	}  

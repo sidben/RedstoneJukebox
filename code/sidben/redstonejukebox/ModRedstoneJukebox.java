@@ -13,7 +13,6 @@ import net.minecraft.util.Vec3;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.client.PlayerEventHandler;
-import sidben.redstonejukebox.client.SoundEventHandler;
 import sidben.redstonejukebox.common.BlockRedstoneJukebox;
 import sidben.redstonejukebox.common.CommandPlayBgMusic;
 import sidben.redstonejukebox.common.CommandPlayRecord;
@@ -24,6 +23,7 @@ import sidben.redstonejukebox.common.ItemBlankRecord;
 import sidben.redstonejukebox.common.ItemCustomRecord;
 import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
 import sidben.redstonejukebox.helper.CustomRecordHelper;
+import sidben.redstonejukebox.helper.CustomRecordObject;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
@@ -38,48 +38,42 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 
-@Mod(modid="SidbenRedstoneJukebox", name="Redstone Jukebox", version="1.2")
-@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {"chRSJukebox"}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
+@Mod(modid=Reference.ModID, name=Reference.ModName, version=Reference.ModVersion)
+@NetworkMod(clientSideRequired=true, serverSideRequired=false, channels = {Reference.Channel}, packetHandler = sidben.redstonejukebox.common.PacketHandler.class)
 public class ModRedstoneJukebox {
 
 	
 
 	// The instance of your mod that Forge uses.
-	// Obs: MUST BE THE VALUE OF MODIF ABOVE!!1!11!!one!
-	@Instance("SidbenRedstoneJukebox")
+	@Instance(Reference.ModID)
 	public static ModRedstoneJukebox instance;
 	
 	
 	// Says where the client and server 'proxy' code is loaded.
-	@SidedProxy(clientSide="sidben.redstonejukebox.client.ClientProxy", serverSide="sidben.redstonejukebox.common.CommonProxy")
+	@SidedProxy(clientSide=Reference.ClientProxyClass, serverSide=Reference.ServerProxyClass)
 	public static CommonProxy proxy;
 
-	
-	// Channels
-	public static final String jukeboxChannel = "chRSJukebox";		// OBS TODO: move this to a "config" class, along with the ModID
-	
 	
 	// Models IDs
 	public static int redstoneJukeboxModelID;
 
 	
 	// Textures and Icons paths
-	public static String blankRecordIcon = "redstonejukebox:blank_record";
-	public static String customRecordIconArray = "redstonejukebox:custom_record_";
-	public static String jukeboxDiscIcon = "redstonejukebox:redstone_jukebox_disc";
-	public static String jukeboxTopIcon = "redstonejukebox:redstone_jukebox_top";
-	public static String jukeboxBottomIcon = "redstonejukebox:redstone_jukebox_bottom";
-	public static String jukeboxSideOnIcon = "redstonejukebox:redstone_jukebox_on";
-	public static String jukeboxSideOffIcon = "redstonejukebox:redstone_jukebox_off";
+	public static String blankRecordIcon            = Reference.ResourcesNamespace + ":blank_record";
+	public static String customRecordIconArray      = Reference.ResourcesNamespace + ":custom_record_";
+	public static String jukeboxDiscIcon            = Reference.ResourcesNamespace + ":redstone_jukebox_disc";
+	public static String jukeboxTopIcon             = Reference.ResourcesNamespace + ":redstone_jukebox_top";
+	public static String jukeboxBottomIcon          = Reference.ResourcesNamespace + ":redstone_jukebox_bottom";
+	public static String jukeboxSideOnIcon          = Reference.ResourcesNamespace + ":redstone_jukebox_on";
+	public static String jukeboxSideOffIcon         = Reference.ResourcesNamespace + ":redstone_jukebox_off";
 
-	// OBS: this don't belong here, almost sure of it
-	public static final ResourceLocation redstoneJukeboxGui = new ResourceLocation("redstonejukebox", "textures/gui/redstonejukebox-gui.png");
-	public static final ResourceLocation recordTradeGui = new ResourceLocation("redstonejukebox", "textures/gui/recordtrading-gui.png");
+	public static final ResourceLocation redstoneJukeboxGui     = new ResourceLocation(Reference.ResourcesNamespace, "textures/gui/redstonejukebox-gui.png");
+	public static final ResourceLocation recordTradeGui         = new ResourceLocation(Reference.ResourcesNamespace, "textures/gui/recordtrading-gui.png");
 
 	
 	// GUI IDs
-	public static int redstoneJukeboxGuiID = 0;
-	public static int recordTradingGuiID = 1;
+	public static int redstoneJukeboxGuiID          = 0;
+	public static int recordTradingGuiID            = 1;
 
 	
 	// Blocks and Items IDs
@@ -103,7 +97,7 @@ public class ModRedstoneJukebox {
 	// Global variables
 	public final static String sourceName = "streaming";	// music discs are called "streaming" 
 	public final static int maxCustomRecords = 32;			// Limit of custom records accepted TODO: make this a config
-	public final static int maxCustomRecordIcon = 77;		// Limit of icon IDs for the records. This is stored on the metadata of the item. Start at zero.
+	public final static int maxCustomRecordIcon = 77;		// Limit of icon IDs for the records. This is stored on the metadata (damage value) of the item. Start at zero.
 	public final static int maxStores = 16;					// Number of "record stores" available. Each "store" is a random selection of records for trade.
 	public final static int maxOffers = 8;					// Maximum number of record offers a villager have
 	public static Vec3 lastSoundSource;						// holds the position of the last sound source (used so only 1 redstone jukebox is active at a time)
@@ -121,7 +115,6 @@ public class ModRedstoneJukebox {
 	
 	// Debug mode
 	public static boolean onDebug;							// Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
-	public static boolean forceDebug = true;				// Forces debug mode always on.
 
 	
 	
@@ -213,15 +206,15 @@ public class ModRedstoneJukebox {
 	
 	
 		// Blocks and Items
-		recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, blankRecordIcon).func_111206_d("record_blank");
-		customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord").func_111206_d("record_custom");
-		redstoneJukebox = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setCreativeTab(CreativeTabs.tabRedstone).func_111022_d("redstone_jukebox_off");
-		redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setLightValue(0.75F).func_111022_d("redstone_jukebox_on");
+		recordBlank             = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, blankRecordIcon).func_111206_d("record_blank");
+		customRecord            = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord").func_111206_d("record_custom");
+		redstoneJukebox         = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxIdleID, false).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setCreativeTab(CreativeTabs.tabRedstone).func_111022_d("redstone_jukebox_off");
+		redstoneJukeboxActive   = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setLightValue(0.75F).func_111022_d("redstone_jukebox_on");
 
 		
 		
 		// Blocks
-		GameRegistry.registerBlock(redstoneJukebox, "sidbenRedstoneJukebox");
+		GameRegistry.registerBlock(redstoneJukebox, "RedstoneJukeboxBlock");
 
 		
 		// Enchantments
@@ -241,10 +234,6 @@ public class ModRedstoneJukebox {
 	@Mod.EventHandler
 	public void load(FMLInitializationEvent event) {
 
-        // Register my custom sound handler
-		SoundEventHandler soundEventHandler = new SoundEventHandler();
-		MinecraftForge.EVENT_BUS.register(soundEventHandler);
-		
 		// Register my custom player event handler
 		PlayerEventHandler playerEventHandler = new PlayerEventHandler();
 		MinecraftForge.EVENT_BUS.register(playerEventHandler);
@@ -255,7 +244,7 @@ public class ModRedstoneJukebox {
 		// GUIs
 		NetworkRegistry.instance().registerGuiHandler(this, ModRedstoneJukebox.proxy);
 
-		
+		// Renderer
 		proxy.registerRenderers();
 		
 
@@ -295,11 +284,21 @@ public class ModRedstoneJukebox {
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack10, flintStack, redstoneStack);
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack11, flintStack, redstoneStack);
 		GameRegistry.addShapelessRecipe(recordStack0, recordStack12, flintStack, redstoneStack);
-		// Load all custom records metadata as possible recipes. Maybe I can upgrade this to only consider metadata in use.
+
+		// Load all current custom records as possible recipes.
+		ItemStack customRecordStack;
+		for (CustomRecordObject record: CustomRecordHelper.getRecordList())
+		{
+			customRecordStack = CustomRecordHelper.getCustomRecord(record);
+			if (customRecordStack != null) GameRegistry.addShapelessRecipe(recordStack0, customRecordStack, flintStack, redstoneStack);
+		}
+
+		/*
 		for (int varCont = 0; varCont <= maxCustomRecordIcon; ++varCont)
 		{
 			GameRegistry.addShapelessRecipe(recordStack0, new ItemStack(customRecord, 1, varCont), flintStack, redstoneStack);
 	    }
+	    */
 
 		// Recipe: Redstone Jukebox
 		GameRegistry.addRecipe(new ItemStack(redstoneJukebox), "ggg", "tjt", "www", 'g', glassStack, 't', redstoneTorchStack, 'j', jukeboxStack, 'w', woodStack);
@@ -334,7 +333,7 @@ public class ModRedstoneJukebox {
 
 	public static void logDebug(String info, Level level)
 	{
-		if (forceDebug) {
+		if (Reference.ForceDebug) {
 			System.out.println(info);
 		} else {
 			if (onDebug || level != Level.INFO) FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");

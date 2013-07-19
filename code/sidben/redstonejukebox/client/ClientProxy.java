@@ -14,6 +14,11 @@ import sidben.redstonejukebox.helper.CustomRecordHelper;
 
 public class ClientProxy extends CommonProxy {
 	
+
+	
+	/*-------------------------------------------------------------------
+        Client Logic
+	-------------------------------------------------------------------*/
 	
 	@Override
 	public void registerRenderers() 

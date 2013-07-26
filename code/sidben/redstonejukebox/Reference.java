@@ -8,7 +8,7 @@ public class Reference {
 
 
     // --- Forces debug mode always on
-    public static final boolean ForceDebug         = true;
+    public static final boolean ForceDebug         = false;
 
 
     // --- Mod basic info

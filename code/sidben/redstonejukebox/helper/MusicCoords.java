@@ -39,6 +39,10 @@ public class MusicCoords {
         return (this.x == xCoord && this.y == yCoord && this.z == zCoord && this.dim == dimension);
     }
 
+    public boolean isEqual (int xCoord, int yCoord, int zCoord) {
+        // OBS: dimension is ignored
+        return (this.x == xCoord && this.y == yCoord && this.z == zCoord);
+    }
 
 
 

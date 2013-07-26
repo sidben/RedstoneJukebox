@@ -178,21 +178,37 @@ public class PlayMusicHelper {
 
     @SideOnly(Side.CLIENT)
     public static boolean playAnyRecordAt(String songID, int x, int y, int z, boolean showName, float volumeExtender) {
+        
+        
+        /*
+         * OBS: When a redstone jukebox stops playing, it sends a "PlayRecordAt" packet with a NULL
+         * song name. All clients receive that, but they will only stop playing if the current source
+         * IS in fact the redstone jukebox coordinates.
+         * 
+         * This avoids stopping records when the sound source changes but the server still wasn't notified.
+         */
         if (songID == null) {
-            // Debug
-            ModRedstoneJukebox.logDebugInfo("playAnyRecordAt - stopping all sounds");
+            if (PlayMusicHelper.lastSoundSourceClient.isEqual(x, y, z)) {
+                // Debug
+                ModRedstoneJukebox.logDebugInfo("playAnyRecordAt - stopping all sounds");
 
-            // Stops playing sounds
-            Minecraft auxMC = ModLoader.getMinecraftInstance();
-            if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) {
-                auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
-            }
-            if (auxMC.sndManager.sndSystem.playing("BgMusic")) {
-                auxMC.sndManager.sndSystem.stop("BgMusic");
-            }
+                // Stops playing sounds
+                Minecraft auxMC = ModLoader.getMinecraftInstance();
+                if (auxMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName)) {
+                    auxMC.sndManager.sndSystem.stop(ModRedstoneJukebox.sourceName);
+                }
+                if (auxMC.sndManager.sndSystem.playing("BgMusic")) {
+                    auxMC.sndManager.sndSystem.stop("BgMusic");
+                }
 
-            // this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
-            // this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
+                // this.worldObj.playAuxSFX(1005, this.xCoord, this.yCoord, this.zCoord, 0);
+                // this.worldObj.playRecord((String)null, this.xCoord, this.yCoord, this.zCoord);
+            } 
+            else {
+                // Debug
+                ModRedstoneJukebox.logDebugInfo("playAnyRecordAt - no need to stop playing");
+               
+            }
 
             return true;
         }

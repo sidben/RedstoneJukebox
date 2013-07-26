@@ -121,8 +121,8 @@ public class ModRedstoneJukebox {
 
 
     // Debug mode
-    public static boolean                onDebug;                                                                                                           // Indicates if the MOD is on debug mode.
-                                                                                                                                                             // Extra info will be tracked on the log.
+    public static boolean                onDebug;                                                                                                           // Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
+    public static boolean                onDebugPackets;        // Indicates if packets are also on debug
 
 
 
@@ -147,6 +147,7 @@ public class ModRedstoneJukebox {
 
             // Debug
             ModRedstoneJukebox.onDebug = config.get(customRecordCategory, "onDebug", false).getBoolean(false);
+            ModRedstoneJukebox.onDebugPackets = config.get(customRecordCategory, "onDebugPackets", false).getBoolean(false);
 
             // Load blocks and items IDs
             ModRedstoneJukebox.redstoneJukeboxIdleID = config.getBlock("redstoneJukeboxIdleID", 520).getInt(520);
@@ -358,6 +359,13 @@ public class ModRedstoneJukebox {
 
     public static void logDebugInfo(String info) {
         ModRedstoneJukebox.logDebug(info, Level.INFO);
+    }
+
+
+    public static void logDebugPacket(String info) {
+        if (ModRedstoneJukebox.onDebugPackets) {
+            FMLLog.log("SidbenRedstoneJukebox", Level.INFO,  info, "");
+        }
     }
 
 

@@ -233,7 +233,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
         ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.breakBlock()");
         ModRedstoneJukebox.logDebugInfo("    Side:          " + FMLCommonHandler.instance().getEffectiveSide());
         ModRedstoneJukebox.logDebugInfo("    keepInventory: " + BlockRedstoneJukebox.keepMyInventory);
-        ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + par1World.loadedTileEntityList.size());
 
 
         if (!BlockRedstoneJukebox.keepMyInventory) {
@@ -245,7 +244,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
         }
 
         super.breakBlock(par1World, x, y, z, par5, par6);
-        ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + par1World.loadedTileEntityList.size());
     }
 
 
@@ -257,7 +255,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
     public void onNeighborBlockChange(World world, int x, int y, int z, int blockID) {
         ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.onNeighborBlockChange()");
         ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
+        ModRedstoneJukebox.logDebugInfo("    Block ID:     " + blockID);
 
         // Forces the Tile Entity to update it's state (inspired by BuildCraft)
         TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getBlockTileEntity(x, y, z);
@@ -282,7 +280,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
         ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateJukeboxBlockState");
         ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
         ModRedstoneJukebox.logDebugInfo("    Active:  " + active);
-        ModRedstoneJukebox.logDebugInfo("    TE Size 1: " + world.loadedTileEntityList.size());
 
 
         int targetBlockId = active ? ModRedstoneJukebox.redstoneJukeboxActiveID : ModRedstoneJukebox.redstoneJukeboxIdleID;
@@ -291,7 +288,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
         ModRedstoneJukebox.logDebugInfo("    World block ID = " + currentBlockId);
         ModRedstoneJukebox.logDebugInfo("    Target block ID = " + targetBlockId);
-        ModRedstoneJukebox.logDebugInfo("    TE Size 2: " + world.loadedTileEntityList.size());
 
 
 
@@ -299,7 +295,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
             // get the TileEntity so it won't be reset
             TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
             BlockRedstoneJukebox.keepMyInventory = true;
-            ModRedstoneJukebox.logDebugInfo("    TE Size 3: " + world.loadedTileEntityList.size());
             ModRedstoneJukebox.logDebugInfo("    Setting block");
 
             // change de block id (at this point, Tile Entity was reset)
@@ -307,7 +302,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
             BlockRedstoneJukebox.keepMyInventory = false;
 
-            ModRedstoneJukebox.logDebugInfo("    TE Size 4: " + world.loadedTileEntityList.size());
 
 
             ModRedstoneJukebox.logDebugInfo("    Block setted");
@@ -317,14 +311,12 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
 
             ModRedstoneJukebox.logDebugInfo("    Meta data setted");
-            ModRedstoneJukebox.logDebugInfo("    TE Size 5: " + world.loadedTileEntityList.size());
 
 
             // Recover the Tile Entity
             if (teJukebox != null) {
                 teJukebox.validate();
                 world.setBlockTileEntity(x, y, z, teJukebox);
-                ModRedstoneJukebox.logDebugInfo("    TE Size 6: " + world.loadedTileEntityList.size());
             }
             /*
 	        */

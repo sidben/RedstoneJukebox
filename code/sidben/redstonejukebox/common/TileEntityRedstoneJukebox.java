@@ -431,7 +431,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
                 if (this.forceStop || (!this.isActive() && this.isPlayingNow)) {
                     this.markAsStopped();
                     this.stopPlaying();
-                    this.forceStop = false;
+                    // this.forceStop = false;      // Force stop will need a redstone reset
                     return;
                 }
                 if (this.isActive() && !this.isPlayingNow) {
@@ -517,36 +517,40 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
         ModRedstoneJukebox.logDebugInfo("    Side:       " + FMLCommonHandler.instance().getEffectiveSide());
 
 
-        boolean ok = false;
+        boolean hasEnergy = this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord);
+        boolean canUseEnergy = false;
 
-
+        
+        // When the jukebox is on "Force Stop" mode, it requires a redstone reset, meaning it has to
+        // be de-powered before activating again.
         if (this.forceStop) {
-            ModRedstoneJukebox.logDebugInfo("    Forcing stop, ignoring redstone state.");
+            ModRedstoneJukebox.logDebugInfo("    Forcing stop, ignoring redstone state. Requires a reset.");
+            if (!hasEnergy) {
+                this.forceStop = false;
+            }
 
         } else {
-            ok = this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord);
-            ModRedstoneJukebox.logDebugInfo("    Powered:    " + ok);
+            ModRedstoneJukebox.logDebugInfo("    Powered:    " + hasEnergy);
 
             // only activates power if contains a record
-            if (ok) {
-                ok = false;
+            if (hasEnergy) {
 
                 ItemStack r;
                 for (int c = 0; c < this.getSizeInventory(); ++c) {
                     r = this.getStackInSlot(c);
                     if (r != null) {
-                        ok = true;  // found a record!
+                        canUseEnergy = true;  // found a record!
                         break;
                     }
                 }
 
-                if (!ok) {
+                if (!canUseEnergy) {
                     ModRedstoneJukebox.logDebugInfo("    Empty jukebox, ignoring redstone state.");
                 }
             }
         }
 
-        this.isActive = ok;
+        this.isActive = (hasEnergy && canUseEnergy);
     }
 
 

@@ -15,6 +15,10 @@ import cpw.mods.fml.relauncher.Side;
  * playing records.
  */
 public class MusicTickHandler implements IScheduledTickHandler {
+    
+    
+    private int c = 0;      // Counter
+    
 
 
     /**
@@ -46,23 +50,36 @@ public class MusicTickHandler implements IScheduledTickHandler {
         {
             // Check if should run
             if (PlayMusicHelper.musicCheckActive) {
+                ++c;
                 
-                // Process responses
-                PlayMusicHelper.ProcessResponseList();
                 
-                // Reset the Players response list
-                PlayMusicHelper.ResetResponseList();
-                
-                // Sends question to all players if they are playing something.
-                // (only if still active)
-                if (PlayMusicHelper.musicCheckActive) {
-                    ModRedstoneJukebox.logDebugInfo("Sending playing music question to all players.");
-                    PacketHelper.sendIsPlayingQuestionPacket();
+                if (c < PlayMusicHelper.musicProcessFrequency) {
+                    // Process responses, but only after the first full check
+                    PlayMusicHelper.ProcessResponseList(false);
                 }
-                
-                // Updates the first check flag.
-                PlayMusicHelper.musicFirstCheck = false;
-                
+                else
+                {
+                    c = 0;
+                    
+                    // Process responses. If didn't get a response by now, mark as no clients playing.
+                    PlayMusicHelper.ProcessResponseList(true);
+                    
+                    // Reset the Players response list
+                    PlayMusicHelper.ResetResponseList();
+                    
+                    // Sends question to all players if they are playing something.
+                    // (only if still active)
+                    if (PlayMusicHelper.musicCheckActive) {
+                        ModRedstoneJukebox.logDebugInfo("Sending playing music question to all players.");
+                        PacketHelper.sendIsPlayingQuestionPacket();
+                    }
+
+                    // Updates the first check flag.
+                    PlayMusicHelper.musicFirstFullCheck = false;
+
+                }
+
+
             }
         }
         
@@ -95,7 +112,7 @@ public class MusicTickHandler implements IScheduledTickHandler {
      */
     @Override
     public int nextTickSpacing() {
-        return PlayMusicHelper.musicCheckFrequency;
+        return PlayMusicHelper.musicCheckTickSize;
     }
 
 }

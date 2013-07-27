@@ -84,7 +84,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
 
 
     // -- Indicates if the playlist is initialized. When a playlist is initialized, the order of the records is set.
-    private boolean     playlistInitialized    = false;
+//    private boolean     playlistInitialized    = false;
 
 
     // Some "force" flag to trigger the right behavior. May be refactored in future, was done on demand.
@@ -681,7 +681,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
         this.nextPlaySlot = -1;
         this.isPlayingNow = false;
         // this.isRedstonePowered = false;
-        this.playlistInitialized = false;
+        // this.playlistInitialized = false;
 
         ModRedstoneJukebox.logDebugInfo("    3) Active: " +this.isActive+ " - Playing: " +this.isPlayingNow+ " - Loop: " + this.isLoop + " - FStop: " + this.forceStop);
         
@@ -816,7 +816,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
 
         int totalRecords = 0;
         boolean validRecord = false;
-        this.playlistInitialized = true;
+        // this.playlistInitialized = true;
 
 
         // resets the playlist order

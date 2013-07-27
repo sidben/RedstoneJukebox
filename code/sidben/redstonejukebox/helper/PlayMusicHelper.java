@@ -42,9 +42,10 @@ public class PlayMusicHelper {
     @SideOnly(Side.CLIENT)
     public static MusicCoords lastSoundSourceClient = new MusicCoords(0, -1, 0, 0);                    // holds the position of the last "streaming" sound source played on the client
 
-    public static final int musicCheckFrequency = 100;                  // Frequency in ticks the server will send packets asking if players are playing music
+    public static final int musicCheckTickSize = 20;                  // Size of the server tick to check if music is playing (every server tick, responses will be processed)
+    public static final int musicProcessFrequency = 5;                  // Frequency in server ticks the server will send packets asking if players are playing music
     public static boolean musicCheckActive = false;                     // Flag to indicate if the music check should happen.
-    public static boolean musicFirstCheck = false;                     // Flag to indicate the first check, before got any answer. Updated by the TickHandler.
+    public static boolean musicFirstFullCheck = false;                     // Flag to indicate the first check, before got any answer. Updated by the TickHandler.
 
 
 
@@ -89,13 +90,13 @@ public class PlayMusicHelper {
      * Decides if there is still a music playing in any client and the coordinates of that,
      * based on the responses received from players.
      */
-    public static void ProcessResponseList() {
-        ModRedstoneJukebox.logDebugInfo("PlayMusicHelper.ProcessResponseList() - Responses #: " + playingRespCoords.size() + ", First check: " + musicFirstCheck);
+    public static void ProcessResponseList(boolean stopIfNoResponse) {
+        ModRedstoneJukebox.logDebugInfo("PlayMusicHelper.ProcessResponseList() - Responses #: " + playingRespCoords.size() + ", First check: " + musicFirstFullCheck + ", stop empty: " + stopIfNoResponse);
         
-        if (!musicFirstCheck) {
+        if (!musicFirstFullCheck) {
             // If no responses where received, no players are playing records.
             if (playingRespCoords.size() <= 0) {
-                StopTrackingResponses();
+                if (stopIfNoResponse) StopTrackingResponses();
             }
 
             /*
@@ -151,7 +152,7 @@ public class PlayMusicHelper {
         ModRedstoneJukebox.logDebugInfo("PlayMusicHelper.StartTrackingResponses(" +x+ ", " +y+ ", " +z+ ", " +dimensionId+ ")");
         isServerPlaying = true;
         musicCheckActive = true;
-        musicFirstCheck = true;
+        musicFirstFullCheck = true;
         currentSoundSourceServer.set(x, y, z, dimensionId);
     }
     

@@ -116,25 +116,6 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 
         // Regular faces
-        /*
-         * renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 0));
-         * renderblocks.renderFaceYPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 1));
-         * renderblocks.renderFaceZNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 2));
-         * renderblocks.renderFaceZPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 3));
-         * renderblocks.renderFaceXNeg(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 4));
-         * renderblocks.renderFaceXPos(block, (double)x, (double)y, (double)z, block.getBlockTexture(world, x, y, z, 5));
-         */
-
-        /*
-         * Don't work with side on/off
-         * renderblocks.renderFaceYNeg(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(0));
-         * renderblocks.renderFaceYPos(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(1));
-         * renderblocks.renderFaceZNeg(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(2));
-         * renderblocks.renderFaceZPos(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(3));
-         * renderblocks.renderFaceXNeg(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(4));
-         * renderblocks.renderFaceXPos(block, (double)x, (double)y, (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(5));
-         */
-
         renderblocks.renderFaceYNeg(block, x, y, z, renderblocks.getBlockIcon(block, world, x, y, z, 0));
         renderblocks.renderFaceYNeg(block, x, y, z, renderblocks.getBlockIcon(block, world, x, y, z, 0));
         renderblocks.renderFaceYPos(block, x, y, z, renderblocks.getBlockIcon(block, world, x, y, z, 1));
@@ -145,10 +126,6 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler {
 
 
         // Disc face
-        /*
-         * renderblocks.renderFaceYPos(block, (double)x, (double)(y-0.251), (double)z, block.getBlockTexture(world, x, y, z, 7)); // 7 = my special texture
-         * renderblocks.renderFaceYPos(block, (double)x, (double)(y-0.251), (double)z, ModRedstoneJukebox.redstoneJukebox.getBlockTextureFromSide(7)); // 7 = my special texture
-         */
         renderblocks.renderFaceYPos(block, x, y - 0.251, z, renderblocks.getBlockIcon(block, world, x, y, z, 7));
 
 

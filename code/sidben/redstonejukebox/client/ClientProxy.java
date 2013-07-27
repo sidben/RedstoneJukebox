@@ -44,8 +44,7 @@ public class ClientProxy extends CommonProxy {
             // OBS: The X value is the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
             // OBS 2: Not all villagers can trade records, so there is an extra condition.
             Entity villager = world.getEntityByID(x);
-            if (villager instanceof EntityVillager && CustomRecordHelper.canTradeRecords(x))
-                return new GuiRecordTrading(player.inventory, (EntityVillager) villager, world);
+            if (villager instanceof EntityVillager && CustomRecordHelper.canTradeRecords(x)) return new GuiRecordTrading(player.inventory, (EntityVillager) villager, world);
         }
 
         return null;

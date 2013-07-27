@@ -46,8 +46,8 @@ public class EnchantmentDummy extends Enchantment {
 
     @Override
     public boolean canApply(ItemStack par1ItemStack) {
-        ModRedstoneJukebox.logDebugInfo("EnchantmentDummy.canApply()");
-        ModRedstoneJukebox.logDebugInfo("    " + par1ItemStack.toString());
+        // ModRedstoneJukebox.logDebugInfo("EnchantmentDummy.canApply()");
+        // ModRedstoneJukebox.logDebugInfo("    " + par1ItemStack.toString());
 
         return par1ItemStack.itemID == ModRedstoneJukebox.recordBlank.itemID;
     }

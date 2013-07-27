@@ -51,15 +51,19 @@ public class CommandPlayBgMusic extends CommandBase {
 
 
         if (par2ArrayOfStr.length < 1)
+            // not enough parameters
             throw new WrongUsageException(CommandPlayBgMusic.myUsage, new Object[0]);
         else {
+            // gets the song name and try to locate it
             songName = par2ArrayOfStr[0].toLowerCase();
             found = CustomRecordHelper.isValidBgMusicName(songName);
 
 
+            // If the song was found, play it. If not, display error message.
             if (found) {
                 PacketHelper.sendPlayBgMusicPacket(songName);
-            } else
+            }
+            else
                 // error message
                 throw new CommandException("Music not found", new Object[0]);
 

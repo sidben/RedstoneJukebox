@@ -52,21 +52,24 @@ public class CommandPlayRecord extends CommandBase {
 
 
         if (par2ArrayOfStr.length < 1)
+            // not enough parameters
             throw new WrongUsageException(CommandPlayRecord.myUsage, new Object[0]);
         else {
+            // gets the song name and try to locate it
             songName = par2ArrayOfStr[0].toLowerCase();
             found = CustomRecordHelper.isValidRecordName(songName);
 
             // Show playing message, if needed
-            if (par2ArrayOfStr.length >= 2)
-                if (par2ArrayOfStr[1].equals("true")) {
-                    showName = true;
-                }
+            if (par2ArrayOfStr.length >= 2) if (par2ArrayOfStr[1].equals("true")) {
+                showName = true;
+            }
 
 
+            // If the song was found, play it. If not, display error message.
             if (found) {
                 PacketHelper.sendPlayRecordPacket(songName, showName);
-            } else
+            }
+            else
                 // error message
                 throw new CommandException("Music not found", new Object[0]);
 

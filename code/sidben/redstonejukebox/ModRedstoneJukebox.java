@@ -9,7 +9,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.client.PlayerEventHandler;
@@ -21,11 +20,10 @@ import sidben.redstonejukebox.common.CommandPlayRecordAt;
 import sidben.redstonejukebox.common.CommonProxy;
 import sidben.redstonejukebox.common.ItemBlankRecord;
 import sidben.redstonejukebox.common.ItemCustomRecord;
-import sidben.redstonejukebox.helper.MusicTickHandler;
 import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
 import sidben.redstonejukebox.helper.CustomRecordHelper;
 import sidben.redstonejukebox.helper.CustomRecordObject;
-import cpw.mods.fml.common.FMLCommonHandler;
+import sidben.redstonejukebox.helper.MusicTickHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
@@ -40,7 +38,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 
 
@@ -52,77 +49,76 @@ public class ModRedstoneJukebox {
 
     // The instance of your mod that Forge uses.
     @Instance(Reference.ModID)
-    public static ModRedstoneJukebox     instance;
+    public static ModRedstoneJukebox instance;
 
 
     // Says where the client and server 'proxy' code is loaded.
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
-    public static CommonProxy            proxy;
+    public static CommonProxy        proxy;
 
 
     // Models IDs
-    public static int                    redstoneJukeboxModelID;
+    public static int                redstoneJukeboxModelID;
 
 
     // Textures and Icons paths
-    public static String                 blankRecordIcon       = Reference.ResourcesNamespace + ":blank_record";
-    public static String                 customRecordIconArray = Reference.ResourcesNamespace + ":custom_record_";
-    public static String                 jukeboxDiscIcon       = Reference.ResourcesNamespace + ":redstone_jukebox_disc";
-    public static String                 jukeboxTopIcon        = Reference.ResourcesNamespace + ":redstone_jukebox_top";
-    public static String                 jukeboxBottomIcon     = Reference.ResourcesNamespace + ":redstone_jukebox_bottom";
-    public static String                 jukeboxSideOnIcon     = Reference.ResourcesNamespace + ":redstone_jukebox_on";
-    public static String                 jukeboxSideOffIcon    = Reference.ResourcesNamespace + ":redstone_jukebox_off";
-    private static String guiTextureJukebox = "textures/gui/redstonejukebox-gui.png";
-    private static String guiTextureTrade = "textures/gui/recordtrading-gui.png";
-
-    public static final ResourceLocation redstoneJukeboxGui    = new ResourceLocation(Reference.ResourcesNamespace, guiTextureJukebox);
-    public static final ResourceLocation recordTradeGui        = new ResourceLocation(Reference.ResourcesNamespace, guiTextureTrade);
+    public static String             blankRecordIcon;
+    public static String             customRecordIconArray;
+    public static String             jukeboxDiscIcon;
+    public static String             jukeboxTopIcon;
+    public static String             jukeboxBottomIcon;
+    public static String             jukeboxSideOnIcon;
+    public static String             jukeboxSideOffIcon;
+    private static String            guiTextureJukebox;
+    private static String            guiTextureTrade;
+    public static ResourceLocation   redstoneJukeboxGui;
+    public static ResourceLocation   recordTradeGui;
 
 
     // GUI IDs
-    public static int                    redstoneJukeboxGuiID  = 0;
-    public static int                    recordTradingGuiID    = 1;
+    public static int                redstoneJukeboxGuiID = 0;
+    public static int                recordTradingGuiID   = 1;
 
 
     // Blocks and Items IDs
-    public static int                    redstoneJukeboxIdleID;
-    public static int                    redstoneJukeboxActiveID;
-    public static int                    blankRecordItemID;
-    public static int                    customRecordItemID;
+    public static int                redstoneJukeboxIdleID;
+    public static int                redstoneJukeboxActiveID;
+    public static int                blankRecordItemID;
+    public static int                customRecordItemID;
 
 
     // Blocks and Items
-    public static Item                   recordBlank;
-    public static Item                   customRecord;
-    public static Block                  redstoneJukebox;
-    public static Block                  redstoneJukeboxActive;
+    public static Item               recordBlank;
+    public static Item               customRecord;
+    public static Block              redstoneJukebox;
+    public static Block              redstoneJukeboxActive;
 
 
     // Enchantments
-    public static Enchantment            enchantDummy;
+    public static Enchantment        enchantDummy;
 
 
     // Global variables
-    public final static String           sourceName            = "streaming";                                                                               // music discs are called "streaming"
-    public final static int              maxCustomRecords      = 32;                                                                                        // Limit of custom records accepted TODO: make this a config
-    public final static int              maxCustomRecordIcon   = 77;                                                                                        // Limit of icon IDs for the records. This is stored on the metadata (damage value) of the item. Start at zero.
-    public final static int              maxStores             = 16;                                                                                        // Number of "record stores" available. Each "store" is a random selection of records for trade.
-    public final static int              maxOffers             = 8;                                                                                         // Maximum number of record offers a villager have
-    public final static int              maxExtraVolume        = 128;                                                                                       // Maximum amount of extra range for the custom jukebox
-    public static String                 customRecordsFolder   = "jukebox";                                                                                 // Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
-    public static String                 customRecordsPath;                                                                                                 // Path of the custom records folder (used in URL creation)
+    public final static String       sourceName           = "streaming";    // music discs are called "streaming"
+    public final static int          maxCustomRecords     = 32;         // Limit of custom records accepted TODO: make this a config
+    public final static int          maxCustomRecordIcon  = 77;         // Limit of icon IDs for the records. This is stored on the metadata (damage value) of the item. Start at zero.
+    public final static int          maxStores            = 16;         // Number of "record stores" available. Each "store" is a random selection of records for trade.
+    public final static int          maxOffers            = 8;          // Maximum number of record offers a villager have
+    public final static int          maxExtraVolume       = 128;        // Maximum amount of extra range for the custom jukebox
+    public static String             customRecordsFolder  = "jukebox";  // Folder where this mod will look for custom records. Must be inside the 'Mods' folder.
+    public static String             customRecordsPath;                 // Path of the custom records folder (used in URL creation)
 
 
     // Config variables
-    public static int                    customRecordOffersMin;                                                                                             // Minimal of custom records a villager can offer
-    public static int                    customRecordOffersMax;                                                                                             // Maximum of custom records a villager can offer
-    public static int                    customRecordPriceMin;                                                                                              // Minimal value of custom records in emeralds
-    public static int                    customRecordPriceMax;                                                                                              // Maximum value of custom records in emeralds
+    public static int                customRecordOffersMin;             // Minimal of custom records a villager can offer
+    public static int                customRecordOffersMax;             // Maximum of custom records a villager can offer
+    public static int                customRecordPriceMin;              // Minimal value of custom records in emeralds
+    public static int                customRecordPriceMax;              // Maximum value of custom records in emeralds
 
 
     // Debug mode
-    public static boolean                onDebug;                                                                                                           // Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
-    public static boolean                onDebugPackets;        // Indicates if packets are also on debug
+    public static boolean            onDebug;                           // Indicates if the MOD is on debug mode. Extra info will be tracked on the log.
+    public static boolean            onDebugPackets;                    // Indicates if packets are also on debug
 
 
 
@@ -134,7 +130,6 @@ public class ModRedstoneJukebox {
 
         // Custom records config
         String customRecordCategory = "custom_records";
-
 
         // Custom records folder path
         ModRedstoneJukebox.customRecordsPath = "./mods/" + ModRedstoneJukebox.customRecordsFolder + "/";
@@ -204,24 +199,14 @@ public class ModRedstoneJukebox {
             helpComment += "  - if you still have trouble, set onDebug to 'true', restart the game, try playing a custom record and post your log on the Minecraft Forums;" + br;
 
             config.addCustomCategoryComment(customRecordCategory, helpComment);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             FMLLog.log(Level.SEVERE, "Error loading the configuration of the Redstone Jukebox Mod. Error message: " + e.getMessage() + " / " + e.toString());
-        } finally {
+        }
+        finally {
             // saving the configuration to its file
             config.save();
         }
-
-
-
-        /*
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-            // resets the sound source reference
-            ModRedstoneJukebox.lastSoundSourceClient = Vec3.createVectorHelper(0, -1, 0);
-
-            // DEBUG
-            ModRedstoneJukebox.logDebugInfo("   -RESETING CLIENT POS-");
-        }
-        */
 
 
 
@@ -232,14 +217,12 @@ public class ModRedstoneJukebox {
         ModRedstoneJukebox.redstoneJukeboxActive = new BlockRedstoneJukebox(ModRedstoneJukebox.redstoneJukeboxActiveID, true).setHardness(2.0F).setResistance(10.0F).setUnlocalizedName("sidbenRedstoneJukebox").setStepSound(Block.soundStoneFootstep).setLightValue(0.75F).func_111022_d("redstone_jukebox_on");
 
 
-
         // Blocks
         GameRegistry.registerBlock(ModRedstoneJukebox.redstoneJukebox, "RedstoneJukeboxBlock");
 
 
         // Enchantments
         // enchantDummy = new EnchantmentDummy(200, 10);
-
 
 
         // Names
@@ -319,15 +302,23 @@ public class ModRedstoneJukebox {
             }
         }
 
-        /*
-         * for (int varCont = 0; varCont <= maxCustomRecordIcon; ++varCont)
-         * {
-         * GameRegistry.addShapelessRecipe(recordStack0, new ItemStack(customRecord, 1, varCont), flintStack, redstoneStack);
-         * }
-         */
-
         // Recipe: Redstone Jukebox
         GameRegistry.addRecipe(new ItemStack(ModRedstoneJukebox.redstoneJukebox), "ggg", "tjt", "www", 'g', glassStack, 't', redstoneTorchStack, 'j', jukeboxStack, 'w', woodStack);
+
+
+        // Textures and Icons paths
+        ModRedstoneJukebox.blankRecordIcon = Reference.ResourcesNamespace + ":blank_record";
+        ModRedstoneJukebox.customRecordIconArray = Reference.ResourcesNamespace + ":custom_record_";
+        ModRedstoneJukebox.jukeboxDiscIcon = Reference.ResourcesNamespace + ":redstone_jukebox_disc";
+        ModRedstoneJukebox.jukeboxTopIcon = Reference.ResourcesNamespace + ":redstone_jukebox_top";
+        ModRedstoneJukebox.jukeboxBottomIcon = Reference.ResourcesNamespace + ":redstone_jukebox_bottom";
+        ModRedstoneJukebox.jukeboxSideOnIcon = Reference.ResourcesNamespace + ":redstone_jukebox_on";
+        ModRedstoneJukebox.jukeboxSideOffIcon = Reference.ResourcesNamespace + ":redstone_jukebox_off";
+        ModRedstoneJukebox.guiTextureJukebox = "textures/gui/redstonejukebox-gui.png";
+        ModRedstoneJukebox.guiTextureTrade = "textures/gui/recordtrading-gui.png";
+
+        ModRedstoneJukebox.redstoneJukeboxGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureJukebox);
+        ModRedstoneJukebox.recordTradeGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureTrade);
 
     }
 
@@ -347,8 +338,8 @@ public class ModRedstoneJukebox {
         event.registerServerCommand(new CommandPlayRecord());
         event.registerServerCommand(new CommandPlayRecordAt());
         event.registerServerCommand(new CommandPlayBgMusic());
-        
-        
+
+
         // register my custom server Tick Handler
         MusicTickHandler tickHandler = new MusicTickHandler();
         TickRegistry.registerScheduledTickHandler(tickHandler, Side.SERVER);
@@ -364,7 +355,7 @@ public class ModRedstoneJukebox {
 
     public static void logDebugPacket(String info) {
         if (ModRedstoneJukebox.onDebugPackets) {
-            FMLLog.log("SidbenRedstoneJukebox", Level.INFO,  info, "");
+            FMLLog.log("SidbenRedstoneJukebox", Level.INFO, info, "");
         }
     }
 
@@ -372,7 +363,8 @@ public class ModRedstoneJukebox {
     public static void logDebug(String info, Level level) {
         if (Reference.ForceDebug) {
             System.out.println(info);
-        } else {
+        }
+        else {
             if (ModRedstoneJukebox.onDebug || level != Level.INFO) {
                 FMLLog.log("SidbenRedstoneJukebox", level, "Debug: " + info, "");
             }

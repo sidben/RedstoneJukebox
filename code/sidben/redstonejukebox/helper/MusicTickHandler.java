@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.helper;
 
+
 import java.util.EnumSet;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
@@ -10,15 +11,16 @@ import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.relauncher.Side;
 
 
+
 /*
  * This class will run on the server to check if clients are
  * playing records.
  */
 public class MusicTickHandler implements IScheduledTickHandler {
-    
-    
+
+
     private int c = 0;      // Counter
-    
+
 
 
     /**
@@ -30,10 +32,9 @@ public class MusicTickHandler implements IScheduledTickHandler {
      * @param tickData
      */
     @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-    }
+    public void tickStart(EnumSet<TickType> type, Object... tickData) {}
 
-    
+
     /**
      * Called at the "end" phase of a tick
      * 
@@ -44,29 +45,26 @@ public class MusicTickHandler implements IScheduledTickHandler {
      */
     @Override
     public void tickEnd(EnumSet<TickType> type, Object... tickData) {
-        //ModRedstoneJukebox.logDebugInfo("-- TickEnd: " + PlayMusicHelper.musicCheckActive);
-        
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
-        {
+
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
             // Check if should run
             if (PlayMusicHelper.musicCheckActive) {
-                ++c;
-                
-                
-                if (c < PlayMusicHelper.musicProcessFrequency) {
+                ++this.c;
+
+
+                if (this.c < PlayMusicHelper.musicProcessFrequency) {
                     // Process responses, but only after the first full check
                     PlayMusicHelper.ProcessResponseList(false);
                 }
-                else
-                {
-                    c = 0;
-                    
+                else {
+                    this.c = 0;
+
                     // Process responses. If didn't get a response by now, mark as no clients playing.
                     PlayMusicHelper.ProcessResponseList(true);
-                    
+
                     // Reset the Players response list
                     PlayMusicHelper.ResetResponseList();
-                    
+
                     // Sends question to all players if they are playing something.
                     // (only if still active)
                     if (PlayMusicHelper.musicCheckActive) {
@@ -82,10 +80,10 @@ public class MusicTickHandler implements IScheduledTickHandler {
 
             }
         }
-        
+
     }
 
-    
+
     /**
      * Returns the list of ticks this tick handler is interested in receiving at the minute
      */
@@ -103,10 +101,12 @@ public class MusicTickHandler implements IScheduledTickHandler {
         return "MusicPlayingTickHandler";
     }
 
+
     /**
      * Return the number of actual ticks that will pass
      * before your next tick will fire. This will be called
      * just after your last tick fired to compute the next delay.
+     * 
      * @param tick
      * @return
      */

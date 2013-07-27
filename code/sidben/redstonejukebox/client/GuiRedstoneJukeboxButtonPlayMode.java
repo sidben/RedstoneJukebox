@@ -33,7 +33,6 @@ public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton {
             boolean isMouseOver = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
             this.field_82253_i = isMouseOver;
 
-
             if (isMouseOver) {
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 par1Minecraft.func_110434_K().func_110577_a(ModRedstoneJukebox.redstoneJukeboxGui);
@@ -44,12 +43,10 @@ public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton {
 
 
 
-
     // OBS: Mouseover
     @Override
     public boolean func_82252_a() {
         return this.field_82253_i;
     }
-
 
 }

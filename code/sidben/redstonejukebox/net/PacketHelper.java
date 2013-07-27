@@ -3,19 +3,15 @@ package sidben.redstonejukebox.net;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.util.HashMap;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.util.Vec3;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.Reference;
-import sidben.redstonejukebox.helper.MusicCoords;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 
 
@@ -29,17 +25,17 @@ public class PacketHelper {
      ----------------------------------------------------------------------------*/
 
     // Possible packets types
-    public static final byte               JukeboxGUIUpdate       = 0;                             // Client -> Server
-    public static final byte               RecordTradingGUIUpdate = 1;                             // Client -> Server
-    public static final byte               PlayRecordAt           = 2;                             // Server -> Client
-    public static final byte               IsPlayingQuestion      = 3;                             // Server -> Client
-    public static final byte               IsPlayingAnswer        = 4;                             // Client -> Server
-    public static final byte               PlayBgMusic            = 5;                             // Server -> Client
-    public static final byte               PlayBgRecord           = 6;                             // Server -> Client
+    public static final byte JukeboxGUIUpdate       = 0;                             // Client -> Server
+    public static final byte RecordTradingGUIUpdate = 1;                             // Client -> Server
+    public static final byte PlayRecordAt           = 2;                             // Server -> Client
+    public static final byte IsPlayingQuestion      = 3;                             // Server -> Client
+    public static final byte IsPlayingAnswer        = 4;                             // Client -> Server
+    public static final byte PlayBgMusic            = 5;                             // Server -> Client
+    public static final byte PlayBgRecord           = 6;                             // Server -> Client
 
 
     // Unique(ish) number to make sure the response matches the question
-    public static byte                  isPlayingQuestionCode = 0;
+    public static byte       isPlayingQuestionCode  = 0;
 
 
 
@@ -58,7 +54,8 @@ public class PacketHelper {
             outputStream.writeByte(PacketHelper.JukeboxGUIUpdate);
             outputStream.writeBoolean(isLoop);
             outputStream.writeInt(playMode);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -81,7 +78,8 @@ public class PacketHelper {
         try {
             outputStream.writeByte(PacketHelper.RecordTradingGUIUpdate);
             outputStream.writeInt(currentPageIndex);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -105,13 +103,7 @@ public class PacketHelper {
      */
     public static void sendPlayRecordPacket(String songID, int x, int y, int z, boolean showName, float volumeExtender, int dimensionId) {
         // Debug
-        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayRecordPacket");
-        ModRedstoneJukebox.logDebugPacket("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugPacket("    Song ID:      " + songID);
-        ModRedstoneJukebox.logDebugPacket("    Coords:       " + x + ", " + y + ", " + z);
-        ModRedstoneJukebox.logDebugPacket("    Dimension:    " + dimensionId);
-        ModRedstoneJukebox.logDebugPacket("    Show name:    " + showName);
-        ModRedstoneJukebox.logDebugPacket("    Volume Extra: " + volumeExtender);
+        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayRecordPacket(" + songID + ", " + x + ", " + y + ", " + z + ", " + showName + ", " + volumeExtender + ", " + dimensionId + ")");
 
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
@@ -132,13 +124,13 @@ public class PacketHelper {
                 outputStream.writeInt(z);
                 outputStream.writeBoolean(showName);
                 outputStream.writeFloat(volumeExtender);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
 
 
             Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
-            ModRedstoneJukebox.logDebugPacket("    Sending play record package (songID: " + songID + ")");
             PacketDispatcher.sendPacketToAllAround(x, y, z, range, dimensionId, packet);
         }
     }
@@ -149,10 +141,7 @@ public class PacketHelper {
      */
     public static void sendPlayRecordPacket(String songID, boolean showName) {
         // Debug
-        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayRecordPacket");
-        ModRedstoneJukebox.logDebugPacket("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugPacket("    Song ID:      " + songID);
-        ModRedstoneJukebox.logDebugPacket("    Show name:    " + showName);
+        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayRecordPacket(" + songID + ", " + showName + ")");
 
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
@@ -164,7 +153,8 @@ public class PacketHelper {
                 outputStream.writeByte(PacketHelper.PlayBgRecord);
                 outputStream.writeUTF(songID);
                 outputStream.writeBoolean(showName);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
 
@@ -180,12 +170,7 @@ public class PacketHelper {
      */
     public static void sendPlayRecordPacketTo(EntityPlayerMP player, String songID, int x, int y, int z, boolean showName, float volumeExtender) {
         // Debug
-        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayRecordPacketTo");
-        ModRedstoneJukebox.logDebugPacket("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugPacket("    Song ID:      " + songID);
-        ModRedstoneJukebox.logDebugPacket("    Coords:       " + x + ", " + y + ", " + z);
-        ModRedstoneJukebox.logDebugPacket("    Show name:    " + showName);
-        ModRedstoneJukebox.logDebugPacket("    Volume Extra: " + volumeExtender);
+        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayRecordPacketTo(player, " + songID + ", " + x + ", " + y + ", " + z + ", " + showName + ", " + volumeExtender + ")");
 
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
@@ -200,7 +185,8 @@ public class PacketHelper {
                 outputStream.writeInt(z);
                 outputStream.writeBoolean(showName);
                 outputStream.writeFloat(volumeExtender);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
 
@@ -217,9 +203,7 @@ public class PacketHelper {
      */
     public static void sendPlayBgMusicPacket(String songName) {
         // Debug
-        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayBgMusicPacket");
-        ModRedstoneJukebox.logDebugPacket("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugPacket("    Song Name:      " + songName);
+        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendPlayBgMusicPacket(" + songName + ")");
 
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
@@ -229,7 +213,8 @@ public class PacketHelper {
             try {
                 outputStream.writeByte(PacketHelper.PlayBgMusic);
                 outputStream.writeUTF(songName);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
 
@@ -246,16 +231,16 @@ public class PacketHelper {
      * Send a request for all players to inform if they are playing any record (streaming).
      */
     public static void sendIsPlayingQuestionPacket() {
-        // Debug
-        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendIsPlayingQuestionPacket");
-        ModRedstoneJukebox.logDebugPacket("    Side:      " + FMLCommonHandler.instance().getEffectiveSide());
-
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-            
+
             // Creates a new Question ID;
             Random r = new Random();
-            isPlayingQuestionCode = (byte) r.nextInt(250); 
+            PacketHelper.isPlayingQuestionCode = (byte) r.nextInt(250);
+
+            // Debug
+            ModRedstoneJukebox.logDebugPacket("PacketHelper.sendIsPlayingQuestionPacket() - Question Id: " + PacketHelper.isPlayingQuestionCode);
+
 
             // Custom Packet
             ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
@@ -263,13 +248,13 @@ public class PacketHelper {
             try {
                 outputStream.writeByte(PacketHelper.IsPlayingQuestion);
                 outputStream.writeByte(PacketHelper.isPlayingQuestionCode);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 ex.printStackTrace();
             }
 
 
             Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
-            ModRedstoneJukebox.logDebugPacket("    Sending is playing question");
             PacketDispatcher.sendPacketToAllPlayers(packet);
         }
     }
@@ -282,10 +267,7 @@ public class PacketHelper {
      */
     public static void sendIsPlayingAnswerPacket(int questionId, String playerName, boolean isPlaying, int x, int y, int z, int dimensionId) {
         // Debug
-        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendIsPlayingAnswerPacket");
-        ModRedstoneJukebox.logDebugPacket("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugPacket("    Player:  " + playerName);
-        ModRedstoneJukebox.logDebugPacket("    Playing: " + isPlaying);
+        ModRedstoneJukebox.logDebugPacket("PacketHelper.sendIsPlayingAnswerPacket(" + questionId + ", " + playerName + ", " + isPlaying + ", " + x + ", " + y + ", " + z + ", " + dimensionId + ")");
 
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
@@ -303,17 +285,16 @@ public class PacketHelper {
                     outputStream.writeInt(y);
                     outputStream.writeInt(z);
                     outputStream.writeInt(dimensionId);
-                    //outputStream.writeBoolean(isPlaying);       // no need to send boolean, since it won't send false anymore
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     ex.printStackTrace();
                 }
-    
-    
+
+
                 Packet250CustomPayload packet = new Packet250CustomPayload(Reference.Channel, bos.toByteArray());
-                ModRedstoneJukebox.logDebugPacket("    Sending is playing answer");
                 PacketDispatcher.sendPacketToServer(packet);
             }
-            
+
         }
     }
 

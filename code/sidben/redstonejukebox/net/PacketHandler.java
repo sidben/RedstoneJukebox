@@ -4,6 +4,7 @@ package sidben.redstonejukebox.net;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.util.logging.Level;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
@@ -14,7 +15,6 @@ import sidben.redstonejukebox.Reference;
 import sidben.redstonejukebox.common.ContainerRecordTrading;
 import sidben.redstonejukebox.common.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.common.TileEntityRedstoneJukebox;
-import sidben.redstonejukebox.net.PacketHelper;
 import sidben.redstonejukebox.helper.PlayMusicHelper;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
@@ -118,9 +118,9 @@ public class PacketHandler implements IPacketHandler {
                         int playDim = data.readInt();
 
                         // Debug
-                        ModRedstoneJukebox.logDebugPacket("    [Question ID]:[" + questionId + "] - expected:[" +PacketHelper.isPlayingQuestionCode+ "]");
+                        ModRedstoneJukebox.logDebugPacket("    [Question ID]:[" + questionId + "] - expected:[" + PacketHelper.isPlayingQuestionCode + "]");
                         ModRedstoneJukebox.logDebugPacket("    [Name]:[" + playerName + "]");
-                        ModRedstoneJukebox.logDebugPacket("    [Playing at]:[" + playX + ", "  + playY + ", "  + playZ + "]");
+                        ModRedstoneJukebox.logDebugPacket("    [Playing at]:[" + playX + ", " + playY + ", " + playZ + "]");
                         ModRedstoneJukebox.logDebugPacket("    [Playing Dim]:[" + playDim + "]");
 
 
@@ -132,7 +132,8 @@ public class PacketHandler implements IPacketHandler {
 
                     }
 
-                } else if (side == Side.CLIENT) {
+                }
+                else if (side == Side.CLIENT) {
                     // ----------------------------------------------------------------------------
                     // Play Record At Packet
                     // ----------------------------------------------------------------------------
@@ -214,17 +215,17 @@ public class PacketHandler implements IPacketHandler {
                         byte questionId = data.readByte();
 
                         // Debug
-                        ModRedstoneJukebox.logDebugPacket("    [questionID]:[" +questionId+ "]");
+                        ModRedstoneJukebox.logDebugPacket("    [questionID]:[" + questionId + "]");
 
                         // Prepare data
                         Minecraft myMC = ModLoader.getMinecraftInstance();
-                        EntityPlayer myself = (EntityPlayer) player; 
+                        EntityPlayer myself = (EntityPlayer) player;
                         String myName = myself.username;
                         boolean amIPlaying = false;
-                        amIPlaying =  myMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName);
-                        int playX = (int) PlayMusicHelper.lastSoundSourceClient.x;
-                        int playY = (int) PlayMusicHelper.lastSoundSourceClient.y;
-                        int playZ = (int) PlayMusicHelper.lastSoundSourceClient.z;
+                        amIPlaying = myMC.sndManager.sndSystem.playing(ModRedstoneJukebox.sourceName);
+                        int playX = PlayMusicHelper.lastSoundSourceClient.x;
+                        int playY = PlayMusicHelper.lastSoundSourceClient.y;
+                        int playZ = PlayMusicHelper.lastSoundSourceClient.z;
                         int myDim = myself.dimension;
 
                         // Send response
@@ -233,7 +234,8 @@ public class PacketHandler implements IPacketHandler {
 
                 }
 
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 ModRedstoneJukebox.logDebug("Error: " + e.getMessage() + " / " + e.toString(), Level.SEVERE);
 
             }

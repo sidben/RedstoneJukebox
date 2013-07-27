@@ -10,7 +10,6 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 
 
 
-
 public class GuiRedstoneJukeboxButtonLoop extends GuiButton {
 
 

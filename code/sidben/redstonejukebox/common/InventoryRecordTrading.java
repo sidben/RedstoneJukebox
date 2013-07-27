@@ -63,7 +63,8 @@ public class InventoryRecordTrading implements IInventory {
                 var3 = this.theInventory[par1];
                 this.theInventory[par1] = null;
                 return var3;
-            } else if (this.theInventory[par1].stackSize <= par2) {
+            }
+            else if (this.theInventory[par1].stackSize <= par2) {
                 var3 = this.theInventory[par1];
                 this.theInventory[par1] = null;
 
@@ -72,7 +73,8 @@ public class InventoryRecordTrading implements IInventory {
                 }
 
                 return var3;
-            } else {
+            }
+            else {
                 var3 = this.theInventory[par1].splitStack(par2);
 
                 if (this.theInventory[par1].stackSize == 0) {
@@ -85,7 +87,8 @@ public class InventoryRecordTrading implements IInventory {
 
                 return var3;
             }
-        } else
+        }
+        else
             return null;
     }
 
@@ -108,7 +111,8 @@ public class InventoryRecordTrading implements IInventory {
             ItemStack var2 = this.theInventory[par1];
             this.theInventory[par1] = null;
             return var2;
-        } else
+        }
+        else
             return null;
     }
 
@@ -208,7 +212,8 @@ public class InventoryRecordTrading implements IInventory {
 
         if (var1 == null) {
             this.setInventorySlotContents(2, (ItemStack) null);
-        } else {
+        }
+        else {
             MerchantRecipeList var3 = CustomRecordHelper.getStoreCatalog(this.storeId);
 
             if (var3 != null) {
@@ -231,7 +236,8 @@ public class InventoryRecordTrading implements IInventory {
                 if (validRecipe) {
                     this.currentRecipe = slotRecipe;
                     this.setInventorySlotContents(2, slotRecipe.getItemToSell().copy());
-                } else {
+                }
+                else {
                     this.setInventorySlotContents(2, (ItemStack) null);
                 }
             }

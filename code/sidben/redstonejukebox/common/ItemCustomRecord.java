@@ -1,7 +1,6 @@
 package sidben.redstonejukebox.common;
 
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -11,15 +10,12 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.CustomRecordHelper;
 import sidben.redstonejukebox.helper.CustomRecordObject;
-import sidben.redstonejukebox.helper.PlayMusicHelper;
 import sidben.redstonejukebox.net.PacketHelper;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -78,11 +74,6 @@ public class ItemCustomRecord extends ItemRecord {
         String songID = "";
 
 
-        ModRedstoneJukebox.logDebugInfo("itemCustomRecord.onItemUse");
-        ModRedstoneJukebox.logDebugInfo("    Side:   " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugInfo("    Remote: " + par3World.isRemote);
-
-
         // Make this compatible with regular jukeboxes
         if (par3World.getBlockId(x, y, z) == Block.jukebox.blockID && par3World.getBlockMetadata(x, y, z) == 0) {
             if (par3World.isRemote)
@@ -95,18 +86,10 @@ public class ItemCustomRecord extends ItemRecord {
                 --par1ItemStack.stackSize;
                 return true;
             }
-        } else {
-            
-            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER)
-            {
-                // DEBUG TEMP!!!
-                ModRedstoneJukebox.logDebugInfo("Starting TickHandler");
-                PlayMusicHelper.StartTrackingResponses(x, y, z, par2EntityPlayer.dimension);
-            }
-
-            return false;
         }
 
+
+        return false;
     }
 
 
@@ -125,7 +108,8 @@ public class ItemCustomRecord extends ItemRecord {
 
         if (songTitle != "") {
             par3List.add(songTitle);
-        } else {
+        }
+        else {
             par3List.add("No song");
         }
 

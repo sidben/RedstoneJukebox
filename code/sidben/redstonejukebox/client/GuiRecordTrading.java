@@ -51,10 +51,6 @@ public class GuiRecordTrading extends GuiContainer {
         super(new ContainerRecordTrading(player, merchant, world));
         this.theIMerchant = merchant;
         this.storeId = CustomRecordHelper.getStoreID(((Entity) merchant).entityId);
-
-
-        // --DEBUG--//
-        // System.out.println("	GUI for store #" + storeId);
         this.recordList = CustomRecordHelper.getStoreCatalog(this.storeId);
     }
 
@@ -109,23 +105,23 @@ public class GuiRecordTrading extends GuiContainer {
      */
     @Override
     protected void actionPerformed(GuiButton par1GuiButton) {
-        boolean var2 = false;
+        boolean updateServer = false;
 
         // Action = Move to the previous offer
         if (par1GuiButton == this.nextRecipeButtonIndex) {
             ++this.currentRecipeIndex;
-            var2 = true;
+            updateServer = true;
         }
 
         // Action = Move to the next offer
         else if (par1GuiButton == this.previousRecipeButtonIndex) {
             --this.currentRecipeIndex;
-            var2 = true;
+            updateServer = true;
         }
 
 
 
-        if (var2) {
+        if (updateServer) {
             ((ContainerRecordTrading) this.inventorySlots).setCurrentRecipeIndex(this.currentRecipeIndex);
 
             // Packets
@@ -139,9 +135,7 @@ public class GuiRecordTrading extends GuiContainer {
      */
     @Override
     protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
-        // int var4 = this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        // this.mc.renderEngine.bindTexture(CommonProxy.recordTradeGui);
         this.mc.func_110434_K().func_110577_a(ModRedstoneJukebox.recordTradeGui);
         int var5 = (this.width - this.xSize) / 2;
         int var6 = (this.height - this.ySize) / 2;
@@ -157,7 +151,6 @@ public class GuiRecordTrading extends GuiContainer {
             MerchantRecipe var9 = (MerchantRecipe) var7.get(var8);
 
             if (var9.func_82784_g()) {
-                // GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.mc.renderEngine.getTexture(CommonProxy.recordTradeGui));
                 this.mc.func_110434_K().func_110577_a(ModRedstoneJukebox.recordTradeGui);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 GL11.glDisable(GL11.GL_LIGHTING);
@@ -208,9 +201,11 @@ public class GuiRecordTrading extends GuiContainer {
 
             if (this.isPointInRegion(36, 24, 16, 16, par1, par2)) {
                 this.drawItemStackTooltip(var9, par1, par2);
-            } else if (var10 != null && this.isPointInRegion(62, 24, 16, 16, par1, par2)) {
+            }
+            else if (var10 != null && this.isPointInRegion(62, 24, 16, 16, par1, par2)) {
                 this.drawItemStackTooltip(var10, par1, par2);
-            } else if (this.isPointInRegion(120, 24, 16, 16, par1, par2)) {
+            }
+            else if (this.isPointInRegion(120, 24, 16, 16, par1, par2)) {
                 this.drawItemStackTooltip(var11, par1, par2);
             }
 
@@ -250,6 +245,7 @@ public class GuiRecordTrading extends GuiContainer {
 
 
         // Spawns particles if a trade was made.
+        // TODO: better particle effects
         if (this.mc.thePlayer != null) {
             Entity auxVillager = (Entity) this.theIMerchant;
             if (auxVillager != null && madeTrade) {

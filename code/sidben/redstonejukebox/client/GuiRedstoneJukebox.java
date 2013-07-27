@@ -21,7 +21,7 @@ public class GuiRedstoneJukebox extends GuiContainer {
 
     private TileEntityRedstoneJukebox jukeboxInventory;
 
-    // Aux for the dancing blue note that indicates the current record playing
+    // Auxiliary info for the dancing blue note that indicates the current record playing
     private static int                danceNoteSpeed  = 2;
     private static int[]              danceNoteArrayX = { 0, 1, 2, 1, 0, -1, -2, -1 };
     private static int[]              danceNoteArrayY = { 0, 0, 1, 0, 0, 0, 1, 0 };
@@ -97,7 +97,8 @@ public class GuiRedstoneJukebox extends GuiContainer {
                 // Swap play mode (shuffle / normal)
                 if (this.jukeboxInventory.playMode == 0) {
                     this.jukeboxInventory.playMode = 1;
-                } else {
+                }
+                else {
                     this.jukeboxInventory.playMode = 0;
                 }
                 break;
@@ -107,8 +108,7 @@ public class GuiRedstoneJukebox extends GuiContainer {
 
 
             // Packet code here
-            // Without this, it works for the client changing buttons, but the server doesn't save and when the world
-            // reloads, the buttons go back to default. Inventory works fine without it.
+            // This is need to inform the server that changes where made.
             PacketHelper.sendJukeboxGUIPacket(this.jukeboxInventory.isLoop, this.jukeboxInventory.playMode);
 
         }
@@ -133,9 +133,11 @@ public class GuiRedstoneJukebox extends GuiContainer {
 
         if (btPlayOnce.func_82252_a()) {
             this.drawCreativeTabHoveringText("Play records only once", x - this.guiLeft, y - this.guiTop + 21);
-        } else if (btPlayLoop.func_82252_a()) {
+        }
+        else if (btPlayLoop.func_82252_a()) {
             this.drawCreativeTabHoveringText("Play records in loop", x - this.guiLeft, y - this.guiTop + 21);
-        } else if (btPlaymode.func_82252_a()) {
+        }
+        else if (btPlaymode.func_82252_a()) {
             switch (this.jukeboxInventory.playMode) {
             case 0:
                 this.drawCreativeTabHoveringText("Play mode: In order", x - this.guiLeft, y - this.guiTop + 21);
@@ -217,7 +219,8 @@ public class GuiRedstoneJukebox extends GuiContainer {
         if (this.jukeboxInventory.isLoop) {
             // play loop
             this.drawTexturedModalRect(j + 35, k + 42, 176, 21, 18, 21);
-        } else {
+        }
+        else {
             // play once
             this.drawTexturedModalRect(j + 11, k + 49, 176, 12, 16, 9);
         }

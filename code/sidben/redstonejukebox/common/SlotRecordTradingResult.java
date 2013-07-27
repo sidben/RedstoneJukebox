@@ -18,7 +18,7 @@ public class SlotRecordTradingResult extends Slot {
 
     /** The Player who's trying to buy/sell stuff. */
     private EntityPlayer                 thePlayer;
-    private int                          field_75231_g;
+    private int                          field_75231_g;       // stack size?
     boolean                              traded = false;      // Indicates if a trade was made;
 
 

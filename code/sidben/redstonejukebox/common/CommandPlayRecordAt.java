@@ -57,6 +57,7 @@ public class CommandPlayRecordAt extends CommandBase {
 
 
         if (par2ArrayOfStr.length < 2)
+            // not enough parameters
             throw new WrongUsageException(CommandPlayRecordAt.myUsage, new Object[0]);
         else {
             // Gets the target player(s)
@@ -67,8 +68,9 @@ public class CommandPlayRecordAt extends CommandBase {
             soundSourceZ = entityplayermp.getPlayerCoordinates().posZ;
 
 
-            // Song name
+            // gets the song name and try to locate it
             songName = par2ArrayOfStr[0].toLowerCase();
+            found = CustomRecordHelper.isValidRecordName(songName);
 
 
             // Show playing message, if needed
@@ -93,14 +95,14 @@ public class CommandPlayRecordAt extends CommandBase {
             }
 
 
-            // Send play packet
-            found = CustomRecordHelper.isValidRecordName(songName);
+            // If the song was found, play it. If not, display error message.
             if (found) {
-                // OBS: change the extender to remove 64, that is the default value of the sound range
+                // OBS: change the extender to remove 64, that is the default value of the sound range.
                 range -= 64D;
 
                 PacketHelper.sendPlayRecordPacketTo(entityplayermp, songName, (int) soundSourceX, (int) soundSourceY, (int) soundSourceZ, showName, (float) range);
-            } else
+            }
+            else
                 // error message
                 throw new CommandException("Record not found", new Object[0]);
 

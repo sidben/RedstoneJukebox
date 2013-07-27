@@ -19,20 +19,11 @@ public class SoundEventHandler {
     @SideOnly(Side.CLIENT)
     @ForgeSubscribe
     public void onPlayStreamingSourceEvent(PlayStreamingSourceEvent event) {
-        /*
-         * if (songID == "-") {
-         * ModRedstoneJukebox.logDebugInfo("Reseting sound source.");
-         * ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)0, (double)-1, (double)0);
-         * } else {
-         * ModRedstoneJukebox.logDebugInfo("Updating sound source to " + x + ", " + y + ", " + z + ".");
-         * ModRedstoneJukebox.lastSoundSource = Vec3.createVectorHelper((double)x, (double)y, (double)z);
-         * }
-         */
 
         // Updates the sound source on the client
         // OBS: dimension doesn't matter, the player will complete when sending the packet
         ModRedstoneJukebox.logDebugInfo("Updating sound source to " + event.x + ", " + event.y + ", " + event.z + ".");
-        PlayMusicHelper.lastSoundSourceClient = new MusicCoords((int)event.x, (int)event.y, (int)event.z, 0);
+        PlayMusicHelper.lastSoundSourceClient = new MusicCoords((int) event.x, (int) event.y, (int) event.z, 0);
 
     }
 

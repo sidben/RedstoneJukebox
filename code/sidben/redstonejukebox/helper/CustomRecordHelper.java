@@ -11,29 +11,18 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SoundPoolEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.src.ModLoader;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.sound.PlayBackgroundMusicEvent;
-import net.minecraftforge.client.event.sound.PlayStreamingEvent;
-import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
-import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Property;
-import paulscode.sound.SoundSystemConfig;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 
 
@@ -104,6 +93,7 @@ public class CustomRecordHelper {
 
         // Starts validating the custom records list, based on the config info loaded
         if (configArray != null) {
+            // Debug
             ModRedstoneJukebox.logDebugInfo("Found " + configArray.size() + " potential custom records. Initializing list...");
 
 
@@ -134,7 +124,8 @@ public class CustomRecordHelper {
                         try {
                             songURL = new URL("file:" + ModRedstoneJukebox.customRecordsPath + lineArray[2]);
                             auxFile = new File(songURL.getFile());
-                        } catch (MalformedURLException e) {
+                        }
+                        catch (MalformedURLException e) {
                             ModRedstoneJukebox.logDebug("Error creating song URL: " + e.getMessage(), Level.SEVERE);
                             ModRedstoneJukebox.logDebug("Config Line: [" + configLine + "]", Level.SEVERE);
                         }
@@ -150,7 +141,8 @@ public class CustomRecordHelper {
                                     lineArray[3] = lineArray[3].trim();
                                     if (lineArray[3].equals("")) {
                                         lineArray[3] = "(no name)";
-                                    } else if (lineArray[3].length() > 64) {
+                                    }
+                                    else if (lineArray[3].length() > 64) {
                                         lineArray[3] = lineArray[3].substring(0, 63);
                                     }
 
@@ -175,7 +167,9 @@ public class CustomRecordHelper {
                                     ModRedstoneJukebox.logDebugInfo("Loaded custom record ID [" + auxRecord.songID + "], title [" + auxRecord.songTitle + "], url [" + songURL + "].");
                                 }
 
-                            } else {
+                            }
+                            else {
+                                // Debug
                                 ModRedstoneJukebox.logDebug("Song [" + songURL + "] not found in [" + auxFile.getAbsolutePath() + "]. Custom record will not be loaded.", Level.WARNING);
                             }
                         }
@@ -186,6 +180,7 @@ public class CustomRecordHelper {
 
             }
 
+            // Debug
             ModRedstoneJukebox.logDebugInfo("" + CustomRecordHelper.recordList.size() + " custom records initialized.");
         }
 
@@ -216,8 +211,7 @@ public class CustomRecordHelper {
     public static CustomRecordObject getRecordObject(String songID) {
         if (songID != "") {
             for (CustomRecordObject record : CustomRecordHelper.getRecordList()) {
-                if (record.songID.equals(songID.trim().toLowerCase()))
-                    return record;
+                if (record.songID.equals(songID.trim().toLowerCase())) return record;
             }
         }
         return null;
@@ -236,16 +230,14 @@ public class CustomRecordHelper {
 
     public static String getSongTitle(String songID) {
         CustomRecordObject auxRecord = CustomRecordHelper.getRecordObject(songID);
-        if (auxRecord != null)
-            return auxRecord.songTitle;
+        if (auxRecord != null) return auxRecord.songTitle;
         return "";
     }
 
 
     public static ItemStack getCustomRecord(String songID) {
         CustomRecordObject auxRecord = CustomRecordHelper.getRecordObject(songID);
-        if (auxRecord != null)
-            return CustomRecordHelper.getCustomRecord(auxRecord);
+        if (auxRecord != null) return CustomRecordHelper.getCustomRecord(auxRecord);
         return null;
     }
 
@@ -268,23 +260,19 @@ public class CustomRecordHelper {
 
 
     public static boolean isCustomRecord(String songID) {
-        if (songID != "")
-            if (songID.toLowerCase().startsWith("record"))
-                return true;
+        if (songID != "") if (songID.toLowerCase().startsWith("record")) return true;
         return false;
     }
 
 
     public static boolean isValidBgMusicName(String songName) {
-        if (songName != "")
-            return CustomRecordHelper.bgMusicNames.contains(songName.trim().toLowerCase());
+        if (songName != "") return CustomRecordHelper.bgMusicNames.contains(songName.trim().toLowerCase());
         return false;
     }
 
 
     public static boolean isValidRecordName(String songName) {
-        if (songName != "")
-            return CustomRecordHelper.recordNames.contains(songName.trim().toLowerCase());
+        if (songName != "") return CustomRecordHelper.recordNames.contains(songName.trim().toLowerCase());
         return false;
     }
 
@@ -445,7 +433,8 @@ public class CustomRecordHelper {
                 if (auxUsedIds.contains("[" + auxRecordId + "]")) {
                     // used record, try again
                     auxRecordId = -1;
-                } else {
+                }
+                else {
                     // new record, proceeds
                     auxUsedIds = auxUsedIds + "[" + auxRecordId + "]";
                     break;
@@ -458,7 +447,8 @@ public class CustomRecordHelper {
                 // record price
                 if (ModRedstoneJukebox.customRecordPriceMin != ModRedstoneJukebox.customRecordPriceMax) {
                     price = new ItemStack(Item.emerald, ModRedstoneJukebox.customRecordPriceMin + rand.nextInt(1 + ModRedstoneJukebox.customRecordPriceMax - ModRedstoneJukebox.customRecordPriceMin));
-                } else {
+                }
+                else {
                     price = new ItemStack(Item.emerald, ModRedstoneJukebox.customRecordPriceMin);
                 }
 
@@ -506,7 +496,8 @@ public class CustomRecordHelper {
                     if (auxUsedIds.contains("[" + auxRecordId + "]")) {
                         // used record, try again
                         auxRecordId = -1;
-                    } else {
+                    }
+                    else {
                         // new record, proceeds
                         auxUsedIds = auxUsedIds + "[" + auxRecordId + "]";
                         break;
@@ -571,11 +562,10 @@ public class CustomRecordHelper {
 
 
 
-
     /*
      * ======================================================================================
      * 
-     * Misc
+     * Misc.
      * 
      * ======================================================================================
      */

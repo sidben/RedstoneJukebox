@@ -13,7 +13,6 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -66,7 +65,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     @Override
     public boolean isOpaqueCube() {
-        // FALSE turns the block light-transparent
+        // FALSE also turns the block light-transparent
         return false;
     }
 
@@ -132,8 +131,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
 
         default:
             // --- sides
-            if (this.isActive)
-                return this.sideOnIcon;
+            if (this.isActive) return this.sideOnIcon;
             return this.sideOffIcon;
         }
     }
@@ -165,7 +163,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
     }
 
 
-
     /**
      * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
      */
@@ -182,7 +179,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
     public int getRenderType() {
         return ModRedstoneJukebox.redstoneJukeboxModelID;
     }
-
 
 
     /**
@@ -214,11 +210,9 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float a, float b, float c) {
-        // Avoids opening the GUI if sneaking
         TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-        if (tileEntity == null || player.isSneaking())
+        if (tileEntity == null || player.isSneaking())          // Avoids opening the GUI if sneaking
             return false;
-
 
         player.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, world, x, y, z);
         return true;
@@ -231,9 +225,6 @@ public class BlockRedstoneJukebox extends BlockContainer {
     @Override
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6) {
         ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.breakBlock()");
-        ModRedstoneJukebox.logDebugInfo("    Side:          " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugInfo("    keepInventory: " + BlockRedstoneJukebox.keepMyInventory);
-
 
         if (!BlockRedstoneJukebox.keepMyInventory) {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getBlockTileEntity(x, y, z);
@@ -253,9 +244,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, int blockID) {
-        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.onNeighborBlockChange()");
-        ModRedstoneJukebox.logDebugInfo("    Side:         " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugInfo("    Block ID:     " + blockID);
+        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.onNeighborBlockChange(world, " + x + ", " + y + ", " + z + ", " + blockID + ")");
 
         // Forces the Tile Entity to update it's state (inspired by BuildCraft)
         TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getBlockTileEntity(x, y, z);
@@ -277,51 +266,30 @@ public class BlockRedstoneJukebox extends BlockContainer {
      * Triggered by the Tile Entity when it detects changes.
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z) {
-        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateJukeboxBlockState");
-        ModRedstoneJukebox.logDebugInfo("    Side:    " + FMLCommonHandler.instance().getEffectiveSide());
-        ModRedstoneJukebox.logDebugInfo("    Active:  " + active);
+        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateJukeboxBlockState(" + active + ", world, " + x + ", " + y + ", " + z + ")");
 
 
         int targetBlockId = active ? ModRedstoneJukebox.redstoneJukeboxActiveID : ModRedstoneJukebox.redstoneJukeboxIdleID;
         int currentBlockId = world.getBlockId(x, y, z);
 
 
-        ModRedstoneJukebox.logDebugInfo("    World block ID = " + currentBlockId);
-        ModRedstoneJukebox.logDebugInfo("    Target block ID = " + targetBlockId);
-
-
-
         if (currentBlockId != targetBlockId) {
             // get the TileEntity so it won't be reset
             TileEntity teJukebox = world.getBlockTileEntity(x, y, z);
+
+            // change the block id (at this point, Tile Entity was reset)
             BlockRedstoneJukebox.keepMyInventory = true;
-            ModRedstoneJukebox.logDebugInfo("    Setting block");
-
-            // change de block id (at this point, Tile Entity was reset)
             world.setBlock(x, y, z, targetBlockId);
-
             BlockRedstoneJukebox.keepMyInventory = false;
-
-
-
-            ModRedstoneJukebox.logDebugInfo("    Block setted");
 
             // Don't know what this does for sure. I think the flag "2" sends update to client
             world.setBlockMetadataWithNotify(x, y, z, 0, 2);
-
-
-            ModRedstoneJukebox.logDebugInfo("    Meta data setted");
-
 
             // Recover the Tile Entity
             if (teJukebox != null) {
                 teJukebox.validate();
                 world.setBlockTileEntity(x, y, z, teJukebox);
             }
-            /*
-	        */
-
-            // ModRedstoneJukebox.logDebugInfo("    TE for coords= " + (world.getBlockTileEntity(x, y, z).toString()));
 
         }
 
@@ -346,8 +314,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
                         // look for noteblocks
                         if (world.getBlockId(i, j, k) == Block.music.blockID) {
                             amp += 8;
-                            if (amp >= ModRedstoneJukebox.maxExtraVolume)
-                                return ModRedstoneJukebox.maxExtraVolume;
+                            if (amp >= ModRedstoneJukebox.maxExtraVolume) return ModRedstoneJukebox.maxExtraVolume;
                         }
                     }
 

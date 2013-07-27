@@ -7,7 +7,7 @@ package sidben.redstonejukebox;
 public class Reference {
 
 
-    // --- Forces debug mode always on
+    // --- Forces debug mode always on (SHOULD NEVER BE TRUE ON RELEASE)
     public static final boolean ForceDebug         = false;
 
 

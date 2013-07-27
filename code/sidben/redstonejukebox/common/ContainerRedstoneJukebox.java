@@ -32,7 +32,7 @@ public class ContainerRedstoneJukebox extends Container {
         this.addSlotToContainer(new SlotRedstoneJukeboxRecord(this.teJukebox, 7, 152, 8));
 
 
-        // -- Player invetory
+        // -- Player inventory
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 9; k++) {
                 this.addSlotToContainer(new Slot(inventoryPlayer, k + i * 9 + 9, 8 + k * 18, 84 + i * 18));
@@ -72,7 +72,7 @@ public class ContainerRedstoneJukebox extends Container {
          * b = last position of the check
          * r = order (true = reverse, last to first)
          * 
-         * return TRUE if sucessfull
+         * return TRUE if successful
          */
 
 
@@ -88,21 +88,22 @@ public class ContainerRedstoneJukebox extends Container {
 
             if (slotnumber < 8) {
                 // send item from the jukebox to the player
-                if (!this.mergeItemStack(myStack, 8, 43, true))
-                    return null;
-            } else {
+                if (!this.mergeItemStack(myStack, 8, 43, true)) return null;
+            }
+            else {
                 // send a record to the jukebox
                 if (SlotRedstoneJukeboxRecord.isRecord(myStack)) {
-                    if (!this.mergeItemStack(myStack, 0, 8, false))
-                        return null;
-                } else
+                    if (!this.mergeItemStack(myStack, 0, 8, false)) return null;
+                }
+                else
                     return null;
             }
 
 
             if (myStack.stackSize == 0) {
                 slot.putStack((ItemStack) null);
-            } else {
+            }
+            else {
                 slot.onSlotChanged();
             }
 

@@ -3,7 +3,7 @@
 "modid": "SidbenRedstoneJukebox",
 "name": "Redstone Jukebox",
 "description": "Adds a new and improved Jukebox to the game. Configurable interface, holds up to 8 records and activated by redstone. ",
-"version": "2.0 pre-release",
+"version": "2.0 RC 1",
 "mcversion": "1.6.2",
 "url": "http://sidbenmc.wordpress.com/finished-mods/redstone-jukebox/",
 "updateUrl": "",

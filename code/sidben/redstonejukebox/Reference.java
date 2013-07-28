@@ -14,7 +14,7 @@ public class Reference {
     // --- Mod basic info
     public static final String  ModID              = "SidbenRedstoneJukebox";
     public static final String  ModName            = "Redstone Jukebox";
-    public static final String  ModVersion         = "2.0 - Pre-release";
+    public static final String  ModVersion         = "2.0 - Release Candidate 1";
     public static final String  Channel            = "chRSJukebox";
 
     public static final String  ResourcesNamespace = "redstonejukebox";

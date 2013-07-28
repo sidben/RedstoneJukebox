@@ -210,6 +210,21 @@ public class ModRedstoneJukebox {
 
 
 
+        // Textures and Icons paths
+        ModRedstoneJukebox.blankRecordIcon = Reference.ResourcesNamespace + ":blank_record";
+        ModRedstoneJukebox.customRecordIconArray = Reference.ResourcesNamespace + ":custom_record_";
+        ModRedstoneJukebox.jukeboxDiscIcon = Reference.ResourcesNamespace + ":redstone_jukebox_disc";
+        ModRedstoneJukebox.jukeboxTopIcon = Reference.ResourcesNamespace + ":redstone_jukebox_top";
+        ModRedstoneJukebox.jukeboxBottomIcon = Reference.ResourcesNamespace + ":redstone_jukebox_bottom";
+        ModRedstoneJukebox.jukeboxSideOnIcon = Reference.ResourcesNamespace + ":redstone_jukebox_on";
+        ModRedstoneJukebox.jukeboxSideOffIcon = Reference.ResourcesNamespace + ":redstone_jukebox_off";
+        ModRedstoneJukebox.guiTextureJukebox = "textures/gui/redstonejukebox-gui.png";
+        ModRedstoneJukebox.guiTextureTrade = "textures/gui/recordtrading-gui.png";
+
+        ModRedstoneJukebox.redstoneJukeboxGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureJukebox);
+        ModRedstoneJukebox.recordTradeGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureTrade);
+        
+        
         // Blocks and Items
         ModRedstoneJukebox.recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, ModRedstoneJukebox.blankRecordIcon).func_111206_d("record_blank");
         ModRedstoneJukebox.customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord").func_111206_d("record_custom");
@@ -236,7 +251,7 @@ public class ModRedstoneJukebox {
 
     @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
-
+        
         // Register my custom player event handler
         PlayerEventHandler playerEventHandler = new PlayerEventHandler();
         MinecraftForge.EVENT_BUS.register(playerEventHandler);
@@ -305,20 +320,6 @@ public class ModRedstoneJukebox {
         // Recipe: Redstone Jukebox
         GameRegistry.addRecipe(new ItemStack(ModRedstoneJukebox.redstoneJukebox), "ggg", "tjt", "www", 'g', glassStack, 't', redstoneTorchStack, 'j', jukeboxStack, 'w', woodStack);
 
-
-        // Textures and Icons paths
-        ModRedstoneJukebox.blankRecordIcon = Reference.ResourcesNamespace + ":blank_record";
-        ModRedstoneJukebox.customRecordIconArray = Reference.ResourcesNamespace + ":custom_record_";
-        ModRedstoneJukebox.jukeboxDiscIcon = Reference.ResourcesNamespace + ":redstone_jukebox_disc";
-        ModRedstoneJukebox.jukeboxTopIcon = Reference.ResourcesNamespace + ":redstone_jukebox_top";
-        ModRedstoneJukebox.jukeboxBottomIcon = Reference.ResourcesNamespace + ":redstone_jukebox_bottom";
-        ModRedstoneJukebox.jukeboxSideOnIcon = Reference.ResourcesNamespace + ":redstone_jukebox_on";
-        ModRedstoneJukebox.jukeboxSideOffIcon = Reference.ResourcesNamespace + ":redstone_jukebox_off";
-        ModRedstoneJukebox.guiTextureJukebox = "textures/gui/redstonejukebox-gui.png";
-        ModRedstoneJukebox.guiTextureTrade = "textures/gui/recordtrading-gui.png";
-
-        ModRedstoneJukebox.redstoneJukeboxGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureJukebox);
-        ModRedstoneJukebox.recordTradeGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureTrade);
 
     }
 

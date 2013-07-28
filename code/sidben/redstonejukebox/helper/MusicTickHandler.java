@@ -19,7 +19,7 @@ import cpw.mods.fml.relauncher.Side;
 public class MusicTickHandler implements IScheduledTickHandler {
 
 
-    private static int     c                   = 0;             // Counter
+    private static int     c                   = 0;    // Counter
     private static boolean musicFirstFullCheck = false;         // Flag to indicate the first check, before got any answer. Updated by the TickHandler.
 
 

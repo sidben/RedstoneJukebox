@@ -49,8 +49,9 @@ public class ItemCustomRecord extends ItemRecord {
     public void registerIcons(IconRegister iconRegister) {
         this.iconArray = new Icon[ModRedstoneJukebox.maxCustomRecordIcon];
 
+        // OBS: the first icon is 1, not 0.
         for (int i = 0; i < this.iconArray.length; ++i) {
-            this.iconArray[i] = iconRegister.registerIcon(ModRedstoneJukebox.customRecordIconArray + String.format("%03d", i));
+            this.iconArray[i] = iconRegister.registerIcon(ModRedstoneJukebox.customRecordIconArray + String.format("%03d", i + 1));
         }
     }
 
@@ -59,8 +60,12 @@ public class ItemCustomRecord extends ItemRecord {
     @SideOnly(Side.CLIENT)
     @Override
     public Icon getIconFromDamage(int damage) {
+        // Fix to avoid invalid damage values. Without this the world crashes forever, and that is a long time.
+        if (damage < 1 || damage > ModRedstoneJukebox.maxCustomRecordIcon) return ModRedstoneJukebox.recordBlank.getIconFromDamage(0);
+
         // OBS: DamageValue is used to set the custom record icon.
-        return this.iconArray[damage];
+        // OBS 2: the first icon is 1, not 0, so icon damage 1 would be array 0.
+        return this.iconArray[damage - 1];
     }
 
 

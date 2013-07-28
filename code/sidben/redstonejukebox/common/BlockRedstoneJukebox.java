@@ -13,6 +13,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -224,7 +225,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     @Override
     public void breakBlock(World par1World, int x, int y, int z, int par5, int par6) {
-        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.breakBlock()");
+        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.breakBlock() - " + FMLCommonHandler.instance().getEffectiveSide());
 
         if (!BlockRedstoneJukebox.keepMyInventory) {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getBlockTileEntity(x, y, z);
@@ -244,7 +245,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, int blockID) {
-        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.onNeighborBlockChange(world, " + x + ", " + y + ", " + z + ", " + blockID + ")");
+        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.onNeighborBlockChange(world, " + x + ", " + y + ", " + z + ", " + blockID + ") - " + FMLCommonHandler.instance().getEffectiveSide());
 
         // Forces the Tile Entity to update it's state (inspired by BuildCraft)
         TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getBlockTileEntity(x, y, z);
@@ -266,7 +267,7 @@ public class BlockRedstoneJukebox extends BlockContainer {
      * Triggered by the Tile Entity when it detects changes.
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z) {
-        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateJukeboxBlockState(" + active + ", world, " + x + ", " + y + ", " + z + ")");
+        ModRedstoneJukebox.logDebugInfo("BlockRedstoneJukebox.updateJukeboxBlockState(" + active + ", world, " + x + ", " + y + ", " + z + ") - " + FMLCommonHandler.instance().getEffectiveSide());
 
 
         int targetBlockId = active ? ModRedstoneJukebox.redstoneJukeboxActiveID : ModRedstoneJukebox.redstoneJukeboxIdleID;

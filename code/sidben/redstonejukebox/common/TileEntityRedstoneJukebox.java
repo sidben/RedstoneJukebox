@@ -639,6 +639,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory 
 
         // shuffle if needed
         if (this.playMode == 1 && totalRecords > 1) {
+            // Swaps the play order twice
+            for (int i = 0; i < this.playOrder.length; i++) {
+                int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
+                int temp = this.playOrder[i];
+                this.playOrder[i] = this.playOrder[randomPosition];
+                this.playOrder[randomPosition] = temp;
+            }
             for (int i = 0; i < this.playOrder.length; i++) {
                 int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
                 int temp = this.playOrder[i];

@@ -19,7 +19,8 @@ import cpw.mods.fml.relauncher.Side;
 public class MusicTickHandler implements IScheduledTickHandler {
 
 
-    private int c = 0;      // Counter
+    private static int     c                   = 0;             // Counter
+    private static boolean musicFirstFullCheck = false;         // Flag to indicate the first check, before got any answer. Updated by the TickHandler.
 
 
 
@@ -49,18 +50,22 @@ public class MusicTickHandler implements IScheduledTickHandler {
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
             // Check if should run
             if (PlayMusicHelper.musicCheckActive) {
-                ++this.c;
+                ++MusicTickHandler.c;
 
 
-                if (this.c < PlayMusicHelper.musicProcessFrequency) {
+                if (MusicTickHandler.c < PlayMusicHelper.musicProcessFrequency) {
                     // Process responses, but only after the first full check
-                    PlayMusicHelper.ProcessResponseList(false);
+                    if (!MusicTickHandler.musicFirstFullCheck) {
+                        PlayMusicHelper.ProcessResponseList(false);
+                    }
                 }
                 else {
-                    this.c = 0;
+                    MusicTickHandler.c = 0;
 
                     // Process responses. If didn't get a response by now, mark as no clients playing.
-                    PlayMusicHelper.ProcessResponseList(true);
+                    if (!MusicTickHandler.musicFirstFullCheck) {
+                        PlayMusicHelper.ProcessResponseList(true);
+                    }
 
                     // Reset the Players response list
                     PlayMusicHelper.ResetResponseList();
@@ -73,7 +78,7 @@ public class MusicTickHandler implements IScheduledTickHandler {
                     }
 
                     // Updates the first check flag.
-                    PlayMusicHelper.musicFirstFullCheck = false;
+                    MusicTickHandler.musicFirstFullCheck = false;
 
                 }
 
@@ -114,5 +119,14 @@ public class MusicTickHandler implements IScheduledTickHandler {
     public int nextTickSpacing() {
         return PlayMusicHelper.musicCheckTickSize;
     }
+
+
+    public static void refreshTichHanlder() {
+        // Makes sure the tick handler always start fresh
+        MusicTickHandler.c = 0;
+        MusicTickHandler.musicFirstFullCheck = true;
+    }
+
+
 
 }

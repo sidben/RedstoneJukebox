@@ -43,7 +43,6 @@ public class PlayMusicHelper {
     public static final int                     musicCheckTickSize       = 20;                                // Size of the server tick to check if music is playing (every server tick, responses will be processed)
     public static final int                     musicProcessFrequency    = 5;                                 // Frequency in server ticks the server will send packets asking if players are playing music
     public static boolean                       musicCheckActive         = false;                             // Flag to indicate if the music check should happen.
-    public static boolean                       musicFirstFullCheck      = false;                             // Flag to indicate the first check, before got any answer. Updated by the TickHandler.
 
 
 
@@ -96,31 +95,29 @@ public class PlayMusicHelper {
      */
     public static void ProcessResponseList(boolean stopIfNoResponse) {
         // Debug
-        ModRedstoneJukebox.logDebugInfo("PlayMusicHelper.ProcessResponseList() - Responses #: " + PlayMusicHelper.playingRespCoords.size() + ", First check: " + PlayMusicHelper.musicFirstFullCheck + ", stop if empty: " + stopIfNoResponse);
+        ModRedstoneJukebox.logDebugInfo("PlayMusicHelper.ProcessResponseList() - Responses #: " + PlayMusicHelper.playingRespCoords.size() + ", stop if empty: " + stopIfNoResponse);
 
-        if (!PlayMusicHelper.musicFirstFullCheck) {
-            // If no responses where received, no players are playing records.
-            if (PlayMusicHelper.playingRespCoords.size() <= 0) {
-                if (stopIfNoResponse) {
-                    PlayMusicHelper.StopTrackingResponses();
-                }
+        // If no responses where received, no players are playing records.
+        if (PlayMusicHelper.playingRespCoords.size() <= 0) {
+            if (stopIfNoResponse) {
+                PlayMusicHelper.StopTrackingResponses();
             }
-
-            // Check the first response
-            else {
-                for (String key : PlayMusicHelper.playingRespCoords.keySet()) {
-                    PlayMusicHelper.currentSoundSourceServer.set(PlayMusicHelper.playingRespCoords.get(key));
-
-                    // Debug
-                    ModRedstoneJukebox.logDebugInfo("    Server thinks music is at " + PlayMusicHelper.currentSoundSourceServer.x + ", " + PlayMusicHelper.currentSoundSourceServer.y + ", " + PlayMusicHelper.currentSoundSourceServer.z + " based on the response from [" + key + "]");
-
-                    break;
-                }
-            }
-
-            // TODO: up to 3 responses: only 1st is used, more than 3 responses: most used of the first 10.
-
         }
+
+        // Check the first response
+        else {
+            for (String key : PlayMusicHelper.playingRespCoords.keySet()) {
+                PlayMusicHelper.currentSoundSourceServer.set(PlayMusicHelper.playingRespCoords.get(key));
+
+                // Debug
+                ModRedstoneJukebox.logDebugInfo("    Server thinks music is at " + PlayMusicHelper.currentSoundSourceServer.x + ", " + PlayMusicHelper.currentSoundSourceServer.y + ", " + PlayMusicHelper.currentSoundSourceServer.z + " based on the response from [" + key + "]");
+
+                break;
+            }
+        }
+
+        // TODO: up to 3 responses: only 1st is used, more than 3 responses: most used of the first 10.
+
     }
 
 
@@ -155,9 +152,10 @@ public class PlayMusicHelper {
         // Debug
         ModRedstoneJukebox.logDebugInfo("PlayMusicHelper.StartTrackingResponses(" + x + ", " + y + ", " + z + ", " + dimensionId + ")");
 
+        MusicTickHandler.refreshTichHanlder();
+
         PlayMusicHelper.isServerPlaying = true;
         PlayMusicHelper.musicCheckActive = true;
-        PlayMusicHelper.musicFirstFullCheck = true;
         PlayMusicHelper.currentSoundSourceServer.set(x, y, z, dimensionId);
     }
 

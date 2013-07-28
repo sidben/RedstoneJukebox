@@ -223,8 +223,8 @@ public class ModRedstoneJukebox {
 
         ModRedstoneJukebox.redstoneJukeboxGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureJukebox);
         ModRedstoneJukebox.recordTradeGui = new ResourceLocation(Reference.ResourcesNamespace, ModRedstoneJukebox.guiTextureTrade);
-        
-        
+
+
         // Blocks and Items
         ModRedstoneJukebox.recordBlank = new ItemBlankRecord(ModRedstoneJukebox.blankRecordItemID, CreativeTabs.tabMisc, ModRedstoneJukebox.blankRecordIcon).func_111206_d("record_blank");
         ModRedstoneJukebox.customRecord = new ItemCustomRecord(ModRedstoneJukebox.customRecordItemID, "customRecord").func_111206_d("record_custom");
@@ -251,7 +251,7 @@ public class ModRedstoneJukebox {
 
     @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
-        
+
         // Register my custom player event handler
         PlayerEventHandler playerEventHandler = new PlayerEventHandler();
         MinecraftForge.EVENT_BUS.register(playerEventHandler);

@@ -100,7 +100,6 @@ public class ModRedstoneJukebox {
 
     // Global variables
     public final static String       sourceName           = "streaming";    // music discs are called "streaming"
-    public final static int          maxCustomRecords     = 32;         // Limit of custom records accepted TODO: make this a config
     public final static int          maxCustomRecordIcon  = 77;         // Limit of icon IDs for the records. This is stored on the metadata (damage value) of the item. Start at zero.
     public final static int          maxStores            = 16;         // Number of "record stores" available. Each "store" is a random selection of records for trade.
     public final static int          maxOffers            = 8;          // Maximum number of record offers a villager have
@@ -114,6 +113,7 @@ public class ModRedstoneJukebox {
     public static int                customRecordOffersMax;             // Maximum of custom records a villager can offer
     public static int                customRecordPriceMin;              // Minimal value of custom records in emeralds
     public static int                customRecordPriceMax;              // Maximum value of custom records in emeralds
+    public static int                maxCustomRecords;                  // Limit of custom records accepted
 
 
     // Debug mode
@@ -149,6 +149,17 @@ public class ModRedstoneJukebox {
             ModRedstoneJukebox.redstoneJukeboxActiveID = config.getBlock("redstoneJukeboxActiveID", 521).getInt(521);
             ModRedstoneJukebox.blankRecordItemID = config.getItem("blankRecordItemID", 7200).getInt(7200);
             ModRedstoneJukebox.customRecordItemID = config.getItem("customRecordItemID", 7201).getInt(7201);
+
+            // Amount of custom records
+            ModRedstoneJukebox.maxCustomRecords = config.get(customRecordCategory, "maxCustomRecords", 32).getInt(32);
+
+            // Extra validation on the custom records amount (min and max values)
+            if (ModRedstoneJukebox.maxCustomRecords < 1) {
+                ModRedstoneJukebox.maxCustomRecords = 1;
+            }
+            if (ModRedstoneJukebox.maxCustomRecords > 999) {
+                ModRedstoneJukebox.maxCustomRecords = 999;
+            }
 
             // Merchant config
             ModRedstoneJukebox.customRecordOffersMin = config.get(customRecordCategory, "customRecordOffersMin", 2).getInt(2);

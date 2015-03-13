@@ -1,5 +1,8 @@
 package sidben.redstonejukebox.proxy;
 
+import sidben.redstonejukebox.init.MyBlocks;
+import sidben.redstonejukebox.init.MyRecipes;
+
 
 
 
@@ -12,6 +15,7 @@ public abstract class CommonProxy implements IProxy {
         // Register network messages
         
         // Register blocks
+        MyBlocks.register();
     }
 
     
@@ -19,6 +23,7 @@ public abstract class CommonProxy implements IProxy {
     public void initialize()
     {
         // Recipes
+        MyRecipes.register();
 
         // Achievements
 

@@ -178,12 +178,10 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * The type of render function that is called for this block
      */
-    /*    
     @Override
     public int getRenderType() {
-        return ModRedstoneJukebox.redstoneJukeboxModelID;
+        return MyBlocks.redstoneJukeboxModelID;
     }
-    */
     
     
     

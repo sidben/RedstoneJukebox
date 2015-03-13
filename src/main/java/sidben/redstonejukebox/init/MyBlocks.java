@@ -9,6 +9,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
 public class MyBlocks
 {
 
+    // Models IDs
+    public static int                redstoneJukeboxModelID;
+
+    
     // Icons
     public static String             jukeboxDiscIcon;
     public static String             jukeboxTopIcon;

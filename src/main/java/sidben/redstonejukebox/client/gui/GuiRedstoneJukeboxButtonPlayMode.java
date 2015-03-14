@@ -1,53 +1,54 @@
 package sidben.redstonejukebox.client.gui;
 
-import org.lwjgl.opengl.GL11;
-import sidben.redstonejukebox.proxy.ClientProxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 
 
+@SideOnly(Side.CLIENT)
 public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton
 {
 
-    protected static int myWidth  = 92;
-    protected static int myHeight = 25;
+    private static final int       myWidth  = 92;
+    private static final int       myHeight = 25;
+    private final ResourceLocation guiMainTexture;
 
-    
 
-    public GuiRedstoneJukeboxButtonPlayMode(int index, int x, int y) {
-        super(index, x, y, GuiRedstoneJukeboxButtonPlayMode.myWidth, GuiRedstoneJukeboxButtonPlayMode.myHeight, "");
+
+    public GuiRedstoneJukeboxButtonPlayMode(int index, int x, int y, ResourceLocation guiTexture) {
+        super(index, x, y, myWidth, myHeight, "");
+        this.guiMainTexture = guiTexture;
     }
 
-    
-    
+
+
     /**
      * Draws this button to the screen.
      */
     @Override
-    public void drawButton(Minecraft par1Minecraft, int mouseX, int mouseY) {
+    public void drawButton(Minecraft par1Minecraft, int mouseX, int mouseY)
+    {
         if (this.visible) {
-            boolean isMouseOver = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            final boolean isMouseOver = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
             this.field_146123_n = isMouseOver;
 
             if (isMouseOver) {
+                par1Minecraft.getTextureManager().bindTexture(this.guiMainTexture);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                //par1Minecraft.func_110434_K().func_110577_a(ClientProxy.redstoneJukeboxGui);
-                par1Minecraft.getTextureManager().bindTexture(ClientProxy.redstoneJukeboxGui);
-                this.drawTexturedModalRect(this.xPosition, this.yPosition, 24, 166, GuiRedstoneJukeboxButtonPlayMode.myWidth, GuiRedstoneJukeboxButtonPlayMode.myHeight);
+                GL11.glEnable(GL11.GL_BLEND);                       // need those lines for alpha, wasn't needed before (1.6.2)
+                OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+                this.drawTexturedModalRect(this.xPosition, this.yPosition, 24, 166, myWidth, myHeight);
             }
         }
     }
 
 
 
-    /*
-    // OBS: Mouseover
-    @Override
-    public boolean func_82252_a() {     // changed to func_146115_a
-        return this.field_82253_i;
-    }
-    */
-
-    
 }

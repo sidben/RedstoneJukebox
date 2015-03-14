@@ -22,10 +22,8 @@ public class ClientProxy extends CommonProxy {
     public static int                redstoneJukeboxModelID;
     
     // GUI textures and paths
-    private static String            guiTextureJukebox;
-    private static String            guiTextureTrade;
-    public static ResourceLocation   redstoneJukeboxGui;
-    public static ResourceLocation   recordTradeGui;
+    public static String            guiTextureJukebox;
+    public static String            guiTextureTrade;
     
     // Icons
     public static String             jukeboxDiscIcon;
@@ -41,11 +39,8 @@ public class ClientProxy extends CommonProxy {
     public void pre_initialize()
     {
         // GUI
-        ClientProxy.guiTextureJukebox = "textures/gui/redstonejukebox-gui.png";
-        ClientProxy.guiTextureTrade = "textures/gui/recordtrading-gui.png";
-
-        ClientProxy.redstoneJukeboxGui = new ResourceLocation(Reference.ResourcesNamespace, ClientProxy.guiTextureJukebox);
-        ClientProxy.recordTradeGui = new ResourceLocation(Reference.ResourcesNamespace, ClientProxy.guiTextureTrade);
+        ClientProxy.guiTextureJukebox = this.getResourceName("textures/gui/redstonejukebox-gui.png");
+        ClientProxy.guiTextureTrade = this.getResourceName("textures/gui/recordtrading-gui.png");
 
         
         // Block and item textures

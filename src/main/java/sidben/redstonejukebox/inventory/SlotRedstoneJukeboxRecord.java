@@ -44,6 +44,7 @@ public class SlotRedstoneJukeboxRecord extends Slot
     }
 
 
+    // TODO: Move this to a helper class
     public static boolean isRecord(ItemStack s) {
         return s != null && s.getItem() instanceof ItemRecord;
     }

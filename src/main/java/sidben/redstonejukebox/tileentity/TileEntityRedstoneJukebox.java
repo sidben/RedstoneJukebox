@@ -167,6 +167,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     {
         if (this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this) return false;
 
+        // Check if the player is too far
         return par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64D;
     }
 

@@ -1,6 +1,9 @@
 package sidben.redstonejukebox.proxy;
 
-public interface IProxy {
+import cpw.mods.fml.common.network.IGuiHandler;
+
+
+public interface IProxy extends IGuiHandler {
     
     public void pre_initialize();
     public void initialize();

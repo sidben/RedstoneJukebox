@@ -2,6 +2,7 @@ package sidben.redstonejukebox.init;
 
 import net.minecraft.creativetab.CreativeTabs;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
+import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 
@@ -9,16 +10,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 public class MyBlocks
 {
 
-    // Models IDs
-    public static int                redstoneJukeboxModelID;
-
-    
-    // Icons
-    public static String             jukeboxDiscIcon;
-    public static String             jukeboxTopIcon;
-    public static String             jukeboxBottomIcon;
-    public static String             jukeboxSideOnIcon;
-    public static String             jukeboxSideOffIcon;
 
     
     // Blocks instances
@@ -27,11 +18,17 @@ public class MyBlocks
 
     
     public static void register() {
+
+        // Blocks
         redstoneJukebox = (BlockRedstoneJukebox) new BlockRedstoneJukebox(false).setCreativeTab(CreativeTabs.tabRedstone); 
         redstoneJukeboxActive = (BlockRedstoneJukebox) new BlockRedstoneJukebox(true).setLightLevel(0.75F);
         
         GameRegistry.registerBlock(redstoneJukebox, "RedstoneJukeboxBlock");
-        //GameRegistry.registerBlock(redstoneJukeboxActive, "RedstoneJukeboxBlock");
+        
+
+        // Tile Entities
+        GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
+
     }
     
    

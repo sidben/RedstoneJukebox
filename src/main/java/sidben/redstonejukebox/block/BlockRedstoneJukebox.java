@@ -7,13 +7,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.init.MyBlocks;
+import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 
@@ -94,6 +97,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     }
     
     
+    
     //--------------------------------------------------------------------
     //  Textures and Rendering
     //--------------------------------------------------------------------
@@ -148,11 +152,11 @@ public class BlockRedstoneJukebox extends BlockContainer
      * is the only chance you get to register icons.
      */
     public void registerBlockIcons(IIconRegister iconRegister) {
-        this.discIcon = iconRegister.registerIcon(MyBlocks.jukeboxDiscIcon);
-        this.topIcon = iconRegister.registerIcon(MyBlocks.jukeboxTopIcon);
-        this.bottomIcon = iconRegister.registerIcon(MyBlocks.jukeboxBottomIcon);
-        this.sideOnIcon = iconRegister.registerIcon(MyBlocks.jukeboxSideOnIcon);
-        this.sideOffIcon = iconRegister.registerIcon(MyBlocks.jukeboxSideOffIcon);
+        this.discIcon = iconRegister.registerIcon(ClientProxy.jukeboxDiscIcon);
+        this.topIcon = iconRegister.registerIcon(ClientProxy.jukeboxTopIcon);
+        this.bottomIcon = iconRegister.registerIcon(ClientProxy.jukeboxBottomIcon);
+        this.sideOnIcon = iconRegister.registerIcon(ClientProxy.jukeboxSideOnIcon);
+        this.sideOffIcon = iconRegister.registerIcon(ClientProxy.jukeboxSideOffIcon);
     }
     
     
@@ -180,7 +184,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      */
     @Override
     public int getRenderType() {
-        return MyBlocks.redstoneJukeboxModelID;
+        return ClientProxy.redstoneJukeboxModelID;
     }
     
     
@@ -197,5 +201,69 @@ public class BlockRedstoneJukebox extends BlockContainer
     protected String getUnwrappedUnlocalizedName(String unlocalizedName) {
         return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
     }
-  
+ 
+    
+    
+    
+    
+    //--------------------------------------------------------------------
+    // World Events
+    //--------------------------------------------------------------------
+    
+    /**
+     * Called whenever the block is added into the world. Args: world, x, y, z
+     */
+    @Override
+    public void onBlockAdded(World par1World, int x, int y, int z) {
+        super.onBlockAdded(par1World, x, y, z);
+    }
+
+    
+    /**
+     * Called upon block activation (right click on the block.)
+     */
+    @Override
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float a, float b, float c) {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity == null || player.isSneaking())          // Avoids opening the GUI if sneaking
+            return false;
+
+        player.openGui(ModRedstoneJukebox.instance, ClientProxy.redstoneJukeboxGuiID, world, x, y, z);
+        return true;
+    }
+
+
+    /**
+     * ejects contained items into the world, and notifies neighbors of an update, as appropriate
+     */
+    @Override
+    public void breakBlock(World par1World, int x, int y, int z, Block par5, int par6) 
+    {
+        if (!BlockRedstoneJukebox.keepMyInventory) {
+            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getTileEntity(x, y, z);
+
+            if (teJukebox != null) {
+                //teJukebox.ejectAllAndStopPlaying(par1World, x, y, z);
+            }
+        }
+
+        super.breakBlock(par1World, x, y, z, par5, par6);
+    }
+
+
+    /**
+     * Called when a tile entity on a side of this block changes is created or is destroyed.
+     * 
+     */
+    @Override
+    public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) 
+    {
+        // Forces the Tile Entity to update it's state (inspired by BuildCraft)
+        TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+        if (teJukebox != null) {
+            //teJukebox.checkRedstonePower();
+        }
+    }
+    
+    
 }

@@ -1,7 +1,11 @@
 package sidben.redstonejukebox.proxy;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.init.MyRecipes;
+import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 
 
 
@@ -34,6 +38,20 @@ public abstract class CommonProxy implements IProxy {
     @Override
     public void post_initialize()
     {
+    }
+
+    
+    
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+    {
+        return null;
+    }
+
+    @Override
+    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+    {
+        return null;
     }
 
     

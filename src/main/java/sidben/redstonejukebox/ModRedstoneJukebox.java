@@ -7,6 +7,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 
 
 @Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion)
@@ -22,7 +23,8 @@ public class ModRedstoneJukebox
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
     public static IProxy      proxy;
 
-    
+
+
     
     
     
@@ -37,6 +39,9 @@ public class ModRedstoneJukebox
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
+        // GUIs
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, ModRedstoneJukebox.proxy);
+
         // Sided initializations
         proxy.initialize();
     }

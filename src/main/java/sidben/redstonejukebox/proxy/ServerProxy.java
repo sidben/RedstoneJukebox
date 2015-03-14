@@ -1,3 +1,9 @@
 package sidben.redstonejukebox.proxy;
 
-public class ServerProxy extends CommonProxy {}
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+
+
+public class ServerProxy extends CommonProxy 
+{
+}

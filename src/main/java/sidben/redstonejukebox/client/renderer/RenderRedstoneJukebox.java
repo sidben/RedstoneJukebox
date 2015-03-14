@@ -2,6 +2,7 @@ package sidben.redstonejukebox.client.renderer;
 
 import org.lwjgl.opengl.GL11;
 import sidben.redstonejukebox.init.MyBlocks;
+import sidben.redstonejukebox.proxy.ClientProxy;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -138,7 +139,7 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler
 
     @Override
     public int getRenderId() {
-        return MyBlocks.redstoneJukeboxModelID;
+        return ClientProxy.redstoneJukeboxModelID;
     }
 
     

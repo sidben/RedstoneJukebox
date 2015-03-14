@@ -6,6 +6,9 @@ import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 
@@ -29,7 +32,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * 0 = Simple (in order)
      * 1 = Shuffle
      */
-    public int          playMode               = 0;
+    public short          playMode               = 0;
 
     // -- Indicates if it should loop when reach the end of a playlist
     public boolean      isLoop                 = false;
@@ -203,7 +206,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //--------------------------------------------------------------------
 
     public void resync() {
+        sidben.redstonejukebox.helper.LogHelper.info("resync()");
+        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        
         this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+        this.markDirty();
     }
 
 
@@ -263,6 +270,63 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         par1NBTTagCompound.setTag("Items", nbttaglist);
     }
+
+
+    /**
+     * Called when you receive a TileEntityData packet for the location this
+     * TileEntity is currently in. Called on client only. 
+     * 
+     * @param net
+     *            The NetworkManager the packet originated from
+     * @param packet
+     *            The data packet
+     */
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        sidben.redstonejukebox.helper.LogHelper.info("onDataPacket()");
+        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+
+        // Read NBT packet from the server
+        NBTTagCompound tag = packet.func_148857_g();
+
+        this.playMode = tag.getShort("PlayMode");
+        this.isLoop = tag.getBoolean("Loop");
+        this.isActive = tag.getBoolean("Active");
+
+        // Extra info
+        this.currentJukeboxPlaySlot = tag.getShort("JukeboxPlaySlot");
+
+        
+        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
+
+    }
+
+    
+    /**
+     * Gathers data into a packet that is to be sent to the client. Called on server only. 
+     */
+    public Packet getDescriptionPacket() {
+        sidben.redstonejukebox.helper.LogHelper.info("getDescriptionPacket()");
+        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+
+        // Send the NBT Packet to client
+        NBTTagCompound tag = new NBTTagCompound();
+//        this.writeToNBT(tag);
+
+        tag.setShort("PlayMode", this.playMode);
+        tag.setBoolean("Loop", this.isLoop);
+        tag.setBoolean("Active", this.isActive);
+
+        // Extra info (used in GUI)
+        tag.setShort("JukeboxPlaySlot", (short) this.getCurrentJukeboxPlaySlot());
+        
+        
+        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
+        
+
+        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, tag);
+    }
+
     
     
     // TODO: check if overriding [canUpdate] for the inactive jukebox is a good idea

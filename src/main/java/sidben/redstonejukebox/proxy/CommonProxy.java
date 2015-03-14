@@ -2,13 +2,22 @@ package sidben.redstonejukebox.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.relauncher.Side;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.init.MyRecipes;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
+import sidben.redstonejukebox.network.JukeboxGUIUpdatedMessage;
+import sidben.redstonejukebox.network.NetworkHelper;
+import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 
 
-
+/*
+ * Base proxy class, here I initialize everything that must happen on both, server and client.
+ * 
+ */
 public abstract class CommonProxy implements IProxy
 {
 
@@ -17,6 +26,9 @@ public abstract class CommonProxy implements IProxy
     public void pre_initialize()
     {
         // Register network messages
+        ModRedstoneJukebox.NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, 0, Side.SERVER);
+        
 
         // Register blocks
         MyBlocks.register();
@@ -29,8 +41,10 @@ public abstract class CommonProxy implements IProxy
         // Recipes
         MyRecipes.register();
 
+        
         // Achievements
 
+        
         // Event Handlers
     }
 

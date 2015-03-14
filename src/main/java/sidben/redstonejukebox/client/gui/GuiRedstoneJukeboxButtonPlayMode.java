@@ -45,6 +45,8 @@ public class GuiRedstoneJukeboxButtonPlayMode extends GuiButton
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
                 this.drawTexturedModalRect(this.xPosition, this.yPosition, 24, 166, myWidth, myHeight);
+
+                GL11.glDisable(GL11.GL_BLEND);                      // cleanup (needed?)
             }
         }
     }

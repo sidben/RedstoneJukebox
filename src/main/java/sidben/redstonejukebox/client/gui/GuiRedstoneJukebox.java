@@ -3,6 +3,7 @@ package sidben.redstonejukebox.client.gui;
 import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.relauncher.*;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
+import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import net.minecraft.client.gui.GuiButton;
@@ -30,6 +31,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     private int                       danceNoteCount  = 0;
 
     private static final ResourceLocation guiMainTexture = new ResourceLocation(ClientProxy.guiTextureJukebox);
+    private boolean changed = false;    // used to detect if the config was changed, so the server is notified
 
     
     
@@ -88,12 +90,14 @@ public class GuiRedstoneJukebox extends GuiContainer
             case 0:
                 // Loop command: no loop
                 this.jukeboxInventory.isLoop = false;
+                this.changed = true;
                 break;
 
 
             case 1:
                 // Loop command: with loop
                 this.jukeboxInventory.isLoop = true;
+                this.changed = true;
                 break;
 
 
@@ -105,6 +109,7 @@ public class GuiRedstoneJukebox extends GuiContainer
                 else {
                     this.jukeboxInventory.playMode = 0;
                 }
+                this.changed = true;
                 break;
 
 
@@ -114,6 +119,11 @@ public class GuiRedstoneJukebox extends GuiContainer
             // Packet code here
             // This is need to inform the server that changes where made.
             //PacketHelper.sendJukeboxGUIPacket(this.jukeboxInventory.isLoop, this.jukeboxInventory.playMode);
+            // this.jukeboxInventory.resync();  // <-- don't work, this send info server > client, not client > server
+            
+            NetworkHelper.sendJukeboxGUIUpdatedPacket(this.jukeboxInventory);
+            
+            // NOTE: send just one packet when the GUI closes to avoid network spam.
 
         }
 
@@ -265,6 +275,20 @@ public class GuiRedstoneJukebox extends GuiContainer
 
         GuiContainer.itemRender.zLevel = 0.0F;
 
+    }
+    
+
+    
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
+    @Override
+    public void onGuiClosed()
+    {
+        super.onGuiClosed();
+        
+        sidben.redstonejukebox.helper.LogHelper.info("onGuiClosed() - should send update packet to server");
+        sidben.redstonejukebox.helper.LogHelper.info("    " + this.changed);
     }
     
 }

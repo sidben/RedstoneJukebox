@@ -115,16 +115,6 @@ public class GuiRedstoneJukebox extends GuiContainer
 
             }
 
-
-            // Packet code here
-            // This is need to inform the server that changes where made.
-            //PacketHelper.sendJukeboxGUIPacket(this.jukeboxInventory.isLoop, this.jukeboxInventory.playMode);
-            // this.jukeboxInventory.resync();  // <-- don't work, this send info server > client, not client > server
-            
-            NetworkHelper.sendJukeboxGUIUpdatedPacket(this.jukeboxInventory);
-            
-            // NOTE: send just one packet when the GUI closes to avoid network spam.
-
         }
 
 
@@ -287,8 +277,11 @@ public class GuiRedstoneJukebox extends GuiContainer
     {
         super.onGuiClosed();
         
-        sidben.redstonejukebox.helper.LogHelper.info("onGuiClosed() - should send update packet to server");
-        sidben.redstonejukebox.helper.LogHelper.info("    " + this.changed);
+        if (this.changed) {
+            // notify server of the changes made in the GUI
+            NetworkHelper.sendJukeboxGUIUpdatedMessage(this.jukeboxInventory);
+        }
+
     }
     
 }

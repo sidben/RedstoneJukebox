@@ -4,6 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
 
@@ -193,6 +195,130 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         return itemstack.getItem() instanceof ItemRecord;
     }
 
+    
+    
+    
+    //--------------------------------------------------------------------
+    //      NBT and network stuff
+    //--------------------------------------------------------------------
+
+    public void resync() {
+        this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+    }
+
+
+    /**
+     * Reads a tile entity from NBT.
+     * 
+     * OBS: This is the only info that was saved with the world.
+     */
+    @Override
+    public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
+        super.readFromNBT(par1NBTTagCompound);
+        
+        NBTTagList nbttaglist = par1NBTTagCompound.getTagList("Items", 10);
+        this.jukeboxPlaylist = new ItemStack[this.getSizeInventory()];
+
+        // TODO: add custom name
+        
+        for (int i = 0; i < nbttaglist.tagCount(); i++) {
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            byte byte0 = nbttagcompound.getByte("Slot");
+
+            if (byte0 >= 0 && byte0 < this.jukeboxPlaylist.length) {
+                this.jukeboxPlaylist[byte0] = ItemStack.loadItemStackFromNBT(nbttagcompound);
+            }
+        }
+
+        this.playMode = par1NBTTagCompound.getShort("PlayMode");
+        this.isLoop = par1NBTTagCompound.getBoolean("Loop");
+        this.isActive = par1NBTTagCompound.getBoolean("Active");
+    }
+
+
+    /**
+     * Writes a tile entity to NBT.
+     * 
+     * OBS: This is the only info that will be saved with the world.
+     */
+    @Override
+    public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
+        super.writeToNBT(par1NBTTagCompound);
+        
+        par1NBTTagCompound.setShort("PlayMode", (short) this.playMode);
+        par1NBTTagCompound.setBoolean("Loop", this.isLoop);
+        par1NBTTagCompound.setBoolean("Active", this.isActive);
+        NBTTagList nbttaglist = new NBTTagList();
+
+        // TODO: add custom name
+        
+        for (int i = 0; i < this.jukeboxPlaylist.length; i++) {
+            if (this.jukeboxPlaylist[i] != null) {
+                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                nbttagcompound.setByte("Slot", (byte) i);
+                this.jukeboxPlaylist[i].writeToNBT(nbttagcompound);
+                nbttaglist.appendTag(nbttagcompound);
+            }
+        }
+
+        par1NBTTagCompound.setTag("Items", nbttaglist);
+    }
+    
+    
+    // TODO: check if overriding [canUpdate] for the inactive jukebox is a good idea
+    
+    /**
+     * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
+     * ticks and creates a new spawn inside its implementation.
+     */
+    @Override
+    public void updateEntity() {
+
+        if (!this.worldObj.isRemote) {
+
+            if (this.delay > 0) {
+                // Delay counter, this method's checks are not made every tick.
+                --this.delay;
+                return;
+            }
+            else {
+                // Debug
+                // ModRedstoneJukebox.logDebugInfo("TileEntityRedstoneJukebox.updateEntity() - Active: " + this.isActive + " - Playing: " + this.isPlayingNow + " - Force Stop: " + this.forceStop);
+
+                // Resets the delay
+                this.delay = TileEntityRedstoneJukebox.maxDelay;
+
+
+                // If it's not active and not playing, just return
+                if (!this.isActive() && !this.isPlayingNow) return;
+
+                // Updates the state of the tile entity and the block, if needed
+                /*
+                 *TODO: reimplement
+                if (this.forceStop || !this.isActive() && this.isPlayingNow) {
+                    this.markAsStopped();
+                    this.stopPlaying();
+                    return;
+                }
+                if (this.isActive() && !this.isPlayingNow) {
+                    this.markAsPlaying();
+                    this.startPlaying();
+                    return;
+                }
+                if (this.isActive() && this.isPlayingNow) {
+                    this.checkIfStillPlaying();
+                    return;
+                }
+                */
+
+            }
+
+        }
+
+
+    }
+    
+    
     
     
     

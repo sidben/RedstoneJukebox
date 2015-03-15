@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
@@ -25,8 +26,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //--------------------------------------------------------------------
 
     // -- The delay (in ticks) before a "isPlaying" check
-    private static int  maxDelay               = 60;
+    private static int  maxDelay               = 40;
     public int          delay                  = TileEntityRedstoneJukebox.maxDelay;
+    private int         lastUpdateTick         = 0;
 
     // -- Items of this jukebox
     private ItemStack[] jukeboxPlaylist        = new ItemStack[8];
@@ -348,10 +350,20 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void updateEntity() {
 
         if (!this.worldObj.isRemote) {
+            
+            // Prevents multiple calls per tick due to game bug. 
+            // Check BlockRedstoneJukebox.updateJukeboxBlockState for more info.
+            int thisTick = MinecraftServer.getServer().getTickCounter();
+            if (thisTick == this.lastUpdateTick) {
+                // LogHelper.info("    ignoring bugged call");
+                return;
+            } 
+            else {
+                this.lastUpdateTick = thisTick;
+            }
+            
 
             if (this.delay > 0) {
-                //LogHelper.info("TileEntityRedstoneJukebox.updateEntity() - Delay: " + this.delay);
-                
                 // Delay counter, this method's checks are not made every tick.
                 --this.delay;
                 return;
@@ -402,7 +414,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 
             }
 
-        }
+            
+            
+        } // world.isremote
 
 
     }

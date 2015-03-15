@@ -240,7 +240,7 @@ public class BlockRedstoneJukebox extends BlockContainer
 
             if (teJukebox != null) {
                 teJukebox.ejectAll(par1World, x, y, z);
-                par1World.func_147453_f(x, y, z, par5);
+                // par1World.func_147453_f(x, y, z, par5);
             }
         }
 
@@ -264,6 +264,10 @@ public class BlockRedstoneJukebox extends BlockContainer
             
             boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
             int tickRate = 4;
+            
+            LogHelper.info("    haveEnergy " + haveEnergy);
+            LogHelper.info("    isActive " + this.isActive);
+            LogHelper.info("    Block " + block);
             
             if (this.isActive && !haveEnergy) {
                 // Schedule the shut down of the jukebox
@@ -316,9 +320,45 @@ public class BlockRedstoneJukebox extends BlockContainer
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z) {
         LogHelper.info("updateJukeboxBlockState()");
         LogHelper.info("    " + active);
+
         
         // get the TileEntity so it won't be reset
         TileEntity teJukebox = world.getTileEntity(x, y, z);
+
+        // change the block type (without keepMyInventory, Tile Entity would be reset)
+        BlockRedstoneJukebox.keepMyInventory = true;
+        if (active) {
+            world.setBlock(x, y, z, MyBlocks.redstoneJukeboxActive);
+        } else {
+            world.setBlock(x, y, z, MyBlocks.redstoneJukebox);
+        }
+        BlockRedstoneJukebox.keepMyInventory = false;
+
+
+        // Don't know what this does for sure. I think the flag "2" sends update to client
+        // world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+
+
+        // Recover the Tile Entity
+        if (teJukebox != null) {
+            /*
+             * NOTE: In 1.7.10, the games keeps re-adding the Tile Entity to the
+             * list that call "updateEntity". Every time the setTileEntity is
+             * called, the same tile gets added again and ends up being called
+             * faster and faster, multiple times per tick.
+             * 
+             *  This looks like a bug with Forge or even Minecraft itself, I'll
+             *  add some control to ensure that the "updateEntity" only process
+             *  once per tick and ignore further calls. -_-
+             * 
+             * That did not happen in 1.6.2, and this code is the same of the Furnace.
+             */
+            teJukebox.validate();
+            world.setTileEntity(x, y, z, teJukebox);
+        }
+
+        
+        /*
         int metadata = world.getBlockMetadata(x, y, z);
         
         LogHelper.info("    meta " + metadata);
@@ -341,6 +381,7 @@ public class BlockRedstoneJukebox extends BlockContainer
             world.setTileEntity(x, y, z, teJukebox);
         }
 
+         */
     }
 
 

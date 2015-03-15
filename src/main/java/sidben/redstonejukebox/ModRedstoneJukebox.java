@@ -29,6 +29,10 @@ public class ModRedstoneJukebox
     public static SimpleNetworkWrapper NetworkWrapper;
 
     
+    // Global variables
+    public final static int          maxExtraVolume       = 128;        // Maximum amount of extra range for the custom jukebox
+
+    
     
     
     

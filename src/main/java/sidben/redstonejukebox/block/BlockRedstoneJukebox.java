@@ -15,6 +15,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
@@ -59,6 +60,7 @@ public class BlockRedstoneJukebox extends BlockContainer
 
     @Override
     public TileEntity createNewTileEntity(World world, int p_149915_2_) {
+        LogHelper.info("createNewTileEntity()");
         return new TileEntityRedstoneJukebox();
     }
 
@@ -83,7 +85,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      */
     public Item getItemDropped(int par1, Random par2, int par3)
     {
-        return Item.getItemFromBlock(Blocks.furnace);
+        return Item.getItemFromBlock(MyBlocks.redstoneJukebox);
     }
     
     
@@ -93,7 +95,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     @SideOnly(Side.CLIENT)
     public Item getItem(World world, int x, int y, int z)
     {
-        return Item.getItemFromBlock(Blocks.furnace);
+        return Item.getItemFromBlock(MyBlocks.redstoneJukebox);
     }
     
     
@@ -191,7 +193,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     
     
     //----------------------------------------------------
-    // Block name
+    //  Block name
     //----------------------------------------------------
     @Override
     public String getUnlocalizedName() {
@@ -207,17 +209,8 @@ public class BlockRedstoneJukebox extends BlockContainer
     
     
     //--------------------------------------------------------------------
-    // World Events
+    //  World Events
     //--------------------------------------------------------------------
-    
-    /**
-     * Called whenever the block is added into the world. Args: world, x, y, z
-     */
-    @Override
-    public void onBlockAdded(World par1World, int x, int y, int z) {
-        super.onBlockAdded(par1World, x, y, z);
-    }
-
     
     /**
      * Called upon block activation (right click on the block.)
@@ -239,11 +232,15 @@ public class BlockRedstoneJukebox extends BlockContainer
     @Override
     public void breakBlock(World par1World, int x, int y, int z, Block par5, int par6) 
     {
+        LogHelper.info("breakBlock()");
+        LogHelper.info("    Keep inventory - " + BlockRedstoneJukebox.keepMyInventory);
+        
         if (!BlockRedstoneJukebox.keepMyInventory) {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getTileEntity(x, y, z);
 
             if (teJukebox != null) {
-                //teJukebox.ejectAllAndStopPlaying(par1World, x, y, z);
+                teJukebox.ejectAll(par1World, x, y, z);
+                par1World.func_147453_f(x, y, z, par5);
             }
         }
 
@@ -252,18 +249,168 @@ public class BlockRedstoneJukebox extends BlockContainer
 
 
     /**
-     * Called when a tile entity on a side of this block changes is created or is destroyed.
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor Block
      * 
      */
     @Override
-    public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) 
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) 
     {
-        // Forces the Tile Entity to update it's state (inspired by BuildCraft)
-        TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
-        if (teJukebox != null) {
-            //teJukebox.checkRedstonePower();
+        if (!world.isRemote) {
+            //TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+            
+            LogHelper.info("onNeighborChange()");
+            //LogHelper.info("    " + teJukebox);
+            
+            boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+            int tickRate = 4;
+            
+            if (this.isActive && !haveEnergy) {
+                // Schedule the shut down of the jukebox
+                world.scheduleBlockUpdate(x, y, z, this, tickRate);
+            }
+            else if (!this.isActive && haveEnergy) {
+                // Turns the jukebox on
+                BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
+            }
+
+            /*
+            if (teJukebox != null) {
+                teJukebox.checkRedstonePower();
+            }
+            */
         }
     }
     
+    
+    /**
+     * Ticks the block if it's been scheduled
+     */
+    @Override
+    public void updateTick(World world, int x, int y, int z, Random random)
+    {
+        LogHelper.info("updateTick()");
+        
+        boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+        
+        if (!world.isRemote && this.isActive && !haveEnergy)
+        {
+            // Shut down the jukebox
+            BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
+        }
+    }    
+    
+
+    
+    
+    
+    //--------------------------------------------------------------------
+    //  Custom World Events
+    //--------------------------------------------------------------------
+
+    /**
+     * Update which block ID the jukebox is using depending on whether or not it is playing.
+     * 
+     * Triggered by the Tile Entity when it detects changes.
+     */
+    public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z) {
+        LogHelper.info("updateJukeboxBlockState()");
+        LogHelper.info("    " + active);
+        
+        // get the TileEntity so it won't be reset
+        TileEntity teJukebox = world.getTileEntity(x, y, z);
+        int metadata = world.getBlockMetadata(x, y, z);
+        
+        LogHelper.info("    meta " + metadata);
+
+        // change the block type (without keepMyInventory, Tile Entity would be reset)
+        BlockRedstoneJukebox.keepMyInventory = true;
+        if (active) {
+            world.setBlock(x, y, z, MyBlocks.redstoneJukeboxActive);
+        } else {
+            world.setBlock(x, y, z, MyBlocks.redstoneJukebox);
+        }
+        BlockRedstoneJukebox.keepMyInventory = false;
+
+        // Don't know what this does for sure. I think the flag "2" sends update to client
+        world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+        
+        // Recover the Tile Entity
+        if (teJukebox != null) {
+            teJukebox.validate();
+            world.setTileEntity(x, y, z, teJukebox);
+        }
+
+    }
+
+
+    /**
+     * Return the amount of extra range the jukebox will receive from near note blocks.
+     * 
+     * Each note block increases the range by 8.
+     */
+    public static int getAmplifierPower(World world, int x, int y, int z) {
+        int amp = 0;
+
+
+        // check an area of 5x5x3 around the block looking for note blocks
+        for (int i = x - 2; i <= x + 2; ++i) {
+            for (int k = z - 2; k <= z + 2; ++k) {
+                for (int j = y - 1; j <= y + 1; ++j) {
+
+                    if (i != 0 || k != 0 || j != 0) {
+                        // look for note blocks
+                        if (world.getBlock(i, j, k) == Blocks.noteblock) {
+                            amp += 8;
+                            if (amp >= ModRedstoneJukebox.maxExtraVolume) return ModRedstoneJukebox.maxExtraVolume;
+                        }
+                    }
+
+                } // for j
+            } // for k
+        } // for i
+
+
+        return amp;
+    }
+    
+    
+    
+    
+    
+    
+    //--------------------------------------------------------------------
+    //  Redstone logic
+    //--------------------------------------------------------------------
+
+    /**
+     * Can this block provide power. Only wire currently seems to have this change based on its state.
+     */
+    @Override
+    public boolean canProvidePower() {
+        return false;
+    }
+    
+    
+    /**
+     * If this returns true, then comparators facing away from this block will use the value from
+     * getComparatorInputOverride instead of the actual redstone signal strength.
+     */
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+    
+    
+    /**
+     * If hasComparatorInputOverride returns true, the return value from this is used instead of the redstone signal
+     * strength when this block inputs to a comparator.
+     */
+    @Override
+    public int getComparatorInputOverride(World par1World, int x, int y, int z, int par5) {
+        TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getTileEntity(x, y, z);
+        return teJukebox == null ? 0 : teJukebox.isActive() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
+    }
+        
     
 }

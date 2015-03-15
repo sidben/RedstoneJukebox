@@ -1,5 +1,8 @@
 package sidben.redstonejukebox.tileentity;
 
+import sidben.redstonejukebox.block.BlockRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemRecord;
@@ -10,6 +13,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 
 
 
@@ -21,7 +25,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //--------------------------------------------------------------------
 
     // -- The delay (in ticks) before a "isPlaying" check
-    private static int  maxDelay               = 20;
+    private static int  maxDelay               = 60;
     public int          delay                  = TileEntityRedstoneJukebox.maxDelay;
 
     // -- Items of this jukebox
@@ -330,6 +334,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     
     // TODO: check if overriding [canUpdate] for the inactive jukebox is a good idea
+
+    
+    //--------------------------------------------------------------------
+    //      Events
+    //--------------------------------------------------------------------
     
     /**
      * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
@@ -341,23 +350,26 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         if (!this.worldObj.isRemote) {
 
             if (this.delay > 0) {
+                //LogHelper.info("TileEntityRedstoneJukebox.updateEntity() - Delay: " + this.delay);
+                
                 // Delay counter, this method's checks are not made every tick.
                 --this.delay;
                 return;
             }
             else {
                 // Debug
-                // ModRedstoneJukebox.logDebugInfo("TileEntityRedstoneJukebox.updateEntity() - Active: " + this.isActive + " - Playing: " + this.isPlayingNow + " - Force Stop: " + this.forceStop);
+                LogHelper.info("TileEntityRedstoneJukebox.updateEntity() - Active: " + this.isActive + " - Playing: " + this.isPlayingNow + " - Force Stop: " + this.forceStop);
 
                 // Resets the delay
                 this.delay = TileEntityRedstoneJukebox.maxDelay;
 
 
+                /*
                 // If it's not active and not playing, just return
                 if (!this.isActive() && !this.isPlayingNow) return;
+                
 
                 // Updates the state of the tile entity and the block, if needed
-                /*
                  *TODO: reimplement
                 if (this.forceStop || !this.isActive() && this.isPlayingNow) {
                     this.markAsStopped();
@@ -375,6 +387,19 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 }
                 */
 
+                /*
+                if (this.isActive() && !this.isPlayingNow) {
+                    BlockRedstoneJukebox.updateJukeboxBlockState(true, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+                    this.isPlayingNow = true;
+                    return;
+                }
+                else if (!this.isActive() && this.isPlayingNow) {
+                    BlockRedstoneJukebox.updateJukeboxBlockState(false, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+                    this.isPlayingNow = false;
+                    return;
+                }
+                */
+                
             }
 
         }
@@ -390,6 +415,48 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //--------------------------------------------------------------------
     //      This is where the groove starts :)
     //--------------------------------------------------------------------
+
+    public void checkRedstonePower() {
+        boolean hasEnergy = this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord);
+        boolean canUseEnergy = false;
+
+
+        // When the jukebox is on "Force Stop" mode, it requires a redstone reset, meaning it has to
+        // be de-powered before activating again.
+        if (this.forceStop) {
+            if (!hasEnergy) {
+                this.forceStop = false;
+            }
+
+        }
+        else {
+            // only activates power if contains a record
+            if (hasEnergy) {
+
+                ItemStack r;
+                for (int c = 0; c < this.getSizeInventory(); ++c) {
+                    r = this.getStackInSlot(c);
+                    if (r != null) {
+                        canUseEnergy = true;  // found a record! (the slots only accept records, no need to check item type)
+                        break;
+                    }
+                }
+
+            }
+        }
+
+        
+
+        // Debug
+        LogHelper.info("TileEntityRedstoneJukebox.checkRedstonePower()");
+        LogHelper.info("    Force stop:     " + this.forceStop);
+        LogHelper.info("    Has energy:     " + hasEnergy);
+        LogHelper.info("    Can use energy: " + canUseEnergy);
+
+
+        this.isActive = hasEnergy && canUseEnergy;
+    }
+    
     
     // Returns if this Jukebox is playing a record.
     public boolean isActive() {
@@ -408,4 +475,46 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         return this.currentJukeboxPlaySlot;
     }
 
+    
+    
+    
+    /**
+     * Eject all records to the world.
+     * 
+     */
+    public void ejectAll(World world, int x, int y, int z) {
+        for (int i1 = 0; i1 < this.getSizeInventory(); ++i1) {
+            ItemStack item = this.getStackInSlot(i1);
+
+            if (item != null) {
+                float f1 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
+                float f2 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
+                float f3 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
+
+                while (item.stackSize > 0) {
+                    int j1 = this.worldObj.rand.nextInt(21) + 10;
+
+                    if (j1 > item.stackSize) {
+                        j1 = item.stackSize;
+                    }
+
+                    item.stackSize -= j1;
+                    EntityItem entityitem = new EntityItem(world, x + f1, y + f2, z + f3, new ItemStack(item.getItem(), j1, item.getItemDamage()));
+
+                    if (item.hasTagCompound()) {
+                        entityitem.getEntityItem().setTagCompound((NBTTagCompound) item.getTagCompound().copy());
+                    }
+
+                    float f4 = 0.05F;
+                    entityitem.motionX = (float) this.worldObj.rand.nextGaussian() * f4;
+                    entityitem.motionY = (float) this.worldObj.rand.nextGaussian() * f4 + 0.2F;
+                    entityitem.motionZ = (float) this.worldObj.rand.nextGaussian() * f4;
+                    world.spawnEntityInWorld(entityitem);
+                }
+            }
+        }
+
+    }
+    
+    
 }

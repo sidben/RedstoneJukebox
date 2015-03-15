@@ -24,6 +24,7 @@ public class MyBlocks
         redstoneJukeboxActive = (BlockRedstoneJukebox) new BlockRedstoneJukebox(true).setLightLevel(0.75F);
         
         GameRegistry.registerBlock(redstoneJukebox, "RedstoneJukeboxBlock");
+        GameRegistry.registerBlock(redstoneJukeboxActive, "RedstoneJukeboxActiveBlock");
         
 
         // Tile Entities

@@ -240,7 +240,6 @@ public class BlockRedstoneJukebox extends BlockContainer
 
             if (teJukebox != null) {
                 teJukebox.ejectAll(par1World, x, y, z);
-                // par1World.func_147453_f(x, y, z, par5);
             }
         }
 
@@ -257,23 +256,26 @@ public class BlockRedstoneJukebox extends BlockContainer
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) 
     {
         if (!world.isRemote) {
-            //TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
             
             LogHelper.info("onNeighborChange()");
             //LogHelper.info("    " + teJukebox);
             
             boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+            boolean jukeboxActive = teJukebox.isActive();
             int tickRate = 4;
             
             LogHelper.info("    haveEnergy " + haveEnergy);
             LogHelper.info("    isActive " + this.isActive);
+            LogHelper.info("    finished " + teJukebox.finishedPlayingAllRecords());
+            LogHelper.info("    juke active " + jukeboxActive);
             LogHelper.info("    Block " + block);
             
             if (this.isActive && !haveEnergy) {
                 // Schedule the shut down of the jukebox
                 world.scheduleBlockUpdate(x, y, z, this, tickRate);
             }
-            else if (!this.isActive && haveEnergy) {
+            else if (!this.isActive && haveEnergy && !teJukebox.finishedPlayingAllRecords()) {
                 // Turns the jukebox on
                 BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
             }
@@ -295,9 +297,12 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         LogHelper.info("updateTick()");
         
+        TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
         boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+        boolean jukeboxActive = teJukebox.isActive();
+        //boolean finished = teJukebox.finishedPlayingAllRecords();
         
-        if (!world.isRemote && this.isActive && !haveEnergy)
+        if (!world.isRemote && this.isActive && (!haveEnergy || !jukeboxActive))
         {
             // Shut down the jukebox
             BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
@@ -328,15 +333,16 @@ public class BlockRedstoneJukebox extends BlockContainer
         // change the block type (without keepMyInventory, Tile Entity would be reset)
         BlockRedstoneJukebox.keepMyInventory = true;
         if (active) {
-            world.setBlock(x, y, z, MyBlocks.redstoneJukeboxActive);
+            world.setBlock(x, y, z, MyBlocks.redstoneJukeboxActive, 1, 3);
         } else {
-            world.setBlock(x, y, z, MyBlocks.redstoneJukebox);
+            world.setBlock(x, y, z, MyBlocks.redstoneJukebox, 0, 3);
         }
         BlockRedstoneJukebox.keepMyInventory = false;
 
 
         // Don't know what this does for sure. I think the flag "2" sends update to client
-        // world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+        //int metadata = active ? 1 : 0;
+        //world.setBlockMetadataWithNotify(x, y, z, metadata, 2);
 
 
         // Recover the Tile Entity
@@ -355,33 +361,13 @@ public class BlockRedstoneJukebox extends BlockContainer
              */
             teJukebox.validate();
             world.setTileEntity(x, y, z, teJukebox);
+            if (active) {
+                ((TileEntityRedstoneJukebox) teJukebox).startPlaying();
+            } else {
+                ((TileEntityRedstoneJukebox) teJukebox).stopPlaying();
+            }
         }
 
-        
-        /*
-        int metadata = world.getBlockMetadata(x, y, z);
-        
-        LogHelper.info("    meta " + metadata);
-
-        // change the block type (without keepMyInventory, Tile Entity would be reset)
-        BlockRedstoneJukebox.keepMyInventory = true;
-        if (active) {
-            world.setBlock(x, y, z, MyBlocks.redstoneJukeboxActive);
-        } else {
-            world.setBlock(x, y, z, MyBlocks.redstoneJukebox);
-        }
-        BlockRedstoneJukebox.keepMyInventory = false;
-
-        // Don't know what this does for sure. I think the flag "2" sends update to client
-        world.setBlockMetadataWithNotify(x, y, z, 0, 2);
-        
-        // Recover the Tile Entity
-        if (teJukebox != null) {
-            teJukebox.validate();
-            world.setTileEntity(x, y, z, teJukebox);
-        }
-
-         */
     }
 
 

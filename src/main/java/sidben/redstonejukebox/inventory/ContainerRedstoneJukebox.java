@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.inventory;
 
+import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -93,7 +94,7 @@ public class ContainerRedstoneJukebox extends Container
             }
             else {
                 // send a record to the jukebox
-                if (SlotRedstoneJukeboxRecord.isRecord(myStack)) {
+                if (MusicHelper.isRecord(myStack)) {
                     if (!this.mergeItemStack(myStack, 0, 8, false)) return null;
                 }
                 else

@@ -259,15 +259,18 @@ public class BlockRedstoneJukebox extends BlockContainer
             LogHelper.info("onNeighborChange()");
             
             boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
 
 
             if (this.isActive && !haveEnergy) {
                 // Turns the jukebox off
                 BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
+                teJukebox.updateJukeboxTileState(haveEnergy);
             }
             else if (!this.isActive && haveEnergy) {
                 // Turns the jukebox on
                 BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
+                teJukebox.updateJukeboxTileState(haveEnergy);
             }
 
             
@@ -309,6 +312,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Ticks the block if it's been scheduled
      */
+    /*
     @Override
     public void updateTick(World world, int x, int y, int z, Random random)
     {
@@ -324,7 +328,8 @@ public class BlockRedstoneJukebox extends BlockContainer
             // Shut down the jukebox
             BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
         }
-    }    
+    } 
+    */   
     
 
     
@@ -455,7 +460,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     @Override
     public int getComparatorInputOverride(World par1World, int x, int y, int z, int par5) {
         TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getTileEntity(x, y, z);
-        return teJukebox == null ? 0 : teJukebox.isActive() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
+        return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
     }
         
     

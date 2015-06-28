@@ -23,7 +23,7 @@ public class MusicHelper
 
         // TODO: actual code
         int seconds = 5;
-        return seconds * 20;
+        return seconds; //* 20;
     }
 
 

@@ -189,7 +189,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
         // -- current record indicator (blue note)
-        if (this.jukeboxInventory.isActive()) {
+        if (this.jukeboxInventory.isPlaying()) {
 
             switch (this.jukeboxInventory.getCurrentJukeboxPlaySlot()) {
             case 0:

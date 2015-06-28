@@ -15,6 +15,25 @@ import net.minecraft.world.World;
 public class MusicHelper
 {
     
+    private static MusicCollectionItem[] recordCollection = { 
+        new MusicCollectionItem(Items.record_13, 178),
+        new MusicCollectionItem(Items.record_cat, 185),
+        new MusicCollectionItem(Items.record_blocks, 345),
+        new MusicCollectionItem(Items.record_chirp, 185),
+        new MusicCollectionItem(Items.record_far, 174),
+        new MusicCollectionItem(Items.record_mall, 197),
+        new MusicCollectionItem(Items.record_mellohi, 96),
+        new MusicCollectionItem(Items.record_stal, 150),
+        new MusicCollectionItem(Items.record_strad, 188),
+        new MusicCollectionItem(Items.record_ward, 251),
+        new MusicCollectionItem(Items.record_11, 71),
+        new MusicCollectionItem(Items.record_wait, 238)
+    };
+    
+    
+
+    
+    
     public static boolean isRecord(ItemStack s) {
         return s != null && s.getItem() instanceof ItemRecord;
     }
@@ -24,27 +43,14 @@ public class MusicHelper
     {
         if (!isRecord(s)) return 0;
 
-        // TODO: actual code
-        int seconds = 5;
-        return seconds; //* 20;
+        for (int i=0; i < recordCollection.length; i++)
+        {
+            if (s.getItem() == recordCollection[i].record) return recordCollection[i].time; 
+        }
+
+        return 0;
     }
     
-    
-    
-    private static Item[] recordCollection = { 
-        Items.record_13,
-        Items.record_cat,
-        Items.record_blocks,
-        Items.record_chirp,
-        Items.record_far,
-        Items.record_mall,
-        Items.record_mellohi,
-        Items.record_stal,
-        Items.record_strad,
-        Items.record_ward,
-        Items.record_11,
-        Items.record_wait
-    };
     
     
     /**
@@ -55,10 +61,9 @@ public class MusicHelper
     {
         if (index >= 0 && index < recordCollection.length) 
         {
-            ItemRecord record = (ItemRecord)recordCollection[index];
+            ItemRecord record = (ItemRecord)recordCollection[index].record;
             world.playAuxSFXAtEntity(null, 1005, x, y, z, Item.getIdFromItem(record));
         }
-        
     }
     
     
@@ -72,12 +77,29 @@ public class MusicHelper
         {
             for (int i=0; i < recordCollection.length; i++)
             {
-                if (s.getItem() == recordCollection[i]) return i; 
+                if (s.getItem() == recordCollection[i].record) return i; 
             }
         }
         
         return -1;
     }
 
+    
+    
+    
+    
+    static class MusicCollectionItem
+    {
+        Item record;
+        int time;
+        
+        
+        public MusicCollectionItem(Item pRecord, int pTime)
+        {
+            this.record = pRecord;
+            this.time = pTime;
+        }
+    }
+    
 
 }

@@ -79,8 +79,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     */
 
 
-    /** Amount of ticks that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer */
-    private static int  songInterval = 1;
+    /** Amount of seconds that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer */
+    private static int  songInterval = 2;
     
     /** Timer of the song being played */
     public int          songTimer    = 0;
@@ -101,6 +101,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private final int actionPlayVanillaRecord = 5;
     
     
+    // TODO: Persistence of the playlist order on world reload
+    // TODO: Make the music stop 
     
 
     

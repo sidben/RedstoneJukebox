@@ -20,6 +20,7 @@ public class NetworkHelper
     
     /**
      * Tracks an update on the Redstone Jukebox GUI.
+     * 
      * Client -> Server
      */
     public static void sendJukeboxGUIUpdatedMessage(TileEntityRedstoneJukebox teJukebox) 
@@ -31,6 +32,25 @@ public class NetworkHelper
         
     }
     
+
+    /**
+     * Notifies the client that the Jukebox should start playing the record on
+     * the informed slot. In case the slot is -1, it should stop playing.
+     * 
+     * Server -> Client
+     */
+    /*
+    public static void sendJukeboxPlaySlotMessage(TileEntityRedstoneJukebox teJukebox) 
+    {
+        if (teJukebox == null) return;
+        
+        JukeboxPlaySlotMessage message = new JukeboxPlaySlotMessage(teJukebox);
+        TargetPoint target = new TargetPoint(teJukebox.blockType.get, golem.posX, golem.posY, golem.posZ, 64.0D);
+
+        ModRedstoneJukebox.NetworkWrapper.sendToAllAround(message, point);
+        
+    }
+    */
 
     
     

@@ -2,6 +2,7 @@ package sidben.redstonejukebox.client.gui;
 
 import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.relauncher.*;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
@@ -27,6 +28,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     private static int                danceNoteSpeed  = 2;
     private static int[]              danceNoteArrayX = { 0, 1, 2, 1, 0, -1, -2, -1 };
     private static int[]              danceNoteArrayY = { 0, 0, 1, 0, 0, 0, 1, 0 };
+    private static int[]              danceNoteSlotPaddingX = { 27, 46, 64, 82, 100, 118, 136, 154 };
     private int                       danceNoteFrame  = 0;
     private int                       danceNoteCount  = 0;
 
@@ -186,12 +188,21 @@ public class GuiRedstoneJukebox extends GuiContainer
         this.drawTexturedModalRect(j, k, 0, 0, this.xSize, this.ySize);
 
 
-
+        /*
+        LogHelper.info("GUI");
+        LogHelper.info("    isPlaying():  " + this.jukeboxInventory.isPlaying());
+        LogHelper.info("    slot:         " + this.jukeboxInventory.getCurrentJukeboxPlaySlot());
+        */
+        
 
         // -- current record indicator (blue note)
-        if (this.jukeboxInventory.isPlaying()) {
+        byte auxSlot = this.jukeboxInventory.getCurrentJukeboxPlaySlot();
+        if (auxSlot >= 0 && auxSlot <= 7) {
+            this.drawTexturedModalRect(j + GuiRedstoneJukebox.danceNoteArrayX[this.danceNoteFrame] + GuiRedstoneJukebox.danceNoteSlotPaddingX[auxSlot], k + GuiRedstoneJukebox.danceNoteArrayY[this.danceNoteFrame] + 26, 176, 1, 12, 10);
 
-            switch (this.jukeboxInventory.getCurrentJukeboxPlaySlot()) {
+            
+/*            
+            switch (auxSlot) {
             case 0:
                 this.drawTexturedModalRect(j + GuiRedstoneJukebox.danceNoteArrayX[this.danceNoteFrame] + 27, k + GuiRedstoneJukebox.danceNoteArrayY[this.danceNoteFrame] + 26, 176, 1, 12, 10);
                 break;
@@ -217,7 +228,7 @@ public class GuiRedstoneJukebox extends GuiContainer
                 this.drawTexturedModalRect(j + GuiRedstoneJukebox.danceNoteArrayX[this.danceNoteFrame] + 154, k + GuiRedstoneJukebox.danceNoteArrayY[this.danceNoteFrame] + 26, 176, 1, 12, 10);
                 break;
             }
-
+*/
         }
 
 

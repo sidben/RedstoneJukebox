@@ -46,7 +46,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public boolean      paramLoop                 = false;
 
     /** Array with the order in which the records will play (playlist). used for the shuffle option. */
-    private int[]       playOrder              = new int[8];
+    private byte[]       playOrder              = new byte[8];
 
 
     /** Indicates if the block is being powered */
@@ -67,7 +67,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private int         currentIndex        = -1;
 
     /** Slot of the jukebox with the current playing record. */
-    private int         currentJukeboxPlaySlot = -1;
+    private byte       currentJukeboxPlaySlot = -1;
 
     /*
     // -- Slot to play next. OBS: this var refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
@@ -307,8 +307,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-//        sidben.redstonejukebox.helper.LogHelper.info("onDataPacket()");
-//        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        sidben.redstonejukebox.helper.LogHelper.info("onDataPacket()");
+        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
 
         // Read NBT packet from the server
         NBTTagCompound tag = packet.func_148857_g();
@@ -317,7 +317,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.paramLoop = tag.getBoolean("Loop");
 
         // Extra info
-        this.currentJukeboxPlaySlot = tag.getShort("JukeboxPlaySlot");
+        this.currentJukeboxPlaySlot = tag.getByte("JukeboxPlaySlot");
+
+        
+        sidben.redstonejukebox.helper.LogHelper.info("    PlayMode: " + this.paramPlayMode);
+        sidben.redstonejukebox.helper.LogHelper.info("    Loop:     " + this.paramLoop);
+        sidben.redstonejukebox.helper.LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
 
         
 //        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
@@ -329,8 +334,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * Gathers data into a packet that is to be sent to the client. Called on server only. 
      */
     public Packet getDescriptionPacket() {
-//        sidben.redstonejukebox.helper.LogHelper.info("getDescriptionPacket()");
-//        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        sidben.redstonejukebox.helper.LogHelper.info("getDescriptionPacket()");
+        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
 
         // Send the NBT Packet to client
         NBTTagCompound tag = new NBTTagCompound();
@@ -339,13 +344,18 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         tag.setBoolean("Loop", this.paramLoop);
 
         // Extra info (used in GUI)
-        tag.setShort("JukeboxPlaySlot", (short) this.getCurrentJukeboxPlaySlot());
+        tag.setByte("JukeboxPlaySlot", this.currentJukeboxPlaySlot);
         
         
-//        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
+        sidben.redstonejukebox.helper.LogHelper.info("    PlayMode: " + this.paramPlayMode);
+        sidben.redstonejukebox.helper.LogHelper.info("    Loop:     " + this.paramLoop);
+        sidben.redstonejukebox.helper.LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
+
+        
+        //        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
         
 
-        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, tag);
+        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
     }
 
     
@@ -462,10 +472,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                         if (this.paramLoop) {
                             // Must loop, start playing again
                             this.startPlaying();
-                            /*
                         } else {
-                            this.isPlaylistStarted = false;
-                            */
+                            // No loop, stops
+                            this.stopPlaying();
                         }
                         
                     }
@@ -557,6 +566,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.currentJukeboxPlaySlot = -1;
         this.songTimer = 0;
         this.isPlaylistStarted = false;
+
+        // Send update to clients
+        this.resync();
     }
 
     
@@ -587,6 +599,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             {
                 // Record found 
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
+                
+                // Send update to clients
+                this.resync();
                 
                 // To update comparators
                 this.worldObj.notifyBlockOfNeighborChange(this.xCoord - 1, this.yCoord, this.zCoord, this.getBlockType());
@@ -625,7 +640,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
         // adds the records with the regular order
-        for (int i = 0; i < this.playOrder.length; i++) {
+        for (byte i = 0; i < this.playOrder.length; i++) {
             this.playOrder[i] = i;
 
 
@@ -656,13 +671,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // Swaps the play order twice
             for (int i = 0; i < this.playOrder.length; i++) {
                 int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
-                int temp = this.playOrder[i];
+                byte temp = this.playOrder[i];
                 this.playOrder[i] = this.playOrder[randomPosition];
                 this.playOrder[randomPosition] = temp;
             }
             for (int i = 0; i < this.playOrder.length; i++) {
                 int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
-                int temp = this.playOrder[i];
+                byte temp = this.playOrder[i];
                 this.playOrder[i] = this.playOrder[randomPosition];
                 this.playOrder[randomPosition] = temp;
             }
@@ -738,9 +753,16 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
     // Returns the slot currently playing (of the jukebox).
-    public int getCurrentJukeboxPlaySlot() {
+    public byte getCurrentJukeboxPlaySlot() {
         return this.currentJukeboxPlaySlot;
     }
+
+    /*
+    // Sets the slot currently playing (of the jukebox).
+    public void setCurrentJukeboxPlaySlot(byte slot) {
+        this.currentJukeboxPlaySlot = slot;
+    }
+    */
 
     
     

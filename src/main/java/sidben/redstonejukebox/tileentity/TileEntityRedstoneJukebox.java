@@ -85,6 +85,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public int          songTimer    = 0;
     
     
+    // Flags to call some method without doing it recursively, I believe this will performe better.
+    private boolean flagPlayNextRecord = false;
+    private boolean flagStartPlaying = false;
+    private boolean flagStopPlaying = false;
+    
+    
 
     
     //--------------------------------------------------------------------
@@ -264,6 +270,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.paramPlayMode = par1NBTTagCompound.getShort("PlayMode");
         this.paramLoop = par1NBTTagCompound.getBoolean("Loop");
         this.isBlockPowered = par1NBTTagCompound.getBoolean("Powered");
+        this.isPlaylistStarted = par1NBTTagCompound.getBoolean("PlayStarted");
+        this.isPlaylistFinished = par1NBTTagCompound.getBoolean("PlayFinished");
     }
 
 
@@ -279,6 +287,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         par1NBTTagCompound.setShort("PlayMode", (short) this.paramPlayMode);
         par1NBTTagCompound.setBoolean("Loop", this.paramLoop);
         par1NBTTagCompound.setBoolean("Powered", this.isBlockPowered);
+        par1NBTTagCompound.setBoolean("PlayStarted", this.isPlaylistStarted);
+        par1NBTTagCompound.setBoolean("PlayFinished", this.isPlaylistFinished);
         NBTTagList nbttaglist = new NBTTagList();
 
         // TODO: add custom name
@@ -313,6 +323,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         // Read NBT packet from the server
         NBTTagCompound tag = packet.func_148857_g();
 
+        // Main parameters
         this.paramPlayMode = tag.getShort("PlayMode");
         this.paramLoop = tag.getBoolean("Loop");
 
@@ -340,6 +351,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         // Send the NBT Packet to client
         NBTTagCompound tag = new NBTTagCompound();
 
+        // Main parameters
         tag.setShort("PlayMode", this.paramPlayMode);
         tag.setBoolean("Loop", this.paramLoop);
 
@@ -373,14 +385,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.isBlockPowered = haveEnergy;
         if (!haveEnergy) 
         {
-            // Resets the playlist status when the block is unpowered
+            //this.stopPlaying();
+            this.flagStopPlaying = true;
+
+            // Resets the playlist status ONLY when the block is unpowered
             this.isPlaylistStarted = false;
             this.isPlaylistFinished = false;
         } 
         else 
         {
-            // Makes the update timer activate on the next check 
-            this.ratioTimer = 0;      
+            //this.startPlaying();
+            this.flagStartPlaying = true;
         }
     }
     
@@ -394,6 +409,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     }
     */
     
+    private void ResetPlayFlags()
+    {
+        this.flagPlayNextRecord = false;
+        this.flagStartPlaying = false;
+        this.flagStopPlaying = false;
+    }
+    
+    
+    
     
     /**
      * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
@@ -404,8 +428,24 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         if (!this.worldObj.isRemote) {
 
+            /*
+             * Special cases where the code must execute some scheduled methods.
+             */
+            if (this.flagStopPlaying) {
+                this.stopPlaying();
+            } else if (this.flagStartPlaying) {
+                this.startPlaying();
+            } else if(this.flagPlayNextRecord) {
+                this.playNextRecord();
+            }
+            this.ResetPlayFlags();
+            
+            
+            
             // Only process the method when the block is powered and didn't finish the playlist
-            if (!this.isBlockPowered || (this.isPlaylistFinished && !this.paramLoop)) return;
+            //if (!this.isBlockPowered || (this.isPlaylistFinished && !this.paramLoop)) return;
+            // if (!this.isBlockPowered || !this.isPlaying()) return;
+            if (!this.isBlockPowered) return;
             
             
             
@@ -422,6 +462,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             }
             
 
+            
+       
+            
+            
+            
             /*
              * Only executes the checks at the given ratio (default = 20 ticks = 1 second)
              */
@@ -448,9 +493,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 
                 // Debug
                 LogHelper.info("TileEntityRedstoneJukebox.updateEntity()");
-                LogHelper.info("    started  " + this.isPlaylistStarted);
-                LogHelper.info("    finished " + this.isPlaylistFinished);
-                LogHelper.info("    loop     " + this.paramLoop);
+                LogHelper.info("    started   " + this.isPlaylistStarted);
+                LogHelper.info("    finished  " + this.isPlaylistFinished);
+                LogHelper.info("    isPlaying " + this.isPlaying());
+                LogHelper.info("    loop      " + this.paramLoop);
                 LogHelper.info("    song timer: " + this.songTimer);
                 /*
                 LogHelper.info("    block active " + isBlockActive);
@@ -463,9 +509,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 //TODO: this must execute once per tick, can't have a ratio timer
                 // (is this comment still valid? Maybe because of the song timer?)
                 
-                
+/*
                 if (this.isPlaylistStarted) 
                 {
+*/
+/*                
                     if (this.isPlaylistFinished) 
                     {
                         // Reached the end of the playlist, should loop or shut down?
@@ -480,23 +528,28 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                     }
                     else 
                     {
+*/
+                    if (!this.isPlaylistFinished)
+                    {
                         // Still playing, check song timer
                         if (this.songTimer > 0) {
                             // Still counting...
                             --this.songTimer;
                         } else {
                             // Time to play the next record
-                            this.playNextRecord();
+                            // this.playNextRecord();
+                            this.flagPlayNextRecord = true;
                         }
                         
                     }
-                    
+                
+/*                    
                 } // isPlaylistStarted
                 else 
                 {
                     this.startPlaying();
                 }
-
+*/
 
                 /*
                 // Notify the block it needs to update
@@ -553,19 +606,22 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         if (this.isEmpty()) return;
         this.isPlaylistFinished = false;
         this.isPlaylistStarted = true;
+        this.ratioTimer = 0;      
         this.setPlaylistOrder();
-        this.playNextRecord();
+
+        // this.playNextRecord();
+        this.flagPlayNextRecord = true;
     }
     
 
     public void stopPlaying() {
         LogHelper.info("== TileEntityRedstoneJukebox.stopPlaying() ==");
 
-        this.isPlaylistFinished = true;
+        // this.isPlaylistFinished = true;
         this.currentIndex = -1;
         this.currentJukeboxPlaySlot = -1;
         this.songTimer = 0;
-        this.isPlaylistStarted = false;
+        // this.isPlaylistStarted = false;
 
         // Send update to clients
         this.resync();
@@ -584,6 +640,14 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         {
             // Reached the end
             this.isPlaylistFinished = true;
+            
+            if (this.paramLoop) {
+                // Must loop, start playing again
+                this.flagStartPlaying = true;
+            } else {
+                // No loop, stops
+                this.flagStopPlaying = true;
+            }            
         }
         else if (this.currentIndex >= 0 && this.currentIndex <= 7)
         {
@@ -612,7 +676,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             else
             {
                 // if it's not a valid record, skip to the next one
-                this.playNextRecord();
+                // this.playNextRecord();
+                this.flagPlayNextRecord = true;
             }
             
         }
@@ -742,7 +807,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     // Returns if this Jukebox is playing a record.
     public boolean isPlaying() {
-        return this.isPlaylistStarted && !this.isPlaylistFinished;
+        return this.isPlaylistStarted && (!this.isPlaylistFinished || this.paramLoop);
     }
     
     

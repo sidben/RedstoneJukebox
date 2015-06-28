@@ -89,25 +89,25 @@ public class GuiRedstoneJukebox extends GuiContainer
             switch (par1GuiButton.id) {
             case 0:
                 // Loop command: no loop
-                this.jukeboxInventory.isLoop = false;
+                this.jukeboxInventory.paramLoop = false;
                 this.changed = true;
                 break;
 
 
             case 1:
                 // Loop command: with loop
-                this.jukeboxInventory.isLoop = true;
+                this.jukeboxInventory.paramLoop = true;
                 this.changed = true;
                 break;
 
 
             case 2:
                 // Swap play mode (shuffle / normal)
-                if (this.jukeboxInventory.playMode == 0) {
-                    this.jukeboxInventory.playMode = 1;
+                if (this.jukeboxInventory.paramPlayMode == 0) {
+                    this.jukeboxInventory.paramPlayMode = 1;
                 }
                 else {
-                    this.jukeboxInventory.playMode = 0;
+                    this.jukeboxInventory.paramPlayMode = 0;
                 }
                 this.changed = true;
                 break;
@@ -143,7 +143,7 @@ public class GuiRedstoneJukebox extends GuiContainer
             this.drawCreativeTabHoveringText("Play records in loop", x - this.guiLeft, y - this.guiTop + 21);
         }
         else if (btPlaymode.func_146115_a()) {
-            switch (this.jukeboxInventory.playMode) {
+            switch (this.jukeboxInventory.paramPlayMode) {
             case 0:
                 this.drawCreativeTabHoveringText("Play mode: In order", x - this.guiLeft, y - this.guiTop + 21);
                 break;
@@ -222,7 +222,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
 
         // -- loop indicator
-        if (this.jukeboxInventory.isLoop) {
+        if (this.jukeboxInventory.paramLoop) {
             // play loop
             this.drawTexturedModalRect(j + 35, k + 42, 176, 21, 18, 21);
         }
@@ -242,7 +242,7 @@ public class GuiRedstoneJukebox extends GuiContainer
         iRender.zLevel = 100.0F;
 
 
-        switch (this.jukeboxInventory.playMode) {
+        switch (this.jukeboxInventory.paramPlayMode) {
         case 0:
             // normal
             iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 0, k + pStartY);

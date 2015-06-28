@@ -256,6 +256,22 @@ public class BlockRedstoneJukebox extends BlockContainer
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) 
     {
         if (!world.isRemote) {
+            LogHelper.info("onNeighborChange()");
+            
+            boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+
+
+            if (this.isActive && !haveEnergy) {
+                // Turns the jukebox off
+                BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
+            }
+            else if (!this.isActive && haveEnergy) {
+                // Turns the jukebox on
+                BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
+            }
+
+            
+            /*
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
             
             LogHelper.info("onNeighborChange()");
@@ -279,6 +295,7 @@ public class BlockRedstoneJukebox extends BlockContainer
                 // Turns the jukebox on
                 BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
             }
+            */
 
             /*
             if (teJukebox != null) {
@@ -361,11 +378,13 @@ public class BlockRedstoneJukebox extends BlockContainer
              */
             teJukebox.validate();
             world.setTileEntity(x, y, z, teJukebox);
+            /*
             if (active) {
                 ((TileEntityRedstoneJukebox) teJukebox).startPlaying();
             } else {
                 ((TileEntityRedstoneJukebox) teJukebox).stopPlaying();
             }
+            */
         }
 
     }

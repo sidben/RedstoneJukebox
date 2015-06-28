@@ -32,8 +32,8 @@ public class JukeboxGUIUpdatedMessage implements IMessage
     }
 
     public JukeboxGUIUpdatedMessage(TileEntityRedstoneJukebox teJukebox) {
-        this.isLoop = teJukebox.isLoop;
-        this.playMode = teJukebox.playMode;
+        this.isLoop = teJukebox.paramLoop;
+        this.playMode = teJukebox.paramPlayMode;
         this.x = teJukebox.xCoord;
         this.y = teJukebox.yCoord;
         this.z = teJukebox.zCoord;
@@ -50,8 +50,8 @@ public class JukeboxGUIUpdatedMessage implements IMessage
         TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
         if (teCandidate instanceof TileEntityRedstoneJukebox) {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
-            teJukebox.isLoop = this.isLoop;
-            teJukebox.playMode = this.playMode;
+            teJukebox.paramLoop = this.isLoop;
+            teJukebox.paramPlayMode = this.playMode;
             // teJukebox.markDirty();
             teJukebox.resync();
         }

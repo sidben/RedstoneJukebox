@@ -27,41 +27,42 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //      Constants and Variables
     //--------------------------------------------------------------------
 
-    // -- The delay (in ticks) before a "isPlaying" check
-    /*
-    private static int  ratio               = 1;   // default 20
+    /** The delay (in ticks) before a update check */
+    private static int  ratio               = 20;
+    
+    /** Counter for the update delay timer */
     public int          ratioTimer                  = TileEntityRedstoneJukebox.ratio;
-    */
+
+    
     private int         lastUpdateTick         = 0;
 
-    // -- Items of this jukebox
+    /** Items of this jukebox */
     private ItemStack[] jukeboxItems        = new ItemStack[8];
     
-    // -- Play mode
-    /*
-     * 0 = Simple (in order)
-     * 1 = Shuffle
-     */
-    public short          playMode               = 0;
+    /** Play mode:  0 = Simple (in order) / 1 = Shuffle */
+    public short          paramPlayMode               = 0;
 
-    // -- Indicates if it should loop when reach the end of a playlist
-    public boolean      isLoop                 = false;
+    /** Indicates if it should loop when reach the end of a playlist */
+    public boolean      paramLoop                 = false;
 
-    // -- Array with the order in which the records will play (playlist). used for the shuffle option.
+    /** Array with the order in which the records will play (playlist). used for the shuffle option. */
     private int[]       playOrder              = new int[8];
 
-    // -- Indicates if this jukebox started to play a playlist
-    private boolean     isActive               = false;
+    /** Indicates if this jukebox started to play a playlist */
+    private boolean     isPlaylistStarted               = false;
+
+    /** Used to detect when the jukebox finished playing all records */
+    private boolean     isPlaylistFinished = false;
 
     /*
     // -- Indicates if a record of this jukebox is being played right now
     private boolean     isPlayingNow           = false;
     */
 
-    // -- Slot currently playing. OBS: this refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
+    /** Slot currently playing. This refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox */
     private int         currentIndex        = -1;
 
-    // -- Slot of the jukebox with the current playing record.
+    /** Slot of the jukebox with the current playing record. */
     private int         currentJukeboxPlaySlot = -1;
 
     /*
@@ -72,12 +73,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private boolean     forceStop              = false;                             // -- Forces the jukebox stop.
     */
 
-    // Used to detect when the jukebox finished playing all records
-    private boolean finishedPlaylist = false;
 
+    /** Amount of ticks that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer */
+    private static int  songInterval = 10;
     
-    private static int  songInterval = 10;            // amount of ticks that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer
-    public int          songTimer             = 0;      // Timer of the song being played
+    /** Timer of the song being played */
+    public int          songTimer    = 0;
     
     
 
@@ -256,8 +257,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             }
         }
 
-        this.playMode = par1NBTTagCompound.getShort("PlayMode");
-        this.isLoop = par1NBTTagCompound.getBoolean("Loop");
+        this.paramPlayMode = par1NBTTagCompound.getShort("PlayMode");
+        this.paramLoop = par1NBTTagCompound.getBoolean("Loop");
     }
 
 
@@ -270,8 +271,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void writeToNBT(NBTTagCompound par1NBTTagCompound) {
         super.writeToNBT(par1NBTTagCompound);
         
-        par1NBTTagCompound.setShort("PlayMode", (short) this.playMode);
-        par1NBTTagCompound.setBoolean("Loop", this.isLoop);
+        par1NBTTagCompound.setShort("PlayMode", (short) this.paramPlayMode);
+        par1NBTTagCompound.setBoolean("Loop", this.paramLoop);
         NBTTagList nbttaglist = new NBTTagList();
 
         // TODO: add custom name
@@ -306,8 +307,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         // Read NBT packet from the server
         NBTTagCompound tag = packet.func_148857_g();
 
-        this.playMode = tag.getShort("PlayMode");
-        this.isLoop = tag.getBoolean("Loop");
+        this.paramPlayMode = tag.getShort("PlayMode");
+        this.paramLoop = tag.getBoolean("Loop");
 
         // Extra info
         this.currentJukeboxPlaySlot = tag.getShort("JukeboxPlaySlot");
@@ -328,8 +329,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         // Send the NBT Packet to client
         NBTTagCompound tag = new NBTTagCompound();
 
-        tag.setShort("PlayMode", this.playMode);
-        tag.setBoolean("Loop", this.isLoop);
+        tag.setShort("PlayMode", this.paramPlayMode);
+        tag.setBoolean("Loop", this.paramLoop);
 
         // Extra info (used in GUI)
         tag.setShort("JukeboxPlaySlot", (short) this.getCurrentJukeboxPlaySlot());
@@ -350,6 +351,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //--------------------------------------------------------------------
     //      Events
     //--------------------------------------------------------------------
+
+    @Override
+    public boolean canUpdate()
+    {
+        return false;
+    }
+
     
     /**
      * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
@@ -376,7 +384,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             /*
              * Only executes the checks at the given ratio (default = 20 ticks = 1 second)
              */
-            /*
             if (this.ratioTimer > 0) 
             {
                 --this.ratioTimer;
@@ -386,22 +393,21 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             {
                 // Resets the delay
                 this.ratioTimer = TileEntityRedstoneJukebox.ratio;
-             */
             
             
             
                 /*
                  * NOTE: [this.worldObj.getBlockMetadata(xCoord, yCoord, zCoord)] gives me the actual value, 
                  * I would use the [this.getBlockMetadata()] value of TileEntity, but it doesn't update
-                 * after the block changes.
+                 * after the block changes, so it gives me a wrong value.
                  */
-                boolean isBlockActive = (this.worldObj.getBlockMetadata(xCoord, yCoord, zCoord) == 1);
+                boolean isBlockPowered = (this.worldObj.getBlockMetadata(xCoord, yCoord, zCoord) == 1);
                 
                 
                 
-                /*
                 // Debug
                 LogHelper.info("TileEntityRedstoneJukebox.updateEntity()");
+                /*
                 LogHelper.info("    block active " + isBlockActive);
                 LogHelper.info("    active " + this.isActive);
                 LogHelper.info("    finished " + this.finishedPlaylist);
@@ -410,17 +416,18 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 */
 
                 //TODO: this must execute once per tick, can't have a ratio timer
+                // (is this comment still valid? Maybe because of the song timer?)
                 
                 
-                if (this.isActive) {
-                    if (this.finishedPlaylist) 
+                if (this.isPlaylistStarted) {
+                    if (this.isPlaylistFinished) 
                     {
                         // Reached the end of the playlist, should loop or shut down?
-                        if (this.isLoop) {
+                        if (this.paramLoop) {
                             // Must loop, start playing again
                             this.startPlaying();
                         } else {
-                            this.isActive = false;
+                            this.isPlaylistStarted = false;
                         }
                         
                     }
@@ -437,17 +444,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                         
                     }
                     
-                } // isActive
+                } // isPlaylistStarted
 
 
                 // Notify the block it needs to update
-                if (!this.isActive && isBlockActive) {
+                if (!this.isPlaylistStarted && isBlockPowered) {
                     // Block must stop
                     this.worldObj.scheduleBlockUpdate(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(), 4);
                 }
 
 
-//            } // ratio timer
+            } // ratio timer
 
             
             
@@ -482,8 +489,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * 
      */
     public boolean finishedPlayingAllRecords() {
-       if (this.isLoop) return false;
-       return this.finishedPlaylist;
+       if (this.paramLoop) return false;
+       return this.isPlaylistFinished;
     }
    
     
@@ -491,8 +498,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         LogHelper.info("== TileEntityRedstoneJukebox.startPlaying() ==");
         
         if (this.isEmpty()) return;
-        this.finishedPlaylist = false;
-        this.isActive = true;
+        this.isPlaylistFinished = false;
+        this.isPlaylistStarted = true;
         this.setPlaylistOrder();
         this.playNextRecord();
     }
@@ -501,11 +508,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void stopPlaying() {
         LogHelper.info("== TileEntityRedstoneJukebox.stopPlaying() ==");
 
-        this.finishedPlaylist = true;
+        this.isPlaylistFinished = true;
         this.currentIndex = -1;
         this.currentJukeboxPlaySlot = -1;
         this.songTimer = 0;
-        this.isActive = false;
+        this.isPlaylistStarted = false;
     }
 
     
@@ -520,7 +527,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         if (this.currentIndex > 7) 
         {
             // Reached the end
-            this.finishedPlaylist = true;
+            this.isPlaylistFinished = true;
         }
         else if (this.currentIndex >= 0 && this.currentIndex <= 7)
         {
@@ -550,7 +557,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      *  
      */
     private void setPlaylistOrder() {
-        LogHelper.info("TileEntityRedstoneJukebox.setPlaylistOrder() - Shuffle: " + (this.playMode == 1));
+        LogHelper.info("TileEntityRedstoneJukebox.setPlaylistOrder() - Shuffle: " + (this.paramPlayMode == 1));
 
         int totalRecords = 0;
         boolean validRecord = false;
@@ -591,7 +598,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
         // shuffle if needed
-        if (this.playMode == 1 && totalRecords > 1) {
+        if (this.paramPlayMode == 1 && totalRecords > 1) {
             // Swaps the play order twice
             for (int i = 0; i < this.playOrder.length; i++) {
                 int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
@@ -666,7 +673,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     // Returns if this Jukebox is playing a record.
     public boolean isActive() {
-        return this.isActive;
+        return this.isPlaylistStarted;
     }
     
     

@@ -3,6 +3,7 @@ package sidben.redstonejukebox.tileentity;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.helper.MusicHelper;
+import sidben.redstonejukebox.init.MyBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -94,6 +95,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private boolean schedulePlayNextRecord = false;
     private boolean scheduleStartPlaying = false;
     private boolean scheduleStopPlaying = false;
+    
+    
+    // TODO: convert to ENUM (?)
+    private final int actionPlayVanillaRecord = 5;
+    
     
     
 
@@ -339,15 +345,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         sidben.redstonejukebox.helper.LogHelper.info("    PlayMode: " + this.paramPlayMode);
         sidben.redstonejukebox.helper.LogHelper.info("    Loop:     " + this.paramLoop);
         sidben.redstonejukebox.helper.LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
-        
-        
-        // Play record
-        ItemStack record = null;
-        if (this.currentJukeboxPlaySlot >= 0 && this.currentJukeboxPlaySlot <= 7) 
-        {
-            record = this.jukeboxItems[this.currentJukeboxPlaySlot];
-        }
-        sidben.redstonejukebox.helper.LogHelper.info("    Record:   " + record);
 
         
 //        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
@@ -384,6 +381,55 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
     }
 
+    
+    /**
+     * Called when a client event is received with the event number and argument.
+     */
+    @Override
+    public boolean receiveClientEvent(int action, int param)
+    {
+        
+        // Only process Client-Side
+        if (this.worldObj.isRemote) 
+        {
+    
+            sidben.redstonejukebox.helper.LogHelper.info("receiveClientEvent()");
+            sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+            sidben.redstonejukebox.helper.LogHelper.info("    Action [" + action + "], Param [" + param + "]");
+            sidben.redstonejukebox.helper.LogHelper.info("    isRemote [" + this.worldObj.isRemote + "]");
+
+            
+            if (action == this.actionPlayVanillaRecord)
+            {
+                this.setCurrentJukeboxPlaySlot((byte)param);
+
+                
+                // Play record
+                MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param);
+                /*
+                ItemStack record = null;
+                if (this.currentJukeboxPlaySlot >= 0 && this.currentJukeboxPlaySlot <= 7) 
+                {
+                    record = this.jukeboxItems[this.currentJukeboxPlaySlot];
+                }
+                sidben.redstonejukebox.helper.LogHelper.info("    Record:   " + record);
+                */
+                
+                
+                return true;
+            }
+        }
+        
+        // return super.receiveClientEvent(action, param);
+        return true;
+    }
+
+    
+    
+    
+    
+    
+    
     
     
     
@@ -635,9 +681,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             {
                 // Record found 
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
+                int recordIndex = MusicHelper.getVanillaRecordIndex(record);
                 
                 // Send update to clients
-                this.resync();
+                LogHelper.info("    Adding block event");
+                this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukeboxActive, this.actionPlayVanillaRecord, recordIndex);
+                // this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukebox, this.actionPlayVanillaRecord + 3, this.currentJukeboxPlaySlot);
+                // this.resync();
                 
                 // To update comparators
                 this.worldObj.notifyBlockOfNeighborChange(this.xCoord - 1, this.yCoord, this.zCoord, this.getBlockType());
@@ -851,12 +901,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         return this.currentJukeboxPlaySlot;
     }
 
-    /*
-    // Sets the slot currently playing (of the jukebox).
+    /**
+     * Sets the slot currently playing (of the jukebox).
+     *
+     */
     public void setCurrentJukeboxPlaySlot(byte slot) {
         this.currentJukeboxPlaySlot = slot;
     }
-    */
     
     
     

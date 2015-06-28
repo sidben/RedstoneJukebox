@@ -331,6 +331,19 @@ public class BlockRedstoneJukebox extends BlockContainer
     } 
     */   
     
+    
+    
+    public boolean onBlockEventReceived(World world, int x, int y, int z, int action, int param)
+    {
+        LogHelper.info("=== onBlockEventReceived() ===");
+
+        TileEntity tileentity = world.getTileEntity(x, y, z);
+        boolean r = tileentity != null ? tileentity.receiveClientEvent(action, param) : false;
+        
+        LogHelper.info("    R = " + r);
+        return r;
+    }
+    
 
     
     

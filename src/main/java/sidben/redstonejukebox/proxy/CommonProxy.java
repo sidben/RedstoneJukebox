@@ -2,9 +2,11 @@ package sidben.redstonejukebox.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.init.MyRecipes;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
@@ -21,6 +23,11 @@ import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 public abstract class CommonProxy implements IProxy
 {
 
+    @Override
+    public World getClientWorld() {
+        return null;
+    }
+    
 
     @Override
     public void pre_initialize()
@@ -46,6 +53,8 @@ public abstract class CommonProxy implements IProxy
 
         
         // Event Handlers
+        MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
+
     }
 
 

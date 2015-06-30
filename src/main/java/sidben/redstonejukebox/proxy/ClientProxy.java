@@ -6,6 +6,7 @@ import sidben.redstonejukebox.client.gui.GuiRedstoneJukebox;
 import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
 
@@ -33,6 +34,14 @@ public class ClientProxy extends CommonProxy
     public static String jukeboxSideOffIcon;
 
 
+    
+    
+    @Override
+    public World getClientWorld() {
+        return FMLClientHandler.instance().getClient().theWorld;
+    }
+    
+    
 
     @Override
     public void pre_initialize()
@@ -65,6 +74,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public void initialize()
     {
+        super.initialize();
     }
 
 

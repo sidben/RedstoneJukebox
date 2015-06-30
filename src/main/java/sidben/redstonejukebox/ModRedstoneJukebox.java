@@ -1,6 +1,8 @@
 package sidben.redstonejukebox;
 
+import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.proxy.CommonProxy;
 import sidben.redstonejukebox.proxy.IProxy;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;

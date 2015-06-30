@@ -1,10 +1,14 @@
 package sidben.redstonejukebox.tileentity;
 
+import java.lang.reflect.Field;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.init.MyBlocks;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -103,6 +107,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
     // TODO: Persistence of the playlist order on world reload
     // TODO: Make the music stop 
+    // TODO: Stop background music when Jukebox starts
     
 
     
@@ -248,6 +253,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //      NBT and network stuff
     //--------------------------------------------------------------------
 
+    /**
+     * Marks the block and the chuck as "dirty", forcing an update between Server/Client. 
+     */
     public void resync() {
         sidben.redstonejukebox.helper.LogHelper.info("resync()");
         sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
@@ -260,7 +268,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /**
      * Reads a tile entity from NBT.
      * 
-     * OBS: This is the only info that was saved with the world.
+     * OBS: This is the only info that is saved with the world.
      */
     @Override
     public void readFromNBT(NBTTagCompound par1NBTTagCompound) {
@@ -407,7 +415,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
                 
                 // Play record
-                MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param);
+                MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, 1);
                 /*
                 ItemStack record = null;
                 if (this.currentJukeboxPlaySlot >= 0 && this.currentJukeboxPlaySlot <= 7) 
@@ -446,6 +454,39 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     @Override
     public void updateEntity() {
+        
+        //--- DEBUG ---------------------------------------------------------------
+        if (this.worldObj.isRemote)
+        {
+            /*
+            Minecraft mc = Minecraft.getMinecraft();
+            net.minecraft.client.audio.MusicTicker.MusicType musictype = mc.func_147109_W();
+            net.minecraft.client.audio.ISound temp = net.minecraft.client.audio.PositionedSoundRecord.func_147673_a(musictype.getMusicTickerLocation());
+            
+            boolean sp = mc.getSoundHandler().isSoundPlaying(temp);
+            LogHelper.info("    Sound playing (bg): " + sp + "[" + musictype + "]" + "[" + temp + "]");
+            */
+            
+            /*
+            Minecraft mc = Minecraft.getMinecraft();
+            net.minecraft.client.audio.ISound temp = net.minecraft.client.audio.PositionedSoundRecord.func_147673_a(new net.minecraft.util.ResourceLocation("minecraft:music.game.creative"));  
+            boolean sp = mc.getSoundHandler().isSoundPlaying(temp);
+            LogHelper.info("    Sound playing (bg): " + sp + " [" + temp + "]");
+            */
+            
+            /*
+            Field[] fieldList = Minecraft.class.getDeclaredFields(); 
+            for (int i = 0; i < fieldList.length; i++) {
+                System.out.println("[" + i + "] " + fieldList[ i ]);
+            }
+            */
+
+            
+
+
+        }
+        //--- DEBUG ---------------------------------------------------------------
+        
 
         if (!this.worldObj.isRemote) {
 

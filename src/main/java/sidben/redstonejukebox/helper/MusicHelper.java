@@ -1,6 +1,11 @@
 package sidben.redstonejukebox.helper;
 
 import java.lang.reflect.Field;
+import com.google.common.collect.Maps;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;
@@ -22,6 +27,14 @@ import net.minecraft.world.World;
  */
 public class MusicHelper
 {
+    
+
+    /** Currently playing Redstone Jukeboxes.  Type:  HashMap<ChunkCoordinates, ISound> */
+    private final static Map mapJukeboxesPositions = Maps.newHashMap();
+
+    
+    
+    
     
     /**
      * Helper class to hold records info.
@@ -159,17 +172,17 @@ public class MusicHelper
         
 
         
-        /*
         ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-        ISound isound = (ISound)RenderGlobal.mapSoundPositions.get(chunkcoordinates);
+        ISound isound = (ISound)MusicHelper.mapJukeboxesPositions.get(chunkcoordinates);
 
         if (isound != null)
         {
             mc.getSoundHandler().stopSound(isound);
-            RenderGlobal.mapSoundPositions.remove(chunkcoordinates);
+            MusicHelper.mapJukeboxesPositions.remove(chunkcoordinates);
         }
-        */
 
+        
+        
         if (recordResourceName != null)
         {
             ItemRecord itemrecord = ItemRecord.getRecord(recordResourceName);
@@ -183,7 +196,7 @@ public class MusicHelper
 
             if (resource == null) resource = new ResourceLocation(recordResourceName);
             PositionedSoundRecord sound = new PositionedSoundRecord(resource, volumeRange, 1.0F, (float)x, (float)y, (float)z);
-            // RenderGlobal.mapSoundPositions.put(chunkcoordinates, positionedsoundrecord);
+            MusicHelper.mapJukeboxesPositions.put(chunkcoordinates, sound);
             mc.getSoundHandler().playSound(sound);
         }
 
@@ -201,6 +214,7 @@ public class MusicHelper
          * Save the idx in a static variable and use it to access the field, even when obfuscated.
          */
         
+        // TODO: Clean this $#@% temp code up
         Minecraft mc = Minecraft.getMinecraft();
         try {
             Field u = mc.getClass().getDeclaredField("mcMusicTicker");
@@ -231,6 +245,31 @@ public class MusicHelper
             // TODO Auto-generated catch block
             e.printStackTrace();
         }        
+    }
+    
+    
+    
+    /**
+     * Informs if there is any record being played by a Redstone Jukebox.
+     * 
+     */
+    @SuppressWarnings("rawtypes")
+    public static boolean AnyRecordPlaying()
+    {
+        // Ref: SoundManager.updateAllSounds()
+        
+        Minecraft mc = Minecraft.getMinecraft();
+        Iterator iterator = MusicHelper.mapJukeboxesPositions.entrySet().iterator();
+
+        while (iterator.hasNext())
+        {
+            Entry entry = (Entry)iterator.next();
+            ISound isound = (ISound)entry.getValue();
+            boolean p = mc.getSoundHandler().isSoundPlaying(isound); 
+            if (p) return true;
+        }
+
+        return false;
     }
     
     

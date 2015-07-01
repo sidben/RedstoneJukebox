@@ -3,6 +3,7 @@ package sidben.redstonejukebox.handler;
 import java.lang.reflect.Field;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.MusicHelper;
+import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -31,6 +32,16 @@ public class SoundEventHandler
             if (soundCat == SoundCategory.RECORDS) 
             {
                 MusicHelper.StopAllBackgroundMusic();
+            }
+            
+            // When a background music is about to start, check if a Redstone Jukebox is playing
+            // (inspired by the mp3Jukebox mod)
+            else if (soundCat == SoundCategory.MUSIC)
+            {
+                if (MusicHelper.AnyRecordPlaying()) {
+                    event.result = null;
+                    event.setResult(Result.DENY);
+                }
             }
         }
         

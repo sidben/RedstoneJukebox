@@ -140,14 +140,41 @@ public class MusicHelper
             ItemRecord record = (ItemRecord)recordCollection[index].record;
             if (record != null)
             {
+                // Found a record, plays the song
                 String resourceName = "records." + record.recordName;
                 MusicHelper.innerPlayRecord(resourceName, x, y, z, showName, volumeExtender);
+            }
+            else
+            {
+                // Didn't find a record, stops the music
+                ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
+                MusicHelper.stopPlayingAt(chunkcoordinates);
             }
             
             
             //world.playAuxSFXAtEntity(null, 1005, x, y, z, Item.getIdFromItem(record));
         }
     }
+    
+    
+    /**
+     * Stops the record being played at the given coordinates.
+     * 
+     */
+    public static void stopPlayingAt(ChunkCoordinates chunkcoordinates) 
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        ISound isound = (ISound)MusicHelper.mapJukeboxesPositions.get(chunkcoordinates);
+
+        if (isound != null)
+        {
+            mc.getSoundHandler().stopSound(isound);
+            MusicHelper.mapJukeboxesPositions.remove(chunkcoordinates);
+        }
+    }
+
+    
+
     
     
     
@@ -171,16 +198,10 @@ public class MusicHelper
         volumeRange = volumeRange / 64; 
         
 
-        
+        // Stops any record that may be playing at the given coordinate
+        // before starting a new one.
         ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-        ISound isound = (ISound)MusicHelper.mapJukeboxesPositions.get(chunkcoordinates);
-
-        if (isound != null)
-        {
-            mc.getSoundHandler().stopSound(isound);
-            MusicHelper.mapJukeboxesPositions.remove(chunkcoordinates);
-        }
-
+        MusicHelper.stopPlayingAt(chunkcoordinates);
         
         
         if (recordResourceName != null)

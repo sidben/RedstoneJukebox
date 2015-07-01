@@ -11,11 +11,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
+import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
@@ -241,6 +243,10 @@ public class BlockRedstoneJukebox extends BlockContainer
             if (teJukebox != null) {
                 teJukebox.ejectAll(par1World, x, y, z);
             }
+            
+            // Stops playing
+            ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
+            MusicHelper.stopPlayingAt(chunkcoordinates);
         }
 
         super.breakBlock(par1World, x, y, z, par5, par6);

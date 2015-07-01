@@ -21,6 +21,7 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 
 
@@ -63,25 +64,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /** Used to detect when the jukebox finished playing all records */
     private boolean     isPlaylistFinished = false;
 
-    /*
-    // -- Indicates if a record of this jukebox is being played right now
-    private boolean     isPlayingNow           = false;
-    */
-
     /** Slot currently playing. This refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox */
     private int         currentIndex        = -1;
 
     /** Slot of the jukebox with the current playing record. */
     private byte       currentJukeboxPlaySlot = -1;
-
-    /*
-    // -- Slot to play next. OBS: this var refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox
-    private int         nextPlaySlot           = -1;
-
-    // Some "force" flag to trigger the right behavior.
-    private boolean     forceStop              = false;                             // -- Forces the jukebox stop.
-    */
-
 
     /** Amount of seconds that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer */
     private static int  songInterval = 2;
@@ -101,13 +88,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private boolean scheduleStopPlaying = false;
     
     
-    // TODO: convert to ENUM (?)
+    // TODO: convert to ENUM (?) <-- for custom records?
     private final int actionPlayVanillaRecord = 5;
+    private final int actionStopPlaying = 6;
     
-    
+
+    // TODO: Fix dancing note (once again)
+    // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
     // TODO: Persistence of the playlist order on world reload
-    // TODO: Make the music stop 
-    // TODO: Stop background music when Jukebox starts
+
     
 
     
@@ -356,9 +345,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         sidben.redstonejukebox.helper.LogHelper.info("    Loop:     " + this.paramLoop);
         sidben.redstonejukebox.helper.LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
 
-        
-//        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
-
     }
 
     
@@ -385,9 +371,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         sidben.redstonejukebox.helper.LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
 
         
-        //        sidben.redstonejukebox.helper.LogHelper.info("    pack: " + tag);
-        
-
         return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
     }
 
@@ -411,26 +394,24 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             
             if (action == this.actionPlayVanillaRecord)
             {
-                this.setCurrentJukeboxPlaySlot((byte)param);
-
+                // this.setCurrentJukeboxPlaySlot((byte)param);
                 
                 // Play record
                 MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, 1);
-                /*
-                ItemStack record = null;
-                if (this.currentJukeboxPlaySlot >= 0 && this.currentJukeboxPlaySlot <= 7) 
-                {
-                    record = this.jukeboxItems[this.currentJukeboxPlaySlot];
-                }
-                sidben.redstonejukebox.helper.LogHelper.info("    Record:   " + record);
-                */
-                
-                
-                return true;
+
             }
+            else if (action == this.actionStopPlaying)
+            {
+            
+                // Stops the record
+                ChunkCoordinates chunkcoordinates = new ChunkCoordinates(this.xCoord, this.yCoord, this.zCoord);
+                MusicHelper.stopPlayingAt(chunkcoordinates);
+
+            }
+            
+            
         }
         
-        // return super.receiveClientEvent(action, param);
         return true;
     }
 
@@ -454,39 +435,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     @Override
     public void updateEntity() {
-        
-        //--- DEBUG ---------------------------------------------------------------
-        if (this.worldObj.isRemote)
-        {
-            /*
-            Minecraft mc = Minecraft.getMinecraft();
-            net.minecraft.client.audio.MusicTicker.MusicType musictype = mc.func_147109_W();
-            net.minecraft.client.audio.ISound temp = net.minecraft.client.audio.PositionedSoundRecord.func_147673_a(musictype.getMusicTickerLocation());
-            
-            boolean sp = mc.getSoundHandler().isSoundPlaying(temp);
-            LogHelper.info("    Sound playing (bg): " + sp + "[" + musictype + "]" + "[" + temp + "]");
-            */
-            
-            /*
-            Minecraft mc = Minecraft.getMinecraft();
-            net.minecraft.client.audio.ISound temp = net.minecraft.client.audio.PositionedSoundRecord.func_147673_a(new net.minecraft.util.ResourceLocation("minecraft:music.game.creative"));  
-            boolean sp = mc.getSoundHandler().isSoundPlaying(temp);
-            LogHelper.info("    Sound playing (bg): " + sp + " [" + temp + "]");
-            */
-            
-            /*
-            Field[] fieldList = Minecraft.class.getDeclaredFields(); 
-            for (int i = 0; i < fieldList.length; i++) {
-                System.out.println("[" + i + "] " + fieldList[ i ]);
-            }
-            */
-
-            
-
-
-        }
-        //--- DEBUG ---------------------------------------------------------------
-        
 
         if (!this.worldObj.isRemote) {
 
@@ -518,9 +466,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             
             
             
-            // Only process the method when the block is powered and didn't finish the playlist
-            //if (!this.isBlockPowered || (this.isPlaylistFinished && !this.paramLoop)) return;
-            // if (!this.isBlockPowered || !this.isPlaying()) return;
+            // Only process the method when the block is powered
             if (!this.isBlockPowered) return;
             
             
@@ -564,38 +510,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 LogHelper.info("    isPlaying " + this.isPlaying());
                 LogHelper.info("    loop      " + this.paramLoop);
                 LogHelper.info("    song timer: " + this.songTimer);
-                /*
-                LogHelper.info("    block active " + isBlockActive);
-                LogHelper.info("    active " + this.isActive);
-                LogHelper.info("    finished " + this.finishedPlaylist);
-                LogHelper.info("    loop " + this.isLoop);
-                LogHelper.info("    song timer " + this.songTimer);
-                */
 
-                //TODO: this must execute once per tick, can't have a ratio timer
-                // (is this comment still valid? Maybe because of the song timer?)
+
                 
-/*
-                if (this.isPlaylistStarted) 
-                {
-*/
-/*                
-                    if (this.isPlaylistFinished) 
-                    {
-                        // Reached the end of the playlist, should loop or shut down?
-                        if (this.paramLoop) {
-                            // Must loop, start playing again
-                            this.startPlaying();
-                        } else {
-                            // No loop, stops
-                            this.stopPlaying();
-                        }
-                        
-                    }
-                    else 
-                    {
-*/
-                    if (!this.isPlaylistFinished)
+                if (!this.isPlaylistFinished)
                     {
                         // Still playing, check song timer
                         if (this.songTimer > 0) {
@@ -609,26 +527,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                         
                     }
                 
-/*                    
-                } // isPlaylistStarted
-                else 
-                {
-                    this.startPlaying();
-                }
-*/
-
-                /*
-                // Notify the block it needs to update
-                if (!this.isPlaylistStarted && isBlockPowered) {
-                    // Block must stop
-                    this.worldObj.scheduleBlockUpdate(this.xCoord, this.yCoord, this.zCoord, this.getBlockType(), 4);
-                }
-                */
-
 
             } // ratio timer
 
-            
             
         } // world.isremote
 
@@ -643,18 +544,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     //--------------------------------------------------------------------
     //      This is where the groove starts :)
     //--------------------------------------------------------------------
-
-    /**
-     * Indicates if the jukebox finished playing all records.
-     * 
-     */
-    /*
-    public boolean finishedPlayingAllRecords() {
-       if (this.paramLoop) return false;
-       return this.isPlaylistFinished;
-    }
-    */
-   
     
     public void startPlaying() {
         LogHelper.info("== TileEntityRedstoneJukebox.startPlaying() ==");
@@ -665,8 +554,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.ratioTimer = 0;      
         this.setPlaylistOrder();
         this.scheduleStartPlaying = false;
-
-        // this.playNextRecord();
         this.schedulePlayNextRecord = true;
     }
     
@@ -674,14 +561,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void stopPlaying() {
         LogHelper.info("== TileEntityRedstoneJukebox.stopPlaying() ==");
 
-        // this.isPlaylistFinished = true;
         this.currentIndex = -1;
         this.currentJukeboxPlaySlot = -1;
         this.songTimer = 0;
-        // this.isPlaylistStarted = false;
         this.scheduleStopPlaying = false;
 
         // Send update to clients
+        this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukebox, this.actionStopPlaying, 0);
         this.resync();
     }
 
@@ -741,7 +627,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             else
             {
                 // if it's not a valid record, skip to the next one
-                // this.playNextRecord();
                 this.schedulePlayNextRecord = true;
             }
             
@@ -824,52 +709,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
     }
-
     
-    /*
-    public void checkRedstonePower() {
-        boolean hasEnergy = this.worldObj.isBlockIndirectlyGettingPowered(this.xCoord, this.yCoord, this.zCoord);
-        boolean canUseEnergy = false;
 
-
-        // When the jukebox is on "Force Stop" mode, it requires a redstone reset, meaning it has to
-        // be de-powered before activating again.
-        if (this.forceStop) {
-            if (!hasEnergy) {
-                this.forceStop = false;
-            }
-
-        }
-        else {
-            // only activates power if contains a record
-            if (hasEnergy) {
-
-                ItemStack r;
-                for (int c = 0; c < this.getSizeInventory(); ++c) {
-                    r = this.getStackInSlot(c);
-                    if (r != null) {
-                        canUseEnergy = true;  // found a record! (the slots only accept records, no need to check item type)
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        
-
-        // Debug
-        LogHelper.info("TileEntityRedstoneJukebox.checkRedstonePower()");
-        LogHelper.info("    Force stop:     " + this.forceStop);
-        LogHelper.info("    Has energy:     " + hasEnergy);
-        LogHelper.info("    Can use energy: " + canUseEnergy);
-
-
-        this.isActive = hasEnergy && canUseEnergy;
-    }
-    
-    
-    */
 
     
     

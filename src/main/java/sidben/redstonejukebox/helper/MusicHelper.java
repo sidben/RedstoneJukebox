@@ -33,6 +33,8 @@ public class MusicHelper
     private final static Map mapJukeboxesPositions = Maps.newHashMap();
 
     
+    // TODO: Hashmap to store the coordinates of every noteblock around a jukebox. Hashmap updates when a record starts playing and every 10 seconds when the jukebox is active. There are 75 possible spots (5x5x3), 74 considering 1 must be the power source
+    
     
     
     
@@ -218,7 +220,7 @@ public class MusicHelper
 
             if (resource == null) resource = new ResourceLocation(recordResourceName);
             PositionedSoundRecord sound = new PositionedSoundRecord(resource, volumeRange, 1.0F, (float)x, (float)y, (float)z);
-            MusicHelper.mapJukeboxesPositions.put(chunkcoordinates, sound);
+            MusicHelper.mapJukeboxesPositions.put(chunkcoordinates, sound);         // TODO: Make this class a singleton so it can be thread safe
             mc.getSoundHandler().playSound(sound);
         }
 

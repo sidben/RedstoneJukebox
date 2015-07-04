@@ -450,6 +450,112 @@ public class BlockRedstoneJukebox extends BlockContainer
     
     
     
+    //--------------------------------------------------------------------
+    //  Visual Effects
+    //--------------------------------------------------------------------
+
+    /**
+     * A randomly called display update to be able to add particles or other items for display
+     */
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(World world, int x, int y, int z, Random rand)
+    {
+
+        if (this.isActive)
+        {
+            // redstone ore sparkles
+            this.showSparkles(world, x, y, z, rand);
+
+            
+            // notes particles ratio (1/3 of display ticks)
+            if (rand.nextInt(2) == 0)     
+            {
+
+                // notes on note blocks
+                // check an area of 5x5 around the block looking for note block
+                for (int i = x - 2; i <= x + 2; ++i)
+                {
+                    for (int k = z - 2; k <= z + 2; ++k)
+                    {
+                        for (int j = y - 1; j <= y + 1; ++j)
+                        {
+                            
+                            // do not check the jukebox and below it
+                            if (i!=0 || k != 0 || j == 1)
+                            {
+                                // look for note blocks with space on the top
+                                if (world.getBlock(i, j, k) == Blocks.noteblock && !world.getBlock(i, j+1, k).isOpaqueCube())
+                                {
+                                    this.showNoteAbove(world, i, j, k);
+                                }
+                            }
+        
+                        } // for j
+                    } // for k
+                } // for i
+            
+            }
+
+        }
+        
+    }
+    
+    
+    /**
+     * Displays redstone sparkles on the block sides.
+     */
+    private void showSparkles(World world, int x, int y, int z, Random rand)
+    {
+        // Ref: BlockRedstoneOre
+        double distance = 0.0625D;
+
+        
+        for (int i = 2; i < 6; ++i)
+        {
+            double particleX = (double)((float)x + rand.nextFloat());
+            double particleY = (double)((float)y + rand.nextFloat());
+            double particleZ = (double)((float)z + rand.nextFloat());
+
+
+            if (i == 2 && !world.getBlock(x, y, z + 1).isOpaqueCube())
+            {
+                particleZ = (double)(z + 1) + distance;
+            }
+
+            if (i == 3 && !world.getBlock(x, y, z - 1).isOpaqueCube())
+            {
+                particleZ = (double)(z + 0) - distance;
+            }
+
+            if (i == 4 && !world.getBlock(x + 1, y, z).isOpaqueCube())
+            {
+                particleX = (double)(x + 1) + distance;
+            }
+
+            if (i == 5 && !world.getBlock(x - 1, y, z).isOpaqueCube())
+            {
+                particleX = (double)(x + 0) - distance;
+            }
+
+            if (particleX < (double)x || particleX > (double)(x + 1) || particleY < 0.0D || particleY > (double)(y + 1) || particleZ < (double)z || particleZ > (double)(z + 1))
+            {
+                world.spawnParticle("reddust", particleX, particleY, particleZ, 0.0D, 0.0D, 0.0D);
+            }
+        } 
+    }
+   
+    
+    
+    /**
+     * Displays a random music note on the block.
+     */
+    private void showNoteAbove(World world, int x, int y, int z)
+    {
+        int color = world.rand.nextInt(16);
+        world.spawnParticle("note", (double)x + 0.5D, (double)y + 1.2D, (double)z + 0.5D, (double)color / 16.0D, 0.0D, 0.0D);
+    }    
+    
+    
     
     
     

@@ -96,6 +96,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     // TODO: Fix dancing note (once again)
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
     // TODO: Persistence of the playlist order on world reload
+    // TODO: Removing the record currently playing from the inventory makes it skip to the next song.
 
     
 
@@ -397,7 +398,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 // this.setCurrentJukeboxPlaySlot((byte)param);
                 
                 // Play record
-                MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, 1);
+                float extraVolume = this.getExtraVolume();
+                MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, extraVolume);
 
             }
             else if (action == this.actionStopPlaying)
@@ -709,6 +711,18 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
     }
+    
+    
+    
+    /**
+     * Checks the redstone jukebox block for the note blocks that will increase the volume range.
+     * 
+     */
+    private float getExtraVolume()
+    {
+        return (float)BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+    }
+    
     
 
 

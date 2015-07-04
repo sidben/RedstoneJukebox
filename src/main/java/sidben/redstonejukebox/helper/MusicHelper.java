@@ -142,6 +142,7 @@ public class MusicHelper
             {
                 // Found a record, plays the song
                 String resourceName = "records." + record.recordName;
+                
                 MusicHelper.innerPlayRecord(resourceName, x, y, z, showName, volumeExtender);
             }
             else
@@ -195,7 +196,7 @@ public class MusicHelper
         {
             volumeRange += volumeExtender;
         }
-        volumeRange = volumeRange / 64; 
+        volumeRange = volumeRange / 16F; 
         
 
         // Stops any record that may be playing at the given coordinate

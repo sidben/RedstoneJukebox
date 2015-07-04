@@ -358,6 +358,8 @@ public class BlockRedstoneJukebox extends BlockContainer
     //  Custom World Events
     //--------------------------------------------------------------------
 
+    
+    // TODO: check if this method will be needed, Currently it's not used, the jukebox looks active but just don't play any record and don't output any redstone signal.
     /**
      * Update which block ID the jukebox is using depending on whether or not it is playing.
      * 
@@ -443,6 +445,8 @@ public class BlockRedstoneJukebox extends BlockContainer
 
         return amp;
     }
+    
+    
     
     
     

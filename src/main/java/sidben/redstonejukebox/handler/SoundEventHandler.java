@@ -29,7 +29,8 @@ public class SoundEventHandler
         if (soundName != null)
         {
             // When a record starts playing, stops all background music
-            if (soundCat == SoundCategory.RECORDS) 
+            // OBS: Note blocks also have the "Records" sound category, so another condition is needed.
+            if (soundCat == SoundCategory.RECORDS && soundName.startsWith("records.")) 
             {
                 MusicHelper.StopAllBackgroundMusic();
             }

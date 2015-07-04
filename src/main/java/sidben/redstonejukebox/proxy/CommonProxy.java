@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.Side;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.init.MyBlocks;
+import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.init.MyRecipes;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.JukeboxGUIUpdatedMessage;
@@ -37,6 +38,10 @@ public abstract class CommonProxy implements IProxy
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, 0, Side.SERVER);
         
 
+        // Register items
+        MyItems.register();
+
+        
         // Register blocks
         MyBlocks.register();
     }

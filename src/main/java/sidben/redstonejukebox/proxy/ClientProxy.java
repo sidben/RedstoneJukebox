@@ -33,6 +33,8 @@ public class ClientProxy extends CommonProxy
     public static String jukeboxSideOnIcon;
     public static String jukeboxSideOffIcon;
 
+    public static String blankRecordIcon;
+
 
     
     
@@ -57,6 +59,8 @@ public class ClientProxy extends CommonProxy
         ClientProxy.jukeboxBottomIcon = this.getResourceName("redstone_jukebox_bottom");
         ClientProxy.jukeboxSideOnIcon = this.getResourceName("redstone_jukebox_on");
         ClientProxy.jukeboxSideOffIcon = this.getResourceName("redstone_jukebox_off");
+        
+        ClientProxy.blankRecordIcon = this.getResourceName("blank_record");
 
 
         // Special renderers

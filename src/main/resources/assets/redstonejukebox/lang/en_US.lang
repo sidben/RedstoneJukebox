@@ -1,2 +1,5 @@
 # Blocks
 tile.redstonejukebox:redstone_jukebox.name=Redstone Jukebox
+
+# Items
+item.redstonejukebox:blank_record.name=Blank Record

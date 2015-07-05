@@ -3,6 +3,7 @@ package sidben.redstonejukebox.client.gui;
 import java.util.Random;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
@@ -10,7 +11,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiMerchant;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
@@ -38,9 +38,8 @@ public class GuiRecordTrading extends GuiContainer
     private GuiRecordTrading.MerchantButton previousRecipeButtonIndex;
     private String merchantName;
     private int currentRecipeIndex = 0;
-    private int storeId = 0;                                        // Every merchant shares access to one of the available stores.
 
-    private MerchantRecipeList recordList;                          // Record trading uses a special trades list, shared by some merchants
+    private MerchantRecipeList tradesList;                          // Record trading uses a special trades list, shared by some merchants
 
     
     
@@ -50,13 +49,8 @@ public class GuiRecordTrading extends GuiContainer
         this.theIMerchant = merchant;
         this.merchantName = customName != null && customName.length() > -1 ? customName : I18n.format("entity.Villager.name", new Object[0]);
         
-        // TODO: update
-        //this.storeId =  CustomRecordHelper.getStoreID(((Entity)merchant).entityId);
-        this.storeId = -1;
-        
-
-        // TODO: update
-        //recordList = CustomRecordHelper.getStoreCatalog(this.storeId);
+        int villagerId = ((Entity)merchant).getEntityId();
+        tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
     }
 
     
@@ -102,7 +96,7 @@ public class GuiRecordTrading extends GuiContainer
     public void updateScreen()
     {
         super.updateScreen();
-        MerchantRecipeList var1 = recordList;
+        MerchantRecipeList var1 = tradesList;
 
         if (var1 != null)
         {
@@ -154,7 +148,7 @@ public class GuiRecordTrading extends GuiContainer
         int var6 = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(var5, var6, 0, 0, this.xSize, this.ySize);
     
-        MerchantRecipeList var7 = recordList;
+        MerchantRecipeList var7 = tradesList;
         
 
         // Draws a X on the locked trades
@@ -182,7 +176,7 @@ public class GuiRecordTrading extends GuiContainer
     {
         
         super.drawScreen(par1, par2, par3);
-        MerchantRecipeList var4 = recordList; 
+        MerchantRecipeList var4 = tradesList; 
 
         if (var4 != null && !var4.isEmpty())
         {

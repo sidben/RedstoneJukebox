@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -296,6 +297,22 @@ public class MusicHelper
         return false;
     }
     
+
     
+    
+    /* ======================================================================================
+    *
+    *                                  Record Trading
+    *
+    * ====================================================================================== */
+
+    /**
+     * Returns a random record.
+     */
+    public static ItemStack getRandomRecord(Random rand)
+    {
+        int index = rand.nextInt(MusicHelper.recordCollection.length);
+        return new ItemStack(MusicHelper.recordCollection[index].record, 1);
+    }
 
 }

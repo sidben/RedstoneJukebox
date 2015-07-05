@@ -2,6 +2,7 @@ package sidben.redstonejukebox;
 
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.helper.RecordStoreHelper;
 import sidben.redstonejukebox.proxy.CommonProxy;
 import sidben.redstonejukebox.proxy.IProxy;
 import cpw.mods.fml.common.Mod;
@@ -33,7 +34,24 @@ public class ModRedstoneJukebox
     
     // Global variables
     public final static int          maxExtraVolume       = 128;        // Maximum amount of extra range for the custom jukebox
+    
+    
+    // Helper classes
+    private RecordStoreHelper recordStoreHelper;
 
+    
+    
+    
+    
+    /**
+     * Returns a singleton instance of the record store helper class.
+     */
+    public RecordStoreHelper getRecordStoreHelper()
+    {
+        return recordStoreHelper;
+    }
+    
+    
     
     
     
@@ -54,6 +72,9 @@ public class ModRedstoneJukebox
 
         // Sided initializations
         proxy.initialize();
+        
+        // Custom record stores
+        recordStoreHelper = new RecordStoreHelper();
     }
 
 

@@ -1,5 +1,7 @@
 package sidben.redstonejukebox.inventory;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,7 +19,7 @@ public class InventoryRecordTrading implements IInventory
     private final EntityPlayer thePlayer;
     private MerchantRecipe currentRecipe;
     private int currentRecipeIndex;
-    int storeId = 0;
+    private int villagerId;
 
     
     
@@ -29,8 +31,7 @@ public class InventoryRecordTrading implements IInventory
     {
         this.thePlayer = par1EntityPlayer;
         this.theMerchant = merchant;
-        // this.storeId =  CustomRecordHelper.getStoreID(((Entity)merchant).entityId);
-        this.storeId = -1;
+        this.villagerId = ((Entity)this.theMerchant).getEntityId();
     }
 
     /**
@@ -217,11 +218,6 @@ public class InventoryRecordTrading implements IInventory
     public void setCurrentRecipeIndex(int par1)
     {
         this.currentRecipeIndex = par1;
-
-        // TODO: Update
-        //MerchantRecipeList offersList = CustomRecordHelper.getStoreCatalog(this.storeId);
-        //MerchantRecipe slotRecipe = (MerchantRecipe)offersList.get(this.currentRecipeIndex);
-
         this.resetRecipeAndSlots();
     }
 
@@ -254,9 +250,7 @@ public class InventoryRecordTrading implements IInventory
         }
         else
         {
-            // TODO: Update
-            //MerchantRecipeList merchantrecipelist = CustomRecordHelper.getStoreCatalog(this.storeId);
-            MerchantRecipeList merchantrecipelist = this.theMerchant.getRecipes(this.thePlayer);
+            MerchantRecipeList merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
 
             if (merchantrecipelist != null)
             {

@@ -97,9 +97,8 @@ public abstract class CommonProxy implements IProxy
         
         else if (guiID == ClientProxy.recordTradingGuiID) {
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
-            // OBS 2: Not all villagers can trade records, so there is an extra condition.
             Entity villager = world.getEntityByID(x);
-            if (villager instanceof EntityVillager) //&& CustomRecordHelper.canTradeRecords(x))  // TODO: Update
+            if (villager instanceof EntityVillager)
             {
                 return new ContainerRecordTrading(player.inventory, (EntityVillager)villager, world);
             }

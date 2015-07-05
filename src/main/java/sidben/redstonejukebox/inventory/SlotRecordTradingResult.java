@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.inventory;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ public class SlotRecordTradingResult extends Slot
     private EntityPlayer thePlayer;
 
     private int field_75231_g;
+
     boolean traded = false;                 // Indicates if a trade was made;
 
 
@@ -95,9 +97,7 @@ public class SlotRecordTradingResult extends Slot
                 this.theMerchantInventory.setInventorySlotContents(0, var4);
                 this.theMerchantInventory.setInventorySlotContents(1, var5);
                 traded = true;
-
-                //TODO: update
-                //CustomRecordHelper.useRecipe(slotRecipe, theMerchantInventory.storeId);
+                ModRedstoneJukebox.instance.getRecordStoreHelper().useRecipe(slotRecipe, par1EntityPlayer);
             }
         }
     }

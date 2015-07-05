@@ -1,7 +1,10 @@
 package sidben.redstonejukebox.proxy;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import sidben.redstonejukebox.client.gui.GuiRecordTrading;
 import sidben.redstonejukebox.client.gui.GuiRedstoneJukebox;
 import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
 import sidben.redstonejukebox.reference.Reference;
@@ -89,6 +92,16 @@ public class ClientProxy extends CommonProxy
         if (guiID == ClientProxy.redstoneJukeboxGuiID) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
             return new GuiRedstoneJukebox(player.inventory, teJukebox);
+        }
+
+        else if (guiID == ClientProxy.recordTradingGuiID) {
+            // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
+            // OBS 2: Not all villagers can trade records, so there is an extra condition.
+            Entity villager = world.getEntityByID(x);
+            if (villager instanceof EntityVillager) // &&  CustomRecordHelper.canTradeRecords(x)) // TODO: Update
+            {
+                return new GuiRecordTrading(player.inventory, (EntityVillager)villager, world, ((EntityVillager) villager).getCustomNameTag());
+            }
         }
 
         return null;

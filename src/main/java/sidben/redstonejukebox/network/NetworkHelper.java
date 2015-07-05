@@ -1,6 +1,7 @@
 package sidben.redstonejukebox.network;
 
 
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
@@ -32,7 +33,20 @@ public class NetworkHelper
         
     }
     
+    
+    /**
+     * Tracks an update on the Record Trading GUI.
+     * 
+     * Client -> Server
+     */
+    public static void sendRecordTradingGUIUpdatedMessage(int recipeIndex) 
+    {
+        RecordTradingGUIUpdatedMessage message = new RecordTradingGUIUpdatedMessage(recipeIndex);
+        ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
+    }
+    
 
+    
     /**
      * Notifies the client that the Jukebox should start playing the record on
      * the informed slot. In case the slot is -1, it should stop playing.
@@ -73,7 +87,6 @@ public class NetworkHelper
             LogHelper.info("    " + ctx.getServerHandler().playerEntity.worldObj.getBlock(684, 56, 1013));
             */
             
-            
             World world = ctx.getServerHandler().playerEntity.worldObj;
             if (world == null) {
                 LogHelper.warn("Server world not found for message [" + message + "]");                
@@ -88,5 +101,28 @@ public class NetworkHelper
         
     }
     
+
     
+    public static class RecordTradingGUIHandler implements IMessageHandler<RecordTradingGUIUpdatedMessage, IMessage> {
+
+        @Override
+        public IMessage onMessage(RecordTradingGUIUpdatedMessage message, MessageContext ctx) {
+            LogHelper.info("Recieving Record GUI message");
+            LogHelper.info("    " + message);
+            
+
+            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            if (player == null) {
+                LogHelper.warn("Target player not found for message [" + message + "]");                
+            }
+            else {
+                message.updatePlayer(player);
+            }
+            
+            
+            return null;
+
+        }
+        
+    }
 }

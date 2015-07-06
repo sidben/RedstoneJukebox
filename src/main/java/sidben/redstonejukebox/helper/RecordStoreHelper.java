@@ -1,16 +1,14 @@
 package sidben.redstonejukebox.helper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import sidben.redstonejukebox.init.MyItems;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Maps;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -86,10 +84,13 @@ public class RecordStoreHelper
     // TODO: make all of this statics a config file value
     private static final int maxStores = 256;
     private static final int expirationTime = 20;
-    private static final int maxInitialOffers = 2;      // Actual max offers is double of this value, since it's used to limit buying offers and selling offers
+    private static final int maxExtraOffers = 3;
     private static final int maxTrades = 3;             // Maximum amount of times a record trade can be made
-    private static final int recordPriceMin = 5;
-    private static final int recordPriceMax = 9;
+    private static final int recordPriceBuyMin = 5;
+    private static final int recordPriceBuyMax = 11;
+    private static final int recordPriceSellMin = 8;
+    private static final int recordPriceSellMax = 15;
+    private static final int buyingOffersRatio = 60;     // Ratio of buying records VS selling records offers. By default, 60% of the offers will be to buy records.
 
     
     private Random rand = new Random();
@@ -156,64 +157,43 @@ public class RecordStoreHelper
     MerchantRecipeList createRandomStore() 
     {
         MerchantRecipeList store = new MerchantRecipeList();
-        ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
-        ItemStack musicDisc = null;
-        ItemStack emeralds = null;
         MerchantRecipe recipe;
-        int recipeStock;
+        Queue<EnumRecipeType> offers = new LinkedList<EnumRecipeType>();
+        
+        int luck;
+        EnumRecipeType luckType;
 
-        // Decides how many offers will be added
-        int buyOffers = rand.nextInt(maxInitialOffers) + 1;
-        int sellOffers = rand.nextInt(maxInitialOffers) + 1;
+
+        // Decides how many offers will be added, beyond the default two
+        int offersSize = rand.nextInt(maxExtraOffers) + 1;
         
+        // Adds one buying offers and one selling offer, by default (extra if for extra randomness)
+        if (rand.nextInt(10) < 5) {
+            offers.add(EnumRecipeType.BUYING_RECORDS);
+            offers.add(EnumRecipeType.SELLING_RECORDS);
+        } else {
+            offers.add(EnumRecipeType.SELLING_RECORDS);
+            offers.add(EnumRecipeType.BUYING_RECORDS);
+        }
         
-        // Adds the "buying" offers, where the villager buys records for emeralds
-        for (int i = 0; i < buyOffers; i++)
+        // Randomly adds the types of the remaining offers
+        for (int i = 0; i < offersSize; i++) 
         {
-            // gets a random disc
-            musicDisc = MusicHelper.getRandomRecord(this.rand);
-            
-            // sets the price
-            if (recordPriceMin == recordPriceMax) {
-                emeralds = new ItemStack(Items.emerald, recordPriceMin);
-            } else {
-                emeralds = new ItemStack(Items.emerald, rand.nextInt(recordPriceMax - recordPriceMin) + recordPriceMin);
-            }
-            
-            
-            // Since the maxTrades variable is hard-coded on 7, manually reduces the amount of 
-            // times this trade can be used.
-            recipe = new MerchantRecipe(musicDisc, emeralds);
-            recipeStock = rand.nextInt(maxTrades) + 1;
-            recipe.func_82783_a(recipeStock - 7);
-            
-            // add to the offers list
+            luck = rand.nextInt(100) + 1;
+            luckType = luck <= buyingOffersRatio ? EnumRecipeType.BUYING_RECORDS : EnumRecipeType.SELLING_RECORDS;
+            offers.add(luckType);
+        }
+        
+
+        // Adds the actual offers based on the type list
+        for(EnumRecipeType t : offers)
+        {
+            recipe = this.getRandomRecipe(t);
             store.add(recipe);
         }
         
         
-        // Adds the "selling" offers, where the villager sells records for blank records and emeralds
-        for (int i = 0; i < sellOffers; i++)
-        {
-            // gets a random disc
-            musicDisc = MusicHelper.getRandomRecord(this.rand);
-            
-            // sets the price
-            if (recordPriceMin == recordPriceMax) {
-                emeralds = new ItemStack(Items.emerald, recordPriceMin);
-            } else {
-                emeralds = new ItemStack(Items.emerald, rand.nextInt(recordPriceMax - recordPriceMin) + recordPriceMin);
-            }
-            
-            // Since the maxTrades variable is hard-coded on 7, manually reduces the amount of 
-            // times this trade can be used.
-            recipe = new MerchantRecipe(emptyDisc, emeralds, musicDisc);
-            recipeStock = rand.nextInt(maxTrades) + 1;
-            recipe.func_82783_a(recipeStock - 7);
-            
-            // add to the offers list
-            store.add(recipe);
-        }
+        // TODO: remove duplicate recipes
 
         
         // returns the new store
@@ -221,5 +201,71 @@ public class RecordStoreHelper
     }
 
     
+    
+    MerchantRecipe getRandomRecipe(EnumRecipeType type) 
+    {
+        ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
+        ItemStack musicDisc = null;
+        ItemStack emeralds = null;
+        MerchantRecipe recipe;
+        int recipeStock;
+        
+        int auxPriceMin, auxPriceMax;
 
+        
+        // gets a random disc
+        musicDisc = MusicHelper.getRandomRecord(this.rand);
+        
+        
+        // sets the price
+        if (type == EnumRecipeType.BUYING_RECORDS) {
+            auxPriceMin = recordPriceBuyMin;
+            auxPriceMax = recordPriceBuyMax;
+        }
+        else if (type == EnumRecipeType.SELLING_RECORDS) {
+            auxPriceMin = recordPriceSellMin;
+            auxPriceMax = recordPriceSellMax;
+        }
+        else {
+            return null;
+        }
+
+        if (auxPriceMin == auxPriceMax) {
+            emeralds = new ItemStack(Items.emerald, auxPriceMin);
+        } else {
+            emeralds = new ItemStack(Items.emerald, rand.nextInt(auxPriceMax - auxPriceMin + 1) + auxPriceMin);
+        }
+        
+        
+        // create the trade recipe
+        if (type == EnumRecipeType.BUYING_RECORDS) {
+            recipe = new MerchantRecipe(musicDisc, emeralds);
+        } 
+        else if (type == EnumRecipeType.SELLING_RECORDS) {
+            recipe = new MerchantRecipe(emptyDisc, emeralds, musicDisc);
+        }
+        else {
+            return null;
+        }
+        
+        
+        // Since the maxTrades variable is hard-coded on 7, manually reduces the amount of 
+        // times this trade can be used.
+        recipeStock = rand.nextInt(maxTrades) + 1;
+        recipe.func_82783_a(recipeStock - 7);
+        
+        
+        // returns the recipe
+        return recipe;
+    }
+    
+
+    
+    
+    public enum EnumRecipeType
+    {
+        BUYING_RECORDS,
+        SELLING_RECORDS
+    }
+    
 }

@@ -32,14 +32,14 @@ public class SoundEventHandler
             // OBS: Note blocks also have the "Records" sound category, so another condition is needed.
             if (soundCat == SoundCategory.RECORDS && soundName.startsWith("records.")) 
             {
-                MusicHelper.StopAllBackgroundMusic();
+                ModRedstoneJukebox.instance.getMusicHelper().StopAllBackgroundMusic();
             }
             
             // When a background music is about to start, check if a Redstone Jukebox is playing
             // (inspired by the mp3Jukebox mod)
             else if (soundCat == SoundCategory.MUSIC)
             {
-                if (MusicHelper.AnyRecordPlaying()) {
+                if (ModRedstoneJukebox.instance.getMusicHelper().AnyRecordPlaying()) {
                     event.result = null;
                     event.setResult(Result.DENY);
                 }

@@ -1,6 +1,7 @@
 package sidben.redstonejukebox.tileentity;
 
 import java.lang.reflect.Field;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.helper.MusicHelper;
@@ -88,9 +89,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private boolean scheduleStopPlaying = false;
     
     
-    // TODO: convert to ENUM (?) <-- for custom records?
-    private final int actionPlayVanillaRecord = 5;
-    private final int actionStopPlaying = 6;
+    private static final int actionPlayVanillaRecord = 5;
+    private static final int actionStopPlaying = 6;
     
 
     // TODO: Fix dancing note (once again)
@@ -233,7 +233,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public boolean isItemValidForSlot(int i, ItemStack s)
     {
-        return MusicHelper.isRecord(s);
+        return ModRedstoneJukebox.instance.getMusicHelper().isRecord(s);
     }
 
     
@@ -399,7 +399,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 
                 // Play record
                 float extraVolume = this.getExtraVolume();
-                MusicHelper.playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, extraVolume);
+                ModRedstoneJukebox.instance.getMusicHelper().playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, extraVolume);
 
             }
             else if (action == this.actionStopPlaying)
@@ -407,7 +407,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             
                 // Stops the record
                 ChunkCoordinates chunkcoordinates = new ChunkCoordinates(this.xCoord, this.yCoord, this.zCoord);
-                MusicHelper.stopPlayingAt(chunkcoordinates);
+                ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
 
             }
             
@@ -603,7 +603,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // reads the selected slot to find a record and get the time of the song
             this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
             ItemStack record = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            int auxSongTime = MusicHelper.getSongTime(record);
+            int auxSongTime = ModRedstoneJukebox.instance.getMusicHelper().getSongTime(record);
 
             LogHelper.info("    slot [" + this.currentJukeboxPlaySlot + "] has item [" + record + "] with song time [" + auxSongTime + "]");
 
@@ -612,7 +612,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             {
                 // Record found 
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
-                int recordIndex = MusicHelper.getVanillaRecordIndex(record);
+                int recordIndex = ModRedstoneJukebox.instance.getMusicHelper().getVanillaRecordIndex(record);
                 
                 // Send update to clients
                 LogHelper.info("    Adding block event");
@@ -664,7 +664,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             // check every slot to search for records.
             ItemStack s = this.getStackInSlot(i);
-            if (MusicHelper.isRecord(s)) {
+            if (ModRedstoneJukebox.instance.getMusicHelper().isRecord(s)) {
                 validRecord = true;
 
                 /*
@@ -847,5 +847,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     }
     
+
     
 }

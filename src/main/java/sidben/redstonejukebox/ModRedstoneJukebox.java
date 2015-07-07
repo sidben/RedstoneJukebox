@@ -2,6 +2,7 @@ package sidben.redstonejukebox;
 
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
 import sidben.redstonejukebox.proxy.CommonProxy;
 import sidben.redstonejukebox.proxy.IProxy;
@@ -37,11 +38,20 @@ public class ModRedstoneJukebox
     
     
     // Helper classes
+    private MusicHelper musicHelper;
     private RecordStoreHelper recordStoreHelper;
 
     
     
     
+    
+    /**
+     * Returns a singleton instance of the music helper class.
+     */
+    public MusicHelper getMusicHelper()
+    {
+        return musicHelper;
+    }
     
     /**
      * Returns a singleton instance of the record store helper class.
@@ -73,7 +83,8 @@ public class ModRedstoneJukebox
         // Sided initializations
         proxy.initialize();
         
-        // Custom record stores
+        // Helper classes single instances
+        musicHelper = new MusicHelper();
         recordStoreHelper = new RecordStoreHelper();
     }
 

@@ -1,5 +1,6 @@
 package sidben.redstonejukebox.inventory;
 
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.MusicHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -21,7 +22,7 @@ public class SlotRedstoneJukeboxRecord extends Slot
      */
     @Override
     public boolean isItemValid(ItemStack s) {
-        return MusicHelper.isRecord(s);
+        return ModRedstoneJukebox.instance.getMusicHelper().isRecord(s);
     }
 
 

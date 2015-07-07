@@ -246,7 +246,7 @@ public class BlockRedstoneJukebox extends BlockContainer
             
             // Stops playing
             ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-            MusicHelper.stopPlayingAt(chunkcoordinates);
+            ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
         }
 
         super.breakBlock(par1World, x, y, z, par5, par6);

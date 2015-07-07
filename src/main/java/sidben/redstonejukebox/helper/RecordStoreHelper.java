@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.init.MyItems;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -110,7 +111,7 @@ public class RecordStoreHelper
                     }
                 });
 
-    
+    // TODO: check what happens if the cache expires while the GUI is open
     
     
     
@@ -214,7 +215,7 @@ public class RecordStoreHelper
 
         
         // gets a random disc
-        musicDisc = MusicHelper.getRandomRecord(this.rand);
+        musicDisc = ModRedstoneJukebox.instance.getMusicHelper().getRandomRecord(this.rand);
         
         
         // sets the price

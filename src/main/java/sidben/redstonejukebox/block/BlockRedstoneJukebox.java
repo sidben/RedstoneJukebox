@@ -25,6 +25,22 @@ import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 
 
 
+/*
+ * KNOW ISSUE: In 1.7.10, the games keeps re-adding the Tile Entity to the
+ *  list that call "updateEntity". Every time the setTileEntity is
+ *  called, the same tile gets added again and ends up being called
+ *  faster and faster, multiple times per tick.
+ * 
+ *  This looks like a bug with Forge or even Minecraft itself, I added
+ *  a check on the TileEntity updateEntity() method to make sure it only
+ *  process once per tick and ignore further calls. -_-
+ * 
+ *  That behavior did not happen in 1.6.2, and this code is the same of the Furnace.
+ *  
+ *  REF: updateJukeboxBlockState() method
+ */
+
+
 public class BlockRedstoneJukebox extends BlockContainer
 {
 
@@ -359,11 +375,10 @@ public class BlockRedstoneJukebox extends BlockContainer
     //--------------------------------------------------------------------
 
     
-    // TODO: check if this method will be needed, Currently it's not used, the jukebox looks active but just don't play any record and don't output any redstone signal.
     /**
      * Update which block ID the jukebox is using depending on whether or not it is playing.
      * 
-     * Triggered by the Tile Entity when it detects changes.
+     * Triggered by onNeighborBlockChange.
      */
     public static void updateJukeboxBlockState(boolean active, World world, int x, int y, int z) {
         LogHelper.info("updateJukeboxBlockState()");
@@ -390,30 +405,12 @@ public class BlockRedstoneJukebox extends BlockContainer
 
         // Recover the Tile Entity
         if (teJukebox != null) {
-            /*
-             * NOTE: In 1.7.10, the games keeps re-adding the Tile Entity to the
-             * list that call "updateEntity". Every time the setTileEntity is
-             * called, the same tile gets added again and ends up being called
-             * faster and faster, multiple times per tick.
-             * 
-             *  This looks like a bug with Forge or even Minecraft itself, I'll
-             *  add some control to ensure that the "updateEntity" only process
-             *  once per tick and ignore further calls. -_-
-             * 
-             * That did not happen in 1.6.2, and this code is the same of the Furnace.
-             */
             teJukebox.validate();
             world.setTileEntity(x, y, z, teJukebox);
-            /*
-            if (active) {
-                ((TileEntityRedstoneJukebox) teJukebox).startPlaying();
-            } else {
-                ((TileEntityRedstoneJukebox) teJukebox).stopPlaying();
-            }
-            */
         }
 
     }
+
 
 
     /**

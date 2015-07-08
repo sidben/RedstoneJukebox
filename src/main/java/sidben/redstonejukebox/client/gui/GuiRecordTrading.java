@@ -257,14 +257,25 @@ public class GuiRecordTrading extends GuiContainer
         
         
         // Spawns particles if a trade was made.
-        // TODO: Update
-        /*
-        if (this.mc.thePlayer != null)
+        if (this.mc.thePlayer != null && madeTrade)
         {
             Entity auxVillager = (Entity)this.theIMerchant;
-            if (auxVillager != null && madeTrade) { CustomRecordHelper.spawnTradeParticles(this.mc.thePlayer.worldObj, auxVillager, this.rand); }
+            String s = "note";
+            
+            if (auxVillager != null) { 
+                for (int i = 0; i < 3; ++i)
+                {
+                    double pX = auxVillager.posX + (this.rand.nextFloat() * auxVillager.width * 2.0F) - auxVillager.width;
+                    double pY = auxVillager.posY + 1.0D + (this.rand.nextFloat() * auxVillager.height);
+                    double pZ = auxVillager.posZ + (this.rand.nextFloat() * auxVillager.width * 2.0F) - auxVillager.width;
+                    double velX = this.rand.nextGaussian();
+                    double velY = this.rand.nextGaussian();
+                    double velZ = this.rand.nextGaussian();
+                    
+                    auxVillager.worldObj.spawnParticle(s, pX, pY, pZ, velX, velY, velZ);
+                }                
+            }
         }
-        */
     }
 
     

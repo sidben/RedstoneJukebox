@@ -92,6 +92,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private static final int actionPlayVanillaRecord = 5;
     private static final int actionStopPlaying = 6;
     
+    
+    private String customName;
+    
 
     // TODO: Fix dancing note (once again)
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
@@ -183,15 +186,19 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     @Override
     public String getInventoryName() {
-        return "container.redstoneJukebox";
+        return this.hasCustomInventoryName() ? this.customName : "container.redstoneJukebox";
+    }
+
+
+    public void setInventoryName(String name) {
+        this.customName = name;
     }
 
     
     @Override
     public boolean hasCustomInventoryName()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return this.customName != null && this.customName.length() > 0;
     }
     
     
@@ -266,8 +273,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         
         NBTTagList nbttaglist = par1NBTTagCompound.getTagList("Items", 10);
         this.jukeboxItems = new ItemStack[this.getSizeInventory()];
-
-        // TODO: add custom name
         
         for (int i = 0; i < nbttaglist.tagCount(); i++) {
             NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
@@ -278,11 +283,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             }
         }
 
+        
         this.paramPlayMode = par1NBTTagCompound.getShort("PlayMode");
         this.paramLoop = par1NBTTagCompound.getBoolean("Loop");
         this.isBlockPowered = par1NBTTagCompound.getBoolean("Powered");
         this.isPlaylistStarted = par1NBTTagCompound.getBoolean("PlayStarted");
         this.isPlaylistFinished = par1NBTTagCompound.getBoolean("PlayFinished");
+        
+        if (par1NBTTagCompound.hasKey("CustomName", 8))
+        {
+            this.customName = par1NBTTagCompound.getString("CustomName");
+        }
     }
 
 
@@ -302,8 +313,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         par1NBTTagCompound.setBoolean("PlayFinished", this.isPlaylistFinished);
         NBTTagList nbttaglist = new NBTTagList();
 
-        // TODO: add custom name
-        
+       
         for (int i = 0; i < this.jukeboxItems.length; i++) {
             if (this.jukeboxItems[i] != null) {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
@@ -314,6 +324,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         }
 
         par1NBTTagCompound.setTag("Items", nbttaglist);
+        
+        if (this.hasCustomInventoryName()) 
+        {
+            par1NBTTagCompound.setString("CustomName", this.customName);
+        }
     }
 
 

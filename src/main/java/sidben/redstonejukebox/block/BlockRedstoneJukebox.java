@@ -7,9 +7,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
@@ -243,6 +245,22 @@ public class BlockRedstoneJukebox extends BlockContainer
         return true;
     }
 
+
+    
+    /**
+     * Called when the block is placed in the world.
+     */
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack stack) 
+    {
+        if (stack.hasDisplayName())
+        {
+            ((TileEntityRedstoneJukebox)world.getTileEntity(x, y, z)).setInventoryName(stack.getDisplayName());
+        }
+    }
+    
+
+    
 
     /**
      * ejects contained items into the world, and notifies neighbors of an update, as appropriate

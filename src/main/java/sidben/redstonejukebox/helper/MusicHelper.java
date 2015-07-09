@@ -42,7 +42,24 @@ public class MusicHelper
     // There are 75 possible spots (5x5x3), 74 considering 1 must be the power source
     // P.S. - I just want to avoid a constant world check while the juke is playing.
     
+    
+    /**
+     * Holds a reference to [mcMusicTicker], a class that triggers random
+     * background music.
+     */
+    private MusicTicker mcMusicTicker = null;
+    
+    /**
+     * Holds a reference to the private field of mcMusicTicker that hold the current
+     * background music, so it can be accessed via reflection. 
+     */
+    private Field fieldCurrentMusic = null;
 
+    
+
+    private final Minecraft mc;
+
+    
     /**
      * Contains all vanilla records and the song times (in seconds). 
      */
@@ -63,6 +80,70 @@ public class MusicHelper
     
     
     
+    
+
+    
+    //--------------------------------------------
+    // Constructor
+    //--------------------------------------------
+    public MusicHelper(Minecraft minecraft) 
+    {
+        this.mc = minecraft;
+
+
+        // Debug
+        LogHelper.info("Loading MusicTicker using Reflection...");
+        
+        
+        // Loops through each field in order to find the private mcMusicTicker.
+        // 
+        // I'm using this approach because searching by name requires a double check, one
+        // for dev environment and one for the obfuscated environment. Also, the field names 
+        // may change with each Forge build, so using this one-time loop I can get what I
+        // need with no mistake. 
+        for(Field f : mc.getClass().getDeclaredFields())
+        {
+            if (f.getType() == MusicTicker.class) {
+                try {
+                    f.setAccessible(true);
+                    this.mcMusicTicker = (MusicTicker) f.get(mc);
+                    LogHelper.info("MusicTicker found.");
+                } catch (IllegalArgumentException e) {
+                    this.mcMusicTicker = null;
+                    LogHelper.error("Error loading mcMusicTicker via reflection: " + e.getMessage());
+                } catch (IllegalAccessException e) {
+                    this.mcMusicTicker = null;
+                    LogHelper.error("Error loading mcMusicTicker via reflection: " + e.getMessage());
+                }
+                break;
+            }
+        }
+        
+
+        
+        
+        // If the MusicTicker class was found, seek the field that hold the
+        // current playing music, so it can be checked later.
+        if (this.mcMusicTicker != null) 
+        {
+
+            // Debug
+            LogHelper.info("Loading ISound using Reflection...");
+
+            for(Field f : this.mcMusicTicker.getClass().getDeclaredFields())
+            {
+                if (f.getType() == ISound.class) {
+                    f.setAccessible(true);
+                    this.fieldCurrentMusic = f;
+                    LogHelper.info("ISound found.");
+                    break;
+                }
+            }            
+        }
+        
+
+    }
+
     
     
     
@@ -157,7 +238,6 @@ public class MusicHelper
      */
     public void stopPlayingAt(ChunkCoordinates chunkcoordinates) 
     {
-        Minecraft mc = Minecraft.getMinecraft();
         ISound isound = (ISound)this.mapJukeboxesPositions.get(chunkcoordinates);
 
         if (isound != null)
@@ -180,7 +260,6 @@ public class MusicHelper
      */
     private void innerPlayRecord(String recordResourceName, int x, int y, int z, boolean showName, float volumeExtender)
     {
-        Minecraft mc = Minecraft.getMinecraft();
         float volumeRange = 64F;
 
         
@@ -224,42 +303,28 @@ public class MusicHelper
     
     public void StopAllBackgroundMusic()
     {
-        /*
-         * TODO: loop each declared field and find the idx of the one I want by Type, not name
-         * Save the idx in a static variable and use it to access the field, even when obfuscated.
-         */
+        // Check the music ticker for a background music being played.
+        if (this.mcMusicTicker != null && this.fieldCurrentMusic != null) 
+        {
+            ISound currentSound = null;
+
+            // Use reflection to access the private field that hold the last music played.
+            try {
+                currentSound = (ISound) this.fieldCurrentMusic.get(this.mcMusicTicker);
+            } catch (IllegalArgumentException e) {
+                LogHelper.error("Error checking mcMusicTicker via reflection: " + e.getMessage());
+            } catch (IllegalAccessException e) {
+                LogHelper.error("Error checking mcMusicTicker via reflection: " + e.getMessage());
+            }
+
+            // Check if that music is still playing and shut it down.
+            if (currentSound != null)
+            {
+                boolean isPlaying = mc.getSoundHandler().isSoundPlaying(currentSound);
+                if (isPlaying) mc.getSoundHandler().stopSound(currentSound);
+            }
+        }
         
-        // TODO: Clean this $#@% temp code up
-        Minecraft mc = Minecraft.getMinecraft();
-        try {
-            Field u = mc.getClass().getDeclaredField("mcMusicTicker");
-            u.setAccessible(true);
-            net.minecraft.client.audio.MusicTicker p = (MusicTicker) u.get(mc);
-            
-            Field v = p.getClass().getDeclaredField("field_147678_c");
-            v.setAccessible(true);
-            net.minecraft.client.audio.ISound q = (ISound) v.get(p);
-            
-            boolean sp = mc.getSoundHandler().isSoundPlaying(q);
-            if (sp) mc.getSoundHandler().stopSound(q);
-            
-            System.out.println("[" + u + "] ");
-            System.out.println("[" + p + "] ");
-            System.out.println("[" + v + "] ");
-            System.out.println("[" + sp + "] ");
-        } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }        
     }
     
     
@@ -274,7 +339,6 @@ public class MusicHelper
         // TODO: Also check vanilla for records playing by a regular jukebox
         
         // Ref: SoundManager.updateAllSounds()
-        Minecraft mc = Minecraft.getMinecraft();
         Iterator iterator = this.mapJukeboxesPositions.entrySet().iterator();
 
         while (iterator.hasNext())

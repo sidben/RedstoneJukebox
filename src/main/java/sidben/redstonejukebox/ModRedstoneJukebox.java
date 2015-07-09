@@ -1,5 +1,6 @@
 package sidben.redstonejukebox;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.helper.MusicHelper;
@@ -84,7 +85,7 @@ public class ModRedstoneJukebox
         proxy.initialize();
         
         // Helper classes single instances
-        musicHelper = new MusicHelper();
+        musicHelper = new MusicHelper(Minecraft.getMinecraft());
         recordStoreHelper = new RecordStoreHelper();
     }
 

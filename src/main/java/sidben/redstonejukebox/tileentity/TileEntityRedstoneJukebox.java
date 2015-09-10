@@ -1,19 +1,12 @@
 package sidben.redstonejukebox.tileentity;
 
-import java.lang.reflect.Field;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
-import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.init.MyBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -430,7 +423,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 // Sets the slot
                 this.setCurrentJukeboxPlaySlot(auxSlot);
                 
-                // Play record
+                // Play the record
                 float extraVolume = this.getExtraVolume();
                 ModRedstoneJukebox.instance.getMusicHelper().playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, auxRecordIndex, true, extraVolume);
 
@@ -441,6 +434,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 // Stops the record
                 ChunkCoordinates chunkcoordinates = new ChunkCoordinates(this.xCoord, this.yCoord, this.zCoord);
                 ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
+
+                // Sets the slot
+                this.setCurrentJukeboxPlaySlot((byte)-1);
 
             }
             
@@ -503,14 +499,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             
             // Only process the method when the block is powered
             if (!this.isBlockPowered) return;
-            
-            
-            
-
-            
-
-            
-       
             
             
             
@@ -608,7 +596,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.scheduleStopPlaying = false;
 
         // Send update to clients
-        this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukebox, TileEntityRedstoneJukebox.actionStopPlaying, 0);
+        this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, (this.isBlockPowered ? MyBlocks.redstoneJukeboxActive : MyBlocks.redstoneJukebox), TileEntityRedstoneJukebox.actionStopPlaying, 0);
         this.resync();
     }
 

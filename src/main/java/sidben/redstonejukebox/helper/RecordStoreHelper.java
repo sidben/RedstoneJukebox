@@ -194,7 +194,7 @@ public class RecordStoreHelper
         }
         
         
-        // TODO: remove duplicate recipes
+        // TODO: remove duplicate recipes (can't have multiple trades for the same record)
 
         
         // returns the new store

@@ -1,9 +1,7 @@
 package sidben.redstonejukebox.init;
 
 import net.minecraft.creativetab.CreativeTabs;
-import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.item.ItemBlankRecord;
-import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 

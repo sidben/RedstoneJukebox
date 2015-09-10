@@ -1,15 +1,9 @@
 package sidben.redstonejukebox.handler;
 
-import java.lang.reflect.Field;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.MusicHelper;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.SoundCategory;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 
 

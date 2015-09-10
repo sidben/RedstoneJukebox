@@ -6,12 +6,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
@@ -40,7 +38,7 @@ public class MusicHelper
     // TODO: (?) Hashmap to store the coordinates of every noteblock around a jukebox. 
     // Hashmap updates when a record starts playing and every 10 seconds when the jukebox is active. 
     // There are 75 possible spots (5x5x3), 74 considering 1 must be the power source
-    // P.S. - I just want to avoid a constant world check while the juke is playing.
+    // P.S. - I just want to avoid a constant world check while the jukebox is playing.
     
     
     /**

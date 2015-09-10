@@ -19,7 +19,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
-import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
@@ -312,39 +311,7 @@ public class BlockRedstoneJukebox extends BlockContainer
                 BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
                 teJukebox.updateJukeboxTileState(haveEnergy);
             }
-
             
-            /*
-            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
-            
-            LogHelper.info("onNeighborChange()");
-            //LogHelper.info("    " + teJukebox);
-            
-            boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
-            boolean jukeboxActive = teJukebox.isActive();
-            int tickRate = 4;
-            
-            LogHelper.info("    haveEnergy " + haveEnergy);
-            LogHelper.info("    isActive " + this.isActive);
-            LogHelper.info("    finished " + teJukebox.finishedPlayingAllRecords());
-            LogHelper.info("    juke active " + jukeboxActive);
-            LogHelper.info("    Block " + block);
-            
-            if (this.isActive && !haveEnergy) {
-                // Schedule the shut down of the jukebox
-                world.scheduleBlockUpdate(x, y, z, this, tickRate);
-            }
-            else if (!this.isActive && haveEnergy && !teJukebox.finishedPlayingAllRecords()) {
-                // Turns the jukebox on
-                BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
-            }
-            */
-
-            /*
-            if (teJukebox != null) {
-                teJukebox.checkRedstonePower();
-            }
-            */
         }
     }
     
@@ -469,6 +436,9 @@ public class BlockRedstoneJukebox extends BlockContainer
     //  Visual Effects
     //--------------------------------------------------------------------
 
+    // TODO: Remove particles if the config for particles is low (follow same rule of redstone dust)
+    
+    
     /**
      * A randomly called display update to be able to add particles or other items for display
      */

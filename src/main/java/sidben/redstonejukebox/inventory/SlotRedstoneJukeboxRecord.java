@@ -1,7 +1,6 @@
 package sidben.redstonejukebox.inventory;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.MusicHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;

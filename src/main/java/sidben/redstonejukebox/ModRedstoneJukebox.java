@@ -1,11 +1,9 @@
 package sidben.redstonejukebox;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
-import sidben.redstonejukebox.proxy.CommonProxy;
 import sidben.redstonejukebox.proxy.IProxy;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;

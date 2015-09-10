@@ -1,10 +1,8 @@
 package sidben.redstonejukebox.network;
 
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.world.World;
 import io.netty.buffer.ByteBuf;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
-import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 

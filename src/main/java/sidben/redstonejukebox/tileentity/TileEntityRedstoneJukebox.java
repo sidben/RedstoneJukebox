@@ -283,7 +283,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.currentIndex = par1NBTTagCompound.getInteger("PlaylistIndex");
         
         if (this.playOrder == null || this.playOrder.length != 8) this.playOrder = new byte[8];
-        if (this.currentIndex >= 0) this.currentIndex--;        // Removes 1 from the index because on world load, this will trigger the "PlayNextRecord" method, that will add 1 to the index
+        if (this.currentIndex >= 0) this.currentIndex--;        // Removes 1 from the index because on world load, the "PlayNextRecord" method will be triggered and that will add 1 to the index
         
         if (par1NBTTagCompound.hasKey("CustomName", 8))     // OBS: Custom name is useless, since it don't appear on the GUI... But it's coded!
         {

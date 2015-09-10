@@ -98,7 +98,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
     // TODO: Persistence of the playlist order on world reload
-    // TODO: Removing the record currently playing from the inventory makes it skip to the next song.
 
     
 
@@ -549,6 +548,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                         if (this.songTimer > 0) {
                             // Still counting...
                             --this.songTimer;
+                            
+                            // Check the jukebox slot, skip to the next record if the current slot is empty (most likely removed by player)
+                            if (this.currentJukeboxPlaySlot > -1) {
+                                ItemStack record = this.jukeboxItems[this.currentJukeboxPlaySlot];
+                                if (record == null) { this.schedulePlayNextRecord = true; }
+                            }
                         } else {
                             // Time to play the next record
                             // this.playNextRecord();
@@ -597,7 +602,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.scheduleStopPlaying = false;
 
         // Send update to clients
-        this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukebox, this.actionStopPlaying, 0);
+        this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukebox, TileEntityRedstoneJukebox.actionStopPlaying, 0);
         this.resync();
     }
 

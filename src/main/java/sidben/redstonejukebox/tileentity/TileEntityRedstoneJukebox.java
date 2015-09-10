@@ -96,7 +96,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private String customName;
     
 
-    // TODO: Fix dancing note (once again)
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
     // TODO: Persistence of the playlist order on world reload
     // TODO: Removing the record currently playing from the inventory makes it skip to the next song.
@@ -290,7 +289,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.isPlaylistStarted = par1NBTTagCompound.getBoolean("PlayStarted");
         this.isPlaylistFinished = par1NBTTagCompound.getBoolean("PlayFinished");
         
-        if (par1NBTTagCompound.hasKey("CustomName", 8))
+        if (par1NBTTagCompound.hasKey("CustomName", 8))     // OBS: Custom name is useless, since it don't appear on the GUI... But it's coded!
         {
             this.customName = par1NBTTagCompound.getString("CustomName");
         }
@@ -353,8 +352,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.paramPlayMode = tag.getShort("PlayMode");
         this.paramLoop = tag.getBoolean("Loop");
 
-        // Extra info
-        this.currentJukeboxPlaySlot = tag.getByte("JukeboxPlaySlot");
+        // // Extra info
+        // this.currentJukeboxPlaySlot = tag.getByte("JukeboxPlaySlot");
 
         
         sidben.redstonejukebox.helper.LogHelper.info("    PlayMode: " + this.paramPlayMode);
@@ -378,8 +377,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         tag.setShort("PlayMode", this.paramPlayMode);
         tag.setBoolean("Loop", this.paramLoop);
 
-        // Extra info (used in GUI)
-        tag.setByte("JukeboxPlaySlot", this.currentJukeboxPlaySlot);
+        // // Extra info (used in GUI)
+        // tag.setByte("JukeboxPlaySlot", this.currentJukeboxPlaySlot);
         
         
         sidben.redstonejukebox.helper.LogHelper.info("    PlayMode: " + this.paramPlayMode);
@@ -408,16 +407,30 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             sidben.redstonejukebox.helper.LogHelper.info("    isRemote [" + this.worldObj.isRemote + "]");
 
             
-            if (action == this.actionPlayVanillaRecord)
+            if (action == TileEntityRedstoneJukebox.actionPlayVanillaRecord)
             {
                 // this.setCurrentJukeboxPlaySlot((byte)param);
                 
+                // The parameter should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record index
+                // In other words, the first digit will always be a number between 1 and 9, representing the slot. The following
+                // digits should represent the record index.
+                String auxParam = Integer.toString(param);
+                if (auxParam.length() < 2) {
+                    LogHelper.error("Error decoding PlayVanillaRecord parameter. Value: " + param);
+                    return false;
+                }
+                byte auxSlot = (byte)(Integer.parseInt(auxParam.substring(0, 1)) - 1); 
+                int auxRecordIndex = Integer.parseInt(auxParam.substring(1));
+
+                // Sets the slot
+                this.setCurrentJukeboxPlaySlot(auxSlot);
+                
                 // Play record
                 float extraVolume = this.getExtraVolume();
-                ModRedstoneJukebox.instance.getMusicHelper().playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, param, true, extraVolume);
+                ModRedstoneJukebox.instance.getMusicHelper().playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, auxRecordIndex, true, extraVolume);
 
             }
-            else if (action == this.actionStopPlaying)
+            else if (action == TileEntityRedstoneJukebox.actionStopPlaying)
             {
             
                 // Stops the record
@@ -629,11 +642,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
                 int recordIndex = ModRedstoneJukebox.instance.getMusicHelper().getVanillaRecordIndex(record);
                 
+                // Sets the block event parameter. It should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record index
+                int blockParam = Integer.parseInt(Integer.toString(this.currentJukeboxPlaySlot + 1) + Integer.toString(recordIndex)); 
+                
                 // Send update to clients
                 LogHelper.info("    Adding block event");
-                this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukeboxActive, this.actionPlayVanillaRecord, recordIndex);
-                // this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukebox, this.actionPlayVanillaRecord + 3, this.currentJukeboxPlaySlot);
-                // this.resync();
+                this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukeboxActive, TileEntityRedstoneJukebox.actionPlayVanillaRecord, blockParam);
+                // this.resync();   // OBS: Looks like it's not needed
                 
                 // To update comparators
                 this.worldObj.notifyBlockOfNeighborChange(this.xCoord - 1, this.yCoord, this.zCoord, this.getBlockType());

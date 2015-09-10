@@ -209,6 +209,7 @@ public class MusicHelper
     /**
      * Starts playing a vanilla record on the given coordinates.
      * 
+     * @param index Index of the record in the internal recordCollection array, used to tell the client whick record should be played. This is NOT the current slot being played.
      */
     public void playVanillaRecordAt(World world, int x, int y, int z, int index, boolean showName, float volumeExtender)
     {

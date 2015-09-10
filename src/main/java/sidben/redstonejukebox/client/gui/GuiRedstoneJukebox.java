@@ -2,7 +2,6 @@ package sidben.redstonejukebox.client.gui;
 
 import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.relauncher.*;
-import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;

@@ -97,7 +97,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     
 
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
-    // TODO: Persistence of the playlist order on world reload
 
     
 
@@ -287,6 +286,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.isBlockPowered = par1NBTTagCompound.getBoolean("Powered");
         this.isPlaylistStarted = par1NBTTagCompound.getBoolean("PlayStarted");
         this.isPlaylistFinished = par1NBTTagCompound.getBoolean("PlayFinished");
+        this.playOrder = par1NBTTagCompound.getByteArray("PlaylistOrder");
+        this.currentIndex = par1NBTTagCompound.getInteger("PlaylistIndex");
+        
+        if (this.playOrder == null || this.playOrder.length != 8) this.playOrder = new byte[8];
+        if (this.currentIndex >= 0) this.currentIndex--;        // Removes 1 from the index because on world load, this will trigger the "PlayNextRecord" method, that will add 1 to the index
         
         if (par1NBTTagCompound.hasKey("CustomName", 8))     // OBS: Custom name is useless, since it don't appear on the GUI... But it's coded!
         {
@@ -309,6 +313,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         par1NBTTagCompound.setBoolean("Powered", this.isBlockPowered);
         par1NBTTagCompound.setBoolean("PlayStarted", this.isPlaylistStarted);
         par1NBTTagCompound.setBoolean("PlayFinished", this.isPlaylistFinished);
+        par1NBTTagCompound.setByteArray("PlaylistOrder", this.playOrder);
+        par1NBTTagCompound.setInteger("PlaylistIndex", this.currentIndex);
         NBTTagList nbttaglist = new NBTTagList();
 
        

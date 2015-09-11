@@ -76,7 +76,7 @@ public class MusicHelper
         new MusicCollectionItem(Items.record_wait, 238)
     };
     
-    
+    // TODO: Find the music length by reading the OGG files
     
     
 

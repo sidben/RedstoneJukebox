@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.init.MyItems;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -82,23 +83,11 @@ public class RecordStoreHelper
     // Fields
     //--------------------------------------------
 
-    // TODO: make all of this statics a config file value
-    private static final int maxStores = 256;
-    private static final int expirationTime = 20;
-    private static final int maxExtraOffers = 3;
-    private static final int maxTrades = 3;             // Maximum amount of times a record trade can be made
-    private static final int recordPriceBuyMin = 5;
-    private static final int recordPriceBuyMax = 11;
-    private static final int recordPriceSellMin = 8;
-    private static final int recordPriceSellMax = 15;
-    private static final int buyingOffersRatio = 60;     // Ratio of buying records VS selling records offers. By default, 60% of the offers will be to buy records.
-
-    
     private Random rand = new Random();
     
     private LoadingCache<Integer, MerchantRecipeList> storeCache = CacheBuilder.newBuilder()
-            .maximumSize(maxStores)
-            .expireAfterAccess(expirationTime, TimeUnit.MINUTES)
+            .maximumSize(ConfigurationHandler.maxStores)
+            .expireAfterAccess(ConfigurationHandler.expirationTime, TimeUnit.MINUTES)
             .recordStats()
             .build(new CacheLoader<Integer, MerchantRecipeList>() 
                 {
@@ -166,7 +155,7 @@ public class RecordStoreHelper
 
 
         // Decides how many offers will be added, beyond the default two
-        int offersSize = rand.nextInt(maxExtraOffers) + 1;
+        int offersSize = rand.nextInt(ConfigurationHandler.maxExtraOffers) + 1;
         
         // Adds one buying offers and one selling offer, by default (extra if for extra randomness)
         if (rand.nextInt(10) < 5) {
@@ -181,7 +170,7 @@ public class RecordStoreHelper
         for (int i = 0; i < offersSize; i++) 
         {
             luck = rand.nextInt(100) + 1;
-            luckType = luck <= buyingOffersRatio ? EnumRecipeType.BUYING_RECORDS : EnumRecipeType.SELLING_RECORDS;
+            luckType = luck <= ConfigurationHandler.buyingOffersRatio ? EnumRecipeType.BUYING_RECORDS : EnumRecipeType.SELLING_RECORDS;
             offers.add(luckType);
         }
         
@@ -220,12 +209,12 @@ public class RecordStoreHelper
         
         // sets the price
         if (type == EnumRecipeType.BUYING_RECORDS) {
-            auxPriceMin = recordPriceBuyMin;
-            auxPriceMax = recordPriceBuyMax;
+            auxPriceMin = ConfigurationHandler.recordPriceBuyMin;
+            auxPriceMax = ConfigurationHandler.recordPriceBuyMax;
         }
         else if (type == EnumRecipeType.SELLING_RECORDS) {
-            auxPriceMin = recordPriceSellMin;
-            auxPriceMax = recordPriceSellMax;
+            auxPriceMin = ConfigurationHandler.recordPriceSellMin;
+            auxPriceMax = ConfigurationHandler.recordPriceSellMax;
         }
         else {
             return null;
@@ -252,7 +241,7 @@ public class RecordStoreHelper
         
         // Since the maxTrades variable is hard-coded on 7, manually reduces the amount of 
         // times this trade can be used.
-        recipeStock = rand.nextInt(maxTrades) + 1;
+        recipeStock = rand.nextInt(ConfigurationHandler.maxTrades) + 1;
         recipe.func_82783_a(recipeStock - 7);
         
         

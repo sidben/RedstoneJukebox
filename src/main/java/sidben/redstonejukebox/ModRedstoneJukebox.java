@@ -2,9 +2,11 @@ package sidben.redstonejukebox;
 
 import net.minecraft.client.Minecraft;
 import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
 import sidben.redstonejukebox.proxy.IProxy;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -41,7 +43,8 @@ public class ModRedstoneJukebox
     private RecordStoreHelper recordStoreHelper;
 
     
-    
+    // TODO: Commands
+    // TODO: Custom records
     
     
     /**
@@ -68,6 +71,10 @@ public class ModRedstoneJukebox
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        // Loads config
+        ConfigurationHandler.init(event.getSuggestedConfigurationFile());
+        FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
+
         // Sided pre-initialization
         proxy.pre_initialize();
     }

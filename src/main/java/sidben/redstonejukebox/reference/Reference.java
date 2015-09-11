@@ -10,6 +10,6 @@ public class Reference {
 
     public static final String  ServerProxyClass   	= "sidben.redstonejukebox.proxy.ServerProxy";
     public static final String  ClientProxyClass   	= "sidben.redstonejukebox.proxy.ClientProxy";
-    //public static final String  GuiFactoryClass   	= "sidben.villagertweaks.client.gui.GuiFactory";
+    public static final String  GuiFactoryClass   	= "sidben.redstonejukebox.client.gui.GuiFactory";
 
 }

@@ -16,7 +16,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 
-@Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion)
+@Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion, guiFactory = Reference.GuiFactoryClass)
 public class ModRedstoneJukebox
 {
 

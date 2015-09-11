@@ -91,44 +91,44 @@ public class ConfigurationHandler
         
         // Load properties
         prop = config.get(CATEGORY_TRADING, "max_stores", DEFAULT_maxStores, "", 16, 1024);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.max_stores");
+        prop.setLanguageKey("sidben.redstonejukebox.config.max_stores");
         maxStores = prop.getInt(DEFAULT_maxStores);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "expiration_store", DEFAULT_expirationTime, "", 1, 1440);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.expiration_store");
+        prop.setLanguageKey("sidben.redstonejukebox.config.expiration_store");
         expirationTime = prop.getInt(DEFAULT_expirationTime);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "max_new_trades", DEFAULT_maxExtraOffers, "", 1, 999);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.max_new_trades");
+        prop.setLanguageKey("sidben.redstonejukebox.config.max_new_trades");
         maxExtraOffers = prop.getInt(DEFAULT_maxExtraOffers);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_trade_count", DEFAULT_maxTrades, "", 1, 999);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.record_trade_count");
+        prop.setLanguageKey("sidben.redstonejukebox.config.record_trade_count");
         maxTrades = prop.getInt(DEFAULT_maxTrades);
         propOrder.add(prop.getName());
 
         
         
         prop = config.get(CATEGORY_TRADING, "record_buy_price_min", DEFAULT_recordPriceBuyMin, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.record_buy_price_min");
+        prop.setLanguageKey("sidben.redstonejukebox.config.record_buy_price_min");
         recordPriceBuyMin = prop.getInt(DEFAULT_recordPriceBuyMin);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_buy_price_max", DEFAULT_recordPriceBuyMax, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.record_buy_price_max");
+        prop.setLanguageKey("sidben.redstonejukebox.config.record_buy_price_max");
         recordPriceBuyMax = prop.getInt(DEFAULT_recordPriceBuyMax);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_sell_price_min", DEFAULT_recordPriceSellMin, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.record_sell_price_min");
+        prop.setLanguageKey("sidben.redstonejukebox.config.record_sell_price_min");
         recordPriceSellMin = prop.getInt(DEFAULT_recordPriceSellMin);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_sell_price_max", DEFAULT_recordPriceSellMax, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.configgui.record_sell_price_max");
+        prop.setLanguageKey("sidben.redstonejukebox.config.record_sell_price_max");
         recordPriceSellMax = prop.getInt(DEFAULT_recordPriceSellMax);
         propOrder.add(prop.getName());
 

@@ -609,8 +609,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.schedulePlayNextRecord = false;
         LogHelper.info("    index " + this.currentIndex);
         
-        // TODO: skip empty slots
-        
         
         if (this.currentIndex > 7) 
         {

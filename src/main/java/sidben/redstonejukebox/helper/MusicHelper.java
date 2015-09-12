@@ -22,6 +22,28 @@ import net.minecraft.world.World;
 
 
 
+/*
+ * NOTE ABOUT BEHAVIOUR ACROSS DIMENSIONS / LOADED CHUNKS
+ * ------------------------------------------------------
+ * 
+ * Assuming a redstone jukebox is playing:
+ * 
+ * - If the player leaves the chunk, but the chunk remains loaded
+ *   (like spawn), the song timer will continue to run but once the
+ *   player re-enters the chunk, they won't hear any song.
+ *   
+ *   Background music may start, since the client isn't playing
+ *   any jukebox. Once the song timer runs out and the next one starts
+ *   the player will hear that song normally. As long as the TileEntity
+ *   remains loaded, the jukebox will behave normally, including loops
+ *   and redstone updates.
+ *   
+ * - If the player leaves the chunk and the chunk is unloaded,
+ *   once the player re-enter the chunk, the last song (saved on NBT)
+ *   will play from the beginning.
+ * 
+ */
+
 /**
  * Class designed to help with music playing and record related methods (custom or vanilla).
  *
@@ -78,7 +100,7 @@ public class MusicHelper
         new MusicCollectionItem(Items.record_strad, 188),
         new MusicCollectionItem(Items.record_ward, 251),
         new MusicCollectionItem(Items.record_11, 71),
-        new MusicCollectionItem(Items.record_wait, 238)
+        new MusicCollectionItem(Items.record_wait, 237)
     };
     
     /*
@@ -286,8 +308,7 @@ public class MusicHelper
         // before starting a new one.
         ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
         this.stopPlayingAt(chunkcoordinates);
-        // TODO: check how this behave across dimensions
-        
+
         
         if (recordResourceName != null)
         {
@@ -345,8 +366,6 @@ public class MusicHelper
     @SuppressWarnings("rawtypes")
     public boolean AnyJukeboxPlaying()
     {
-        // TODO: Does this check on other dimensions?
-
         
         // Ref: SoundManager.updateAllSounds()
         Iterator iterator;

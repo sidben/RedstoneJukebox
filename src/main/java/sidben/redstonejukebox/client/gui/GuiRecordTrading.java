@@ -28,8 +28,6 @@ import net.minecraft.world.World;
 public class GuiRecordTrading extends GuiContainer
 {
 
-    // TODO: add villager name
-    
     protected Random rand = new Random();
 
     private static final ResourceLocation guiMainTexture = new ResourceLocation(ClientProxy.guiTextureTrade);
@@ -49,7 +47,7 @@ public class GuiRecordTrading extends GuiContainer
     {
         super(new ContainerRecordTrading(player, merchant, world));
         this.theIMerchant = merchant;
-        this.merchantName = customName != null && customName.length() > -1 ? customName : I18n.format("entity.Villager.name", new Object[0]);
+        this.merchantName = customName != null && customName.length() > 1 ? customName : I18n.format("entity.Villager.name", new Object[0]);
         
         int villagerId = ((Entity)merchant).getEntityId();
         tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);

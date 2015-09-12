@@ -180,7 +180,6 @@ public class RecordStoreHelper
         }
         
 
-        // TODO: test
         // Adds the actual offers based on the type list
         ItemStack record;
         String recordName = "";

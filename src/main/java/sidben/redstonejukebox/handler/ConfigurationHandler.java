@@ -48,9 +48,14 @@ public class ConfigurationHandler
     /** Maximum price in emeralds that a villager will charge when selling records to players */
     public static int recordPriceSellMax;
     
+    /** Percentage of chance that a villager will have record trades. */
+    public static int shopChance;
+
     /** Ratio of buying records VS selling records trades. By default, 60% of the offers will be to buy records from players. */
     public static final int buyingOffersRatio = 60;
 
+
+    
     private static final int DEFAULT_maxStores              = 256;
     private static final int DEFAULT_expirationTime         = 20;
     private static final int DEFAULT_maxOffers              = 5;
@@ -59,6 +64,8 @@ public class ConfigurationHandler
     private static final int DEFAULT_recordPriceBuyMax      = 11;
     private static final int DEFAULT_recordPriceSellMin     = 8;
     private static final int DEFAULT_recordPriceSellMax     = 15;
+    private static final int DEFAULT_shopChance             = 70;
+    
     
     
     
@@ -98,6 +105,11 @@ public class ConfigurationHandler
         prop = config.get(CATEGORY_TRADING, "expiration_store", DEFAULT_expirationTime, "", 1, 1440);
         prop.setLanguageKey("sidben.redstonejukebox.config.expiration_store");
         expirationTime = prop.getInt(DEFAULT_expirationTime);
+        propOrder.add(prop.getName());
+
+        prop = config.get(CATEGORY_TRADING, "store_chance", DEFAULT_shopChance, "", 0, 100);
+        prop.setLanguageKey("sidben.redstonejukebox.config.store_chance");
+        shopChance = prop.getInt(DEFAULT_shopChance);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "max_new_trades", DEFAULT_maxOffers, "", 3, 64);

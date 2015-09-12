@@ -87,7 +87,13 @@ public class RecordStoreHelper
     //--------------------------------------------
 
     private Random rand = new Random();
-    
+
+    /*
+     * NOTE: If the player opens the trade GUI (getting a store) and after some time
+     * the cache expires, on the next [getStore] call, a new recipe list will be created,
+     * so the GUI won't match the actual trades. As far as I tested, this behavior does 
+     * not cause a crash (yay). 
+     */
     private LoadingCache<Integer, MerchantRecipeList> storeCache = CacheBuilder.newBuilder()
             .maximumSize(ConfigurationHandler.maxStores)
             .expireAfterAccess(ConfigurationHandler.expirationTime, TimeUnit.MINUTES)
@@ -97,13 +103,20 @@ public class RecordStoreHelper
                     @Override
                     public MerchantRecipeList load(Integer key) throws Exception
                     {
-                        // TODO: rule that some merchants may not have stores
-                        MerchantRecipeList store = createRandomStore();
+                        // Check if the villager will have a record trade
+                        MerchantRecipeList store;
+
+                        int luck = rand.nextInt(100) + 1;
+                        if (luck <= ConfigurationHandler.shopChance) {
+                            store = createRandomStore();
+                        } else {
+                            store = new MerchantRecipeList();       // Empty store
+                        }
+
                         return store;
                     }
                 });
 
-    // TODO: check what happens if the cache expires while the GUI is open
     
     
     

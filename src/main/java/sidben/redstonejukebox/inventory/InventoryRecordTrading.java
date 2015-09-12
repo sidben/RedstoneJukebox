@@ -16,6 +16,7 @@ public class InventoryRecordTrading implements IInventory
 
     private final IMerchant theMerchant;
     private ItemStack[] theInventory = new ItemStack[3];
+    @SuppressWarnings("unused")
     private final EntityPlayer thePlayer;
     private MerchantRecipe currentRecipe;
     private int currentRecipeIndex;
@@ -280,30 +281,6 @@ public class InventoryRecordTrading implements IInventory
                     this.setInventorySlotContents(2, (ItemStack)null);
                 }
 
-                
-                /*
-                // Direct approach, only checks for the current recipe selected
-                MerchantRecipe slotRecipe = (MerchantRecipe) merchantrecipe.get(this.currentRecipeIndex);
-                boolean slot1Ok = false;
-                boolean slot2Ok = false;
-                
-                slot1Ok = (var1 != null && var1.itemID == slotRecipe.getItemToBuy().itemID && var1.stackSize >= slotRecipe.getItemToBuy().stackSize);
-                if (slotRecipe.getSecondItemToBuy() == null) { slot2Ok = (var2 == null); }
-                if (slotRecipe.getSecondItemToBuy() != null) { slot2Ok = (var2 != null && var2.itemID == slotRecipe.getSecondItemToBuy().itemID && var2.stackSize >= slotRecipe.getSecondItemToBuy().stackSize); }
-
-                boolean validRecipe = (slot1Ok && slot2Ok && !slotRecipe.func_82784_g()); 
-                
-
-                if (validRecipe)
-                {
-                    this.currentRecipe = slotRecipe;
-                    this.setInventorySlotContents(2, slotRecipe.getItemToSell().copy());
-                }
-                else
-                {
-                    this.setInventorySlotContents(2, (ItemStack)null);
-                }
-                */
             }
 
         }

@@ -110,10 +110,7 @@ public class MusicHelper
                     f.setAccessible(true);
                     this.mcMusicTicker = (MusicTicker) f.get(mc);
                     LogHelper.info("MusicTicker found.");
-                } catch (IllegalArgumentException e) {
-                    this.mcMusicTicker = null;
-                    LogHelper.error("Error loading mcMusicTicker via reflection: " + e.getMessage());
-                } catch (IllegalAccessException e) {
+                } catch (IllegalArgumentException|IllegalAccessException e) {
                     this.mcMusicTicker = null;
                     LogHelper.error("Error loading mcMusicTicker via reflection: " + e.getMessage());
                 }
@@ -161,21 +158,11 @@ public class MusicHelper
             } else {
                 LogHelper.error("Error loading mapSoundPositions via reflection: Field not found");
             }
-        } catch (NoSuchFieldException e) {
-            this.vanillaSoundPositions = null;
-            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
-        } catch (SecurityException e) {
-            this.vanillaSoundPositions = null;
-            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            this.vanillaSoundPositions = null;
-            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException|SecurityException|IllegalArgumentException|IllegalAccessException e) {
             this.vanillaSoundPositions = null;
             LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
         }
         
-        // TODO: Check if I can change the project compliance and JRE to 1.7, so I can use multiple catch
     }
 
     
@@ -347,9 +334,7 @@ public class MusicHelper
             // Use reflection to access the private field that hold the last music played.
             try {
                 currentSound = (ISound) this.fieldCurrentMusic.get(this.mcMusicTicker);
-            } catch (IllegalArgumentException e) {
-                LogHelper.error("Error checking mcMusicTicker via reflection: " + e.getMessage());
-            } catch (IllegalAccessException e) {
+            } catch (IllegalArgumentException|IllegalAccessException e) {
                 LogHelper.error("Error checking mcMusicTicker via reflection: " + e.getMessage());
             }
 

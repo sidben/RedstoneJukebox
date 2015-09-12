@@ -35,11 +35,6 @@ public class MusicHelper
     private final Map<ChunkCoordinates, ISound> mapJukeboxesPositions = Maps.newHashMap();
 
     
-    // TODO: (?) Hashmap to store the coordinates of every noteblock around a jukebox. 
-    // Hashmap updates when a record starts playing and every 10 seconds when the jukebox is active. 
-    // There are 75 possible spots (5x5x3), 74 considering 1 must be the power source
-    // P.S. - I just want to avoid a constant world check while the jukebox is playing.
-    
     
     /**
      * Holds a reference to [mcMusicTicker], a class that triggers random

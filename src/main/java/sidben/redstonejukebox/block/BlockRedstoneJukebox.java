@@ -449,6 +449,12 @@ public class BlockRedstoneJukebox extends BlockContainer
             this.showSparkles(world, x, y, z, rand);
 
             
+            // NOTE: To reduce potential lag, I removed the particle effects that were added on surrounding noteblocks.
+            // There are 75 possible spots (5x5x3) to be checked on every display tick, I don't think the amount 
+            // of extra processing is worth some minor visual effects. This may be revisited in the future or
+            // become an optional config, disabled by default.
+            
+            /*
             // notes particles ratio (1/3 of display ticks)
             if (rand.nextInt(2) == 0)     
             {
@@ -477,6 +483,8 @@ public class BlockRedstoneJukebox extends BlockContainer
                 } // for i
             
             }
+            
+            */
 
         }
         
@@ -534,6 +542,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Displays a random music note on the block.
      */
+    @SuppressWarnings("unused")     // OBS: Currently disabled
     private void showNoteAbove(World world, int x, int y, int z)
     {
         int color = world.rand.nextInt(16);

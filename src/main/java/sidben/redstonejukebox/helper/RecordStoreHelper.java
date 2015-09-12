@@ -157,8 +157,8 @@ public class RecordStoreHelper
         EnumRecipeType luckType;
 
 
-        // Decides how many offers will be added, beyond the default two
-        int offersSize = rand.nextInt(ConfigurationHandler.maxExtraOffers) + 1;
+        // Decides how many offers will be added. The minimum is 3 trades.
+        int offersSize = rand.nextInt(ConfigurationHandler.maxOffers - 2) + 3;
         
         // Adds one buying offers and one selling offer, by default (extra if for extra randomness)
         if (rand.nextInt(10) < 5) {
@@ -269,9 +269,9 @@ public class RecordStoreHelper
         }
         
         
-        // Since the maxTrades variable is hard-coded on 7, manually reduces the amount of 
+        // Since the tradeUses variable is hard-coded on 7, manually reduces the amount of 
         // times this trade can be used.
-        recipeStock = rand.nextInt(ConfigurationHandler.maxTrades) + 1;
+        recipeStock = rand.nextInt(ConfigurationHandler.tradeUses) + 1;
         recipe.func_82783_a(recipeStock - 7);
         
         

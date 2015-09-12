@@ -30,11 +30,11 @@ public class ConfigurationHandler
     /** Time in minutes a store will remain in cache */
     public static int expirationTime;
     
-    /** Maximum amount of new record trades a villager can get */
-    public static int maxExtraOffers;
+    /** Maximum amount of record trades a villager can have */
+    public static int maxOffers;
     
     /** Maximum amount of times a record trade can be used */
-    public static int maxTrades;
+    public static int tradeUses;
     
     /** Minimum price in emeralds that a villager will pay when buying records from the player */
     public static int recordPriceBuyMin;
@@ -53,8 +53,8 @@ public class ConfigurationHandler
 
     private static final int DEFAULT_maxStores              = 256;
     private static final int DEFAULT_expirationTime         = 20;
-    private static final int DEFAULT_maxExtraOffers         = 3;
-    private static final int DEFAULT_maxTrades              = 3;
+    private static final int DEFAULT_maxOffers              = 5;
+    private static final int DEFAULT_tradeUses              = 3;
     private static final int DEFAULT_recordPriceBuyMin      = 5;
     private static final int DEFAULT_recordPriceBuyMax      = 11;
     private static final int DEFAULT_recordPriceSellMin     = 8;
@@ -100,14 +100,14 @@ public class ConfigurationHandler
         expirationTime = prop.getInt(DEFAULT_expirationTime);
         propOrder.add(prop.getName());
 
-        prop = config.get(CATEGORY_TRADING, "max_new_trades", DEFAULT_maxExtraOffers, "", 1, 999);
-        prop.setLanguageKey("sidben.redstonejukebox.config.max_new_trades");
-        maxExtraOffers = prop.getInt(DEFAULT_maxExtraOffers);
+        prop = config.get(CATEGORY_TRADING, "max_new_trades", DEFAULT_maxOffers, "", 3, 64);
+        prop.setLanguageKey("sidben.redstonejukebox.config.max_trades");
+        maxOffers = prop.getInt(DEFAULT_maxOffers);
         propOrder.add(prop.getName());
 
-        prop = config.get(CATEGORY_TRADING, "record_trade_count", DEFAULT_maxTrades, "", 1, 999);
+        prop = config.get(CATEGORY_TRADING, "record_trade_count", DEFAULT_tradeUses, "", 1, Integer.MAX_VALUE);
         prop.setLanguageKey("sidben.redstonejukebox.config.record_trade_count");
-        maxTrades = prop.getInt(DEFAULT_maxTrades);
+        tradeUses = prop.getInt(DEFAULT_tradeUses);
         propOrder.add(prop.getName());
 
         

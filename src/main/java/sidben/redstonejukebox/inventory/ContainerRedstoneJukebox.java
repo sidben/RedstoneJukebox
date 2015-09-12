@@ -94,7 +94,7 @@ public class ContainerRedstoneJukebox extends Container
             }
             else {
                 // send a record to the jukebox
-                if (ModRedstoneJukebox.instance.getMusicHelper().isRecord(myStack)) {
+                if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(myStack)) {
                     if (!this.mergeItemStack(myStack, 0, 8, false)) return null;
                 }
                 else

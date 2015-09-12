@@ -230,7 +230,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public boolean isItemValidForSlot(int i, ItemStack s)
     {
-        return ModRedstoneJukebox.instance.getMusicHelper().isRecord(s);
+        return ModRedstoneJukebox.instance.getGenericHelper().isRecord(s);
     }
 
     
@@ -628,7 +628,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // reads the selected slot to find a record and get the time of the song
             this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
             ItemStack record = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            int auxSongTime = ModRedstoneJukebox.instance.getMusicHelper().getSongTime(record);
+            int auxSongTime = ModRedstoneJukebox.instance.getGenericHelper().getSongTime(record);
 
             LogHelper.info("    slot [" + this.currentJukeboxPlaySlot + "] has item [" + record + "] with song time [" + auxSongTime + "]");
 
@@ -637,7 +637,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             {
                 // Record found 
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
-                int recordIndex = ModRedstoneJukebox.instance.getMusicHelper().getVanillaRecordIndex(record);
+                int recordIndex = ModRedstoneJukebox.instance.getGenericHelper().getVanillaRecordIndex(record);
                 
                 // Sets the block event parameter. It should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record index
                 int blockParam = Integer.parseInt(Integer.toString(this.currentJukeboxPlaySlot + 1) + Integer.toString(recordIndex)); 
@@ -691,7 +691,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             // check every slot to search for records.
             ItemStack s = this.getStackInSlot(i);
-            if (ModRedstoneJukebox.instance.getMusicHelper().isRecord(s)) {
+            if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(s)) {
                 validRecord = true;
 
                 /*

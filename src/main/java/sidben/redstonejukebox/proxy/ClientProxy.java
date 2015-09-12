@@ -1,12 +1,17 @@
 package sidben.redstonejukebox.proxy;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.client.gui.GuiRecordTrading;
 import sidben.redstonejukebox.client.gui.GuiRedstoneJukebox;
 import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
+import sidben.redstonejukebox.handler.SoundEventHandler;
+import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -17,13 +22,6 @@ import cpw.mods.fml.client.registry.RenderingRegistry;
 public class ClientProxy extends CommonProxy
 {
 
-
-    // GUI IDs
-    public static int    redstoneJukeboxGuiID = 0;
-    public static int    recordTradingGuiID   = 1;
-
-    // Models IDs
-    public static int    redstoneJukeboxModelID;
 
     // GUI textures and paths
     public static String guiTextureJukebox;
@@ -67,7 +65,7 @@ public class ClientProxy extends CommonProxy
 
 
         // Special renderers
-        ClientProxy.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
+        ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 
         RenderingRegistry.registerBlockHandler(new RenderRedstoneJukebox());
 
@@ -82,6 +80,12 @@ public class ClientProxy extends CommonProxy
     public void initialize()
     {
         super.initialize();
+        
+        // Helper classes single instances
+        ModRedstoneJukebox.instance.setMusicHelper(new MusicHelper(Minecraft.getMinecraft()));
+
+        // Event Handlers
+        MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
     }
 
 
@@ -89,12 +93,12 @@ public class ClientProxy extends CommonProxy
     @Override
     public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
-        if (guiID == ClientProxy.redstoneJukeboxGuiID) {
+        if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
             return new GuiRedstoneJukebox(player.inventory, teJukebox);
         }
 
-        else if (guiID == ClientProxy.recordTradingGuiID) {
+        else if (guiID == ModRedstoneJukebox.recordTradingGuiID) {
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
             Entity villager = world.getEntityByID(x);
             if (villager instanceof EntityVillager)

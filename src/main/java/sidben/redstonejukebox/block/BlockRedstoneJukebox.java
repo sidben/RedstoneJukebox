@@ -205,7 +205,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      */
     @Override
     public int getRenderType() {
-        return ClientProxy.redstoneJukeboxModelID;
+        return ModRedstoneJukebox.redstoneJukeboxModelID;
     }
     
     
@@ -240,7 +240,7 @@ public class BlockRedstoneJukebox extends BlockContainer
         if (tileEntity == null || player.isSneaking())          // Avoids opening the GUI if sneaking
             return false;
 
-        player.openGui(ModRedstoneJukebox.instance, ClientProxy.redstoneJukeboxGuiID, world, x, y, z);
+        player.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, world, x, y, z);
         return true;
     }
 

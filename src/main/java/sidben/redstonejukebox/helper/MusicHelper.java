@@ -3,19 +3,18 @@ package sidben.redstonejukebox.helper;
 import java.lang.reflect.Field;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -48,6 +47,7 @@ import net.minecraft.world.World;
  * Class designed to help with music playing and record related methods (custom or vanilla).
  *
  */
+@SideOnly(Side.CLIENT)
 public class MusicHelper
 {
     
@@ -81,37 +81,9 @@ public class MusicHelper
     
 
     private final Minecraft mc;
-
     
     
     
-    /**
-     * Contains all vanilla records and the song times (in seconds). 
-     */
-    private final MusicCollectionItem[] recordCollection = { 
-        new MusicCollectionItem(Items.record_13, 178),
-        new MusicCollectionItem(Items.record_cat, 185),
-        new MusicCollectionItem(Items.record_blocks, 345),
-        new MusicCollectionItem(Items.record_chirp, 185),
-        new MusicCollectionItem(Items.record_far, 174),
-        new MusicCollectionItem(Items.record_mall, 197),
-        new MusicCollectionItem(Items.record_mellohi, 96),
-        new MusicCollectionItem(Items.record_stal, 150),
-        new MusicCollectionItem(Items.record_strad, 188),
-        new MusicCollectionItem(Items.record_ward, 251),
-        new MusicCollectionItem(Items.record_11, 71),
-        new MusicCollectionItem(Items.record_wait, 237)
-    };
-    
-    /*
-     * TODO: Find the music length by reading the OGG files (will revisit when adding custom records) 
-     * 
-     *      http://www.jsresources.org/faq_audio.html#file_length)
-     *      http://fossies.org/linux/www/webCDwriter-2.8.2.tar.gz/webCDwriter-2.8.2/webCDcreator/Ogg.java?m=t
-     *      
-     *      minecraft:sounds/records/wait.ogg
-     *      mcsounddomain:minecraft:sounds/records/wait.ogg
-     */
     
     
 
@@ -183,57 +155,6 @@ public class MusicHelper
     
     /* ======================================================================================
     *
-    *                                  Records Info
-    *
-    * ====================================================================================== */
-
-    /**
-     * Returns if the given ItemStack is a record.
-     * 
-     */
-    public boolean isRecord(ItemStack s) {
-        return s != null && s.getItem() instanceof ItemRecord;
-    }
-
-
-    /**
-     * Returns the time in seconds that a record should be playing.
-     * 
-     */
-    public int getSongTime(ItemStack s)
-    {
-        if (!isRecord(s)) return 0;
-
-        for (int i=0; i < recordCollection.length; i++)
-        {
-            if (s.getItem() == recordCollection[i].record) return recordCollection[i].time; 
-        }
-        return 0;
-    }
-
-    
-    /**
-     * Returns what is the position of a vanilla record in the inner array.
-     * Used to send packets to the client (e.g. TileEntityRedstoneJukebox.receiveClientEvent())
-     */
-    public int getVanillaRecordIndex(ItemStack s)
-    {
-        if (s != null) 
-        {
-            for (int i=0; i < recordCollection.length; i++)
-            {
-                if (s.getItem() == recordCollection[i].record) return i; 
-            }
-        }
-        return -1;
-    }
-    
-    
-
-    
-    
-    /* ======================================================================================
-    *
     *                                  Music play
     *
     * ====================================================================================== */
@@ -245,9 +166,9 @@ public class MusicHelper
      */
     public void playVanillaRecordAt(World world, int x, int y, int z, int index, boolean showName, float volumeExtender)
     {
-        if (index >= 0 && index < recordCollection.length) 
+        if (index >= 0 && index < ModRedstoneJukebox.instance.getGenericHelper().getRecordCollectionSize()) 
         {
-            ItemRecord record = (ItemRecord)recordCollection[index].record;
+            ItemRecord record = ModRedstoneJukebox.instance.getGenericHelper().getRecordFromCollection(index);
             if (record != null)
             {
                 // Found a record, plays the song
@@ -395,46 +316,5 @@ public class MusicHelper
         return false;
     }
     
-
-    
-    
-    /* ======================================================================================
-    *
-    *                                  Record Trading
-    *
-    * ====================================================================================== */
-
-    /**
-     * Returns a random record.
-     */
-    public ItemStack getRandomRecord(Random rand)
-    {
-        int index = rand.nextInt(this.recordCollection.length);
-        return new ItemStack(this.recordCollection[index].record, 1);
-    }
-
-    
-    
-    
-    
-
-    
-    
-    /**
-     * Helper class to hold records info.
-     *
-     */
-    class MusicCollectionItem
-    {
-        Item record;
-        int time;
-        
-        
-        public MusicCollectionItem(Item pRecord, int pTime)
-        {
-            this.record = pRecord;
-            this.time = pTime;
-        }
-    }
 
 }

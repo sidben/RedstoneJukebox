@@ -8,7 +8,6 @@ import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.init.MyRecipes;
@@ -64,7 +63,6 @@ public abstract class CommonProxy implements IProxy
 
         
         // Event Handlers
-        MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 
     }
@@ -90,12 +88,12 @@ public abstract class CommonProxy implements IProxy
     @Override
     public Object getServerGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
-        if (guiID == ClientProxy.redstoneJukeboxGuiID) {
+        if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
             TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
             return new ContainerRedstoneJukebox(player.inventory, teJukebox);
         }
         
-        else if (guiID == ClientProxy.recordTradingGuiID) {
+        else if (guiID == ModRedstoneJukebox.recordTradingGuiID) {
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
             Entity villager = world.getEntityByID(x);
             if (villager instanceof EntityVillager)

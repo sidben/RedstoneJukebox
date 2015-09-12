@@ -2,6 +2,7 @@ package sidben.redstonejukebox.helper;
 
 import java.lang.reflect.Field;
 import com.google.common.collect.Maps;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
@@ -79,7 +81,15 @@ public class MusicHelper
         new MusicCollectionItem(Items.record_wait, 238)
     };
     
-    // TODO: Find the music length by reading the OGG files
+    /*
+     * TODO: Find the music length by reading the OGG files (will revisit when adding custom records) 
+     * 
+     *      http://www.jsresources.org/faq_audio.html#file_length)
+     *      http://fossies.org/linux/www/webCDwriter-2.8.2.tar.gz/webCDwriter-2.8.2/webCDcreator/Ogg.java?m=t
+     *      
+     *      minecraft:sounds/records/wait.ogg
+     *      mcsounddomain:minecraft:sounds/records/wait.ogg
+     */
     
     
 
@@ -87,7 +97,6 @@ public class MusicHelper
     //--------------------------------------------
     // Constructor
     //--------------------------------------------
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public MusicHelper(Minecraft minecraft) 
     {
         this.mc = minecraft;
@@ -118,8 +127,6 @@ public class MusicHelper
             }
         }
         
-
-        
         
         // If the MusicTicker class was found, seek the field that hold the
         // current playing music, so it can be checked later.
@@ -141,27 +148,9 @@ public class MusicHelper
         }
         
         
-        // Debug
-        LogHelper.info("Loading mapSoundPositions using Reflection...");
-
         // Finds the private [mapSoundPositions] inside RenderGlobal. Since 
         // the field is a generic 'Map' type, I have to seek by name
-        Field auxField = null;
-        try {
-            if (auxField == null) auxField = mc.renderGlobal.getClass().getDeclaredField("mapSoundPositions");
-            // TODO: Also check the 1.7.10 obfuscated field
-            
-            if (auxField != null) {
-                auxField.setAccessible(true);
-                this.vanillaSoundPositions = (Map) auxField.get(mc.renderGlobal);
-                LogHelper.info("mapSoundPositions found.");
-            } else {
-                LogHelper.error("Error loading mapSoundPositions via reflection: Field not found");
-            }
-        } catch (NoSuchFieldException|SecurityException|IllegalArgumentException|IllegalAccessException e) {
-            this.vanillaSoundPositions = null;
-            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
-        }
+        this.vanillaSoundPositions = ObfuscationReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_147593_P", "mapSoundPositions");
         
     }
 

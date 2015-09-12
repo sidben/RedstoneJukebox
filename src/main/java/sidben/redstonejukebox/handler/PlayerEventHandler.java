@@ -3,7 +3,6 @@ package sidben.redstonejukebox.handler;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.proxy.ClientProxy;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipeList;

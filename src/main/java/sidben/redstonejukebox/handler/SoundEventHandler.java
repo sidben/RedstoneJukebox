@@ -33,7 +33,7 @@ public class SoundEventHandler
             // (inspired by the mp3Jukebox mod)
             else if (soundCat == SoundCategory.MUSIC)
             {
-                if (ModRedstoneJukebox.instance.getMusicHelper().AnyRecordPlaying()) {
+                if (ModRedstoneJukebox.instance.getMusicHelper().AnyJukeboxPlaying()) {
                     event.result = null;
                     event.setResult(Result.DENY);
                 }

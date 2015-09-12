@@ -47,11 +47,19 @@ public class MusicHelper
      * background music, so it can be accessed via reflection. 
      */
     private Field fieldCurrentMusic = null;
+    
+    
+    /**
+     * Holds a reference to the private field [mapSoundPositions] from the RenderGlobal.
+     */
+    private Map<ChunkCoordinates, ISound> vanillaSoundPositions;
 
     
 
     private final Minecraft mc;
 
+    
+    
     
     /**
      * Contains all vanilla records and the song times (in seconds). 
@@ -79,6 +87,7 @@ public class MusicHelper
     //--------------------------------------------
     // Constructor
     //--------------------------------------------
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public MusicHelper(Minecraft minecraft) 
     {
         this.mc = minecraft;
@@ -134,7 +143,39 @@ public class MusicHelper
             }            
         }
         
+        
+        // Debug
+        LogHelper.info("Loading mapSoundPositions using Reflection...");
 
+        // Finds the private [mapSoundPositions] inside RenderGlobal. Since 
+        // the field is a generic 'Map' type, I have to seek by name
+        Field auxField = null;
+        try {
+            if (auxField == null) auxField = mc.renderGlobal.getClass().getDeclaredField("mapSoundPositions");
+            // TODO: Also check the 1.7.10 obfuscated field
+            
+            if (auxField != null) {
+                auxField.setAccessible(true);
+                this.vanillaSoundPositions = (Map) auxField.get(mc.renderGlobal);
+                LogHelper.info("mapSoundPositions found.");
+            } else {
+                LogHelper.error("Error loading mapSoundPositions via reflection: Field not found");
+            }
+        } catch (NoSuchFieldException e) {
+            this.vanillaSoundPositions = null;
+            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
+        } catch (SecurityException e) {
+            this.vanillaSoundPositions = null;
+            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            this.vanillaSoundPositions = null;
+            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            this.vanillaSoundPositions = null;
+            LogHelper.error("Error loading mapSoundPositions via reflection: " + e.getMessage());
+        }
+        
+        // TODO: Check if I can change the project compliance and JRE to 1.7, so I can use multiple catch
     }
 
     
@@ -269,6 +310,7 @@ public class MusicHelper
         // before starting a new one.
         ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
         this.stopPlayingAt(chunkcoordinates);
+        // TODO: check how this behave across dimensions
         
         
         if (recordResourceName != null)
@@ -324,17 +366,31 @@ public class MusicHelper
     
     
     /**
-     * Informs if there is any record being played by a Redstone Jukebox.
-     * 
+     * Informs if there is any record being played by a vanilla or Redstone Jukebox.
      */
     @SuppressWarnings("rawtypes")
-    public boolean AnyRecordPlaying()
+    public boolean AnyJukeboxPlaying()
     {
-        // TODO: Also check vanilla for records playing by a regular jukebox
+        // TODO: Does this check on other dimensions?
+
         
         // Ref: SoundManager.updateAllSounds()
-        Iterator iterator = this.mapJukeboxesPositions.entrySet().iterator();
+        Iterator iterator;
 
+        
+        // Check vanilla jukeboxes
+        iterator = this.vanillaSoundPositions.entrySet().iterator();
+        while (iterator.hasNext())
+        {
+            Entry entry = (Entry)iterator.next();
+            ISound isound = (ISound)entry.getValue();
+            boolean p = mc.getSoundHandler().isSoundPlaying(isound); 
+            if (p) return true;
+        }
+        
+
+        // Check redstone jukeboxes
+        iterator = this.mapJukeboxesPositions.entrySet().iterator();
         while (iterator.hasNext())
         {
             Entry entry = (Entry)iterator.next();

@@ -28,6 +28,8 @@ import net.minecraft.world.World;
 public class GuiRecordTrading extends GuiContainer
 {
 
+    // TODO: add villager name
+    
     protected Random rand = new Random();
 
     private static final ResourceLocation guiMainTexture = new ResourceLocation(ClientProxy.guiTextureTrade);

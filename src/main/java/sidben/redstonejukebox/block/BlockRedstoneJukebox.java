@@ -435,9 +435,6 @@ public class BlockRedstoneJukebox extends BlockContainer
     //--------------------------------------------------------------------
     //  Visual Effects
     //--------------------------------------------------------------------
-
-    // TODO: Remove particles if the config for particles is low (follow same rule of redstone dust)
-    
     
     /**
      * A randomly called display update to be able to add particles or other items for display
@@ -491,6 +488,9 @@ public class BlockRedstoneJukebox extends BlockContainer
      */
     private void showSparkles(World world, int x, int y, int z, Random rand)
     {
+        // OBS: If the particle config is set to 'Minimal', particles won't be displayed.
+        // That is controlled by the game engine, no need to check it here.
+        
         // Ref: BlockRedstoneOre
         double distance = 0.0625D;
 

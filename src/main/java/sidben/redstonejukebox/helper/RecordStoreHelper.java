@@ -1,6 +1,8 @@
 package sidben.redstonejukebox.helper;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +15,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
@@ -167,7 +170,9 @@ public class RecordStoreHelper
         }
         
         // Randomly adds the types of the remaining offers
-        for (int i = 0; i < offersSize; i++) 
+        // Adds some extra offers to fill in any duplicates removed
+        final int spareOffers = 5;
+        for (int i = 0; i < (offersSize + spareOffers); i++) 
         {
             luck = rand.nextInt(100) + 1;
             luckType = luck <= ConfigurationHandler.buyingOffersRatio ? EnumRecipeType.BUYING_RECORDS : EnumRecipeType.SELLING_RECORDS;
@@ -175,16 +180,41 @@ public class RecordStoreHelper
         }
         
 
+        // TODO: test
         // Adds the actual offers based on the type list
+        ItemStack record;
+        String recordName = "";
+        List<String> usedRecords = new ArrayList<String>();
+        
         for(EnumRecipeType t : offers)
         {
+            // Gets a new random trading recipe of the given type
             recipe = this.getRandomRecipe(t);
-            store.add(recipe);
+            
+            // Finds out the record of the recipe
+            if (ModRedstoneJukebox.instance.getMusicHelper().isRecord(recipe.getItemToBuy())) { record = recipe.getItemToBuy(); }
+            else if (ModRedstoneJukebox.instance.getMusicHelper().isRecord(recipe.getItemToSell())) { record = recipe.getItemToSell(); }
+            else if (ModRedstoneJukebox.instance.getMusicHelper().isRecord(recipe.getSecondItemToBuy())) { record = recipe.getSecondItemToBuy(); }
+            else { record = null; recordName = ""; }
+            
+            // Gets the name of the song / record
+            if (record != null) recordName = ((ItemRecord)record.getItem()).recordName;
+            
+            
+            // Check if that record was used by another trade. Each record can only have 1 trade per store.
+            if (record != null && !usedRecords.contains(recordName)) {
+                // Adds to the 'store'            
+                store.add(recipe);
+                usedRecords.add(recordName);
+            }
+            
+            
+            if (store.size() >= offersSize + 2) break;
         }
         
+        usedRecords = null;
         
-        // TODO: remove duplicate recipes (can't have multiple trades for the same record)
-
+        
         
         // returns the new store
         return store;

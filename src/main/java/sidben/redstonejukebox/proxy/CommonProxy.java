@@ -15,6 +15,7 @@ import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.JukeboxGUIUpdatedMessage;
 import sidben.redstonejukebox.network.NetworkHelper;
+import sidben.redstonejukebox.network.RecordTradingFullListMessage;
 import sidben.redstonejukebox.network.RecordTradingGUIUpdatedMessage;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
@@ -41,6 +42,7 @@ public abstract class CommonProxy implements IProxy
         ModRedstoneJukebox.NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, 0, Side.SERVER);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingGUIHandler.class, RecordTradingGUIUpdatedMessage.class, 1, Side.SERVER);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingFullListHandler.class, RecordTradingFullListMessage.class, 2, Side.CLIENT);
         
 
         // Register items
@@ -112,5 +114,8 @@ public abstract class CommonProxy implements IProxy
         return null;
     }
 
+    
+    
+    
 
 }

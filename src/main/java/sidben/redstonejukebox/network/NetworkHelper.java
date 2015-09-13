@@ -1,7 +1,11 @@
 package sidben.redstonejukebox.network;
 
 
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
@@ -45,6 +49,17 @@ public class NetworkHelper
         ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
     }
     
+    
+    /**
+     * Sends to the client the list of record trades for the current villager GUI.
+     * 
+     * Server -> Client
+     */
+    public static void sendRecordTradingFullListMessage(MerchantRecipeList list, EntityPlayer entityPlayer) 
+    {
+        RecordTradingFullListMessage message = new RecordTradingFullListMessage(list);
+        ModRedstoneJukebox.NetworkWrapper.sendTo(message, (EntityPlayerMP) entityPlayer);
+    }    
 
     
     /**
@@ -125,4 +140,43 @@ public class NetworkHelper
         }
         
     }
+    
+    
+    
+    public static class RecordTradingFullListHandler implements IMessageHandler<RecordTradingFullListMessage, IMessage> {
+
+        @Override
+        public IMessage onMessage(RecordTradingFullListMessage message, MessageContext ctx) {
+            LogHelper.info("Recieving Record trade list message");
+            LogHelper.info("    " + message);
+            
+            
+            NetHandlerPlayClient c = ctx.getClientHandler();
+            message.updateClientSideRecordStore();
+            
+            
+            /*
+            NetHandlerPlayServer a = ctx.getServerHandler();
+            EntityPlayerMP b = ctx.getServerHandler().playerEntity;
+            */
+            
+
+            /*
+            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            if (player == null) {
+                LogHelper.warn("Target player not found for message [" + message + "]");                
+            }
+            else {
+                LogHelper.info("LOGIC HERE");
+                // message.updatePlayer(player);
+            }
+            */
+            
+            
+            return null;
+
+        }
+        
+    }
+    
 }

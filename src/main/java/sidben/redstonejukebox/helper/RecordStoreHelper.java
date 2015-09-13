@@ -13,6 +13,8 @@ import sidben.redstonejukebox.init.MyItems;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemRecord;
@@ -94,6 +96,8 @@ public class RecordStoreHelper
      * so the GUI won't match the actual trades. As far as I tested, this behavior does 
      * not cause a crash (yay). 
      */
+    
+    //@SideOnly(Side.SERVER)
     private LoadingCache<Integer, MerchantRecipeList> storeCache = CacheBuilder.newBuilder()
             .maximumSize(ConfigurationHandler.maxStores)
             .expireAfterAccess(ConfigurationHandler.expirationTime, TimeUnit.MINUTES)
@@ -116,6 +120,10 @@ public class RecordStoreHelper
                         return store;
                     }
                 });
+    
+    
+    public MerchantRecipeList clientSideCurrentStore = new MerchantRecipeList();
+    
 
     
     
@@ -127,6 +135,7 @@ public class RecordStoreHelper
     /**
      * Returns a collection of trade offers for the given villager EntityID.
      */
+    @SideOnly(Side.SERVER)
     public MerchantRecipeList getStore(int villagerId) {
         if (villagerId < 0) return null;
 
@@ -159,6 +168,7 @@ public class RecordStoreHelper
     /**
      * Creates a random set of record trades. Will contain at least one buying trade and one selling trade.
      */
+    @SideOnly(Side.SERVER)
     @SuppressWarnings("unchecked")
     MerchantRecipeList createRandomStore() 
     {
@@ -234,6 +244,7 @@ public class RecordStoreHelper
 
     
     
+    @SideOnly(Side.SERVER)
     MerchantRecipe getRandomRecipe(EnumRecipeType type) 
     {
         ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);

@@ -251,7 +251,8 @@ public class InventoryRecordTrading implements IInventory
         }
         else
         {
-            MerchantRecipeList merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
+            // MerchantRecipeList merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
+            MerchantRecipeList merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
 
             if (merchantrecipelist != null)
             {

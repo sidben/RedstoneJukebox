@@ -29,6 +29,8 @@ public class ContainerRecordTrading extends Container
     
     public ContainerRecordTrading(InventoryPlayer par1InventoryPlayer, IMerchant par2IMerchant, World par3World)
     {
+//        net.minecraft.inventory.ContainerMerchant x;
+        
         this.theMerchant = par2IMerchant;
         this.theWorld = par3World;
         this.merchantInventory = new InventoryRecordTrading(par1InventoryPlayer.player, par2IMerchant);

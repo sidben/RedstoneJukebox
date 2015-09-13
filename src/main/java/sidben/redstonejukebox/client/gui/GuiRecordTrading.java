@@ -49,8 +49,9 @@ public class GuiRecordTrading extends GuiContainer
         this.theIMerchant = merchant;
         this.merchantName = customName != null && customName.length() > 1 ? customName : I18n.format("entity.Villager.name", new Object[0]);
         
-        int villagerId = ((Entity)merchant).getEntityId();
-        tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
+        // int villagerId = ((Entity)merchant).getEntityId();
+        // tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
+        tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
     }
 
     

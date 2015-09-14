@@ -1,25 +1,24 @@
 package sidben.redstonejukebox.inventory;
 
-import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 
 
 
 public class ContainerRedstoneJukebox extends Container
 {
-    
-    private TileEntityRedstoneJukebox teJukebox;
 
-    
+    private final TileEntityRedstoneJukebox teJukebox;
+
+
 
     public ContainerRedstoneJukebox(InventoryPlayer inventoryPlayer, TileEntityRedstoneJukebox tileEntity) {
         this.teJukebox = tileEntity;
-
 
 
         // --- Slots of the Jukebox
@@ -50,17 +49,19 @@ public class ContainerRedstoneJukebox extends Container
 
 
     @Override
-    public boolean canInteractWith(EntityPlayer par1EntityPlayer) {
+    public boolean canInteractWith(EntityPlayer par1EntityPlayer)
+    {
         return this.teJukebox.isUseableByPlayer(par1EntityPlayer);
     }
 
-    
+
 
     /**
      * Called when a player shift-clicks on a slot. You must override this or you will crash when someone does that.
      */
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotnumber) {
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotnumber)
+    {
         /*
          * slot number:
          * 0-7 = jukebox
@@ -79,33 +80,34 @@ public class ContainerRedstoneJukebox extends Container
 
 
 
-
         ItemStack returnStack = null;
-        Slot slot = (Slot) this.inventorySlots.get(slotnumber);
+        final Slot slot = (Slot) this.inventorySlots.get(slotnumber);
 
         if (slot != null && slot.getHasStack()) {
-            ItemStack myStack = slot.getStack();
+            final ItemStack myStack = slot.getStack();
             returnStack = myStack.copy();
 
 
             if (slotnumber < 8) {
                 // send item from the jukebox to the player
-                if (!this.mergeItemStack(myStack, 8, 43, true)) return null;
-            }
-            else {
+                if (!this.mergeItemStack(myStack, 8, 43, true)) {
+                    return null;
+                }
+            } else {
                 // send a record to the jukebox
                 if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(myStack)) {
-                    if (!this.mergeItemStack(myStack, 0, 8, false)) return null;
-                }
-                else
+                    if (!this.mergeItemStack(myStack, 0, 8, false)) {
+                        return null;
+                    }
+                } else {
                     return null;
+                }
             }
 
 
             if (myStack.stackSize == 0) {
                 slot.putStack((ItemStack) null);
-            }
-            else {
+            } else {
                 slot.onSlotChanged();
             }
 
@@ -118,9 +120,9 @@ public class ContainerRedstoneJukebox extends Container
 
 
 
-
-    public TileEntityRedstoneJukebox GetTileEntity() {
+    public TileEntityRedstoneJukebox GetTileEntity()
+    {
         return this.teJukebox;
     }
-    
+
 }

@@ -1,14 +1,14 @@
 package sidben.redstonejukebox.inventory;
 
-import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 
 
 
-public class SlotRedstoneJukeboxRecord extends Slot 
+public class SlotRedstoneJukeboxRecord extends Slot
 {
 
     public SlotRedstoneJukeboxRecord(IInventory par2IInventory, int index, int x, int y) {
@@ -20,7 +20,8 @@ public class SlotRedstoneJukeboxRecord extends Slot
      * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
      */
     @Override
-    public boolean isItemValid(ItemStack s) {
+    public boolean isItemValid(ItemStack s)
+    {
         return ModRedstoneJukebox.instance.getGenericHelper().isRecord(s);
     }
 
@@ -30,7 +31,8 @@ public class SlotRedstoneJukeboxRecord extends Slot
      * of armor slots)
      */
     @Override
-    public int getSlotStackLimit() {
+    public int getSlotStackLimit()
+    {
         return 1;
     }
 
@@ -39,7 +41,8 @@ public class SlotRedstoneJukeboxRecord extends Slot
      * Called when the player picks up an item from an inventory slot
      */
     @Override
-    public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack s) {
+    public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack s)
+    {
         super.onPickupFromSlot(par1EntityPlayer, s);
     }
 

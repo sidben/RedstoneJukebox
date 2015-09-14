@@ -1,23 +1,24 @@
 package sidben.redstonejukebox.client.renderer;
 
-import org.lwjgl.opengl.GL11;
-import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
+import org.lwjgl.opengl.GL11;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 
 
-public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler 
+public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler
 {
-    
-    @Override
-    public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderblocks) {
 
-        Tessellator tessellator = Tessellator.instance;
+    @Override
+    public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderblocks)
+    {
+
+        final Tessellator tessellator = Tessellator.instance;
 
 
 
@@ -83,26 +84,27 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler
 
 
     @Override
-    public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderblocks) {
+    public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderblocks)
+    {
 
 
         // Copied from renderBlockCauldron, this have something to do with the correct lightning of the block
         renderblocks.renderStandardBlock(block, x, y, z);
 
 
-        Tessellator tessellator = Tessellator.instance;
+        final Tessellator tessellator = Tessellator.instance;
         tessellator.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
-        float f = 1.0F;
-        int l = block.colorMultiplier(world, x, y, z);
+        final float f = 1.0F;
+        final int l = block.colorMultiplier(world, x, y, z);
         float f1 = (l >> 16 & 255) / 255.0F;
         float f2 = (l >> 8 & 255) / 255.0F;
         float f3 = (l & 255) / 255.0F;
         float f4;
 
         if (EntityRenderer.anaglyphEnable) {
-            float f5 = (f1 * 30.0F + f2 * 59.0F + f3 * 11.0F) / 100.0F;
+            final float f5 = (f1 * 30.0F + f2 * 59.0F + f3 * 11.0F) / 100.0F;
             f4 = (f1 * 30.0F + f2 * 70.0F) / 100.0F;
-            float f6 = (f1 * 30.0F + f3 * 70.0F) / 100.0F;
+            final float f6 = (f1 * 30.0F + f3 * 70.0F) / 100.0F;
             f1 = f5;
             f2 = f4;
             f3 = f6;
@@ -131,16 +133,18 @@ public class RenderRedstoneJukebox implements ISimpleBlockRenderingHandler
 
 
     @Override
-    public boolean shouldRender3DInInventory(int modelId) {
+    public boolean shouldRender3DInInventory(int modelId)
+    {
         return true;
     }
 
 
     @Override
-    public int getRenderId() {
+    public int getRenderId()
+    {
         return ModRedstoneJukebox.redstoneJukeboxModelID;
     }
 
-    
-    
+
+
 }

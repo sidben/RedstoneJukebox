@@ -1,10 +1,10 @@
 package sidben.redstonejukebox.inventory;
 
-import sidben.redstonejukebox.ModRedstoneJukebox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 
 
 
@@ -12,20 +12,19 @@ import net.minecraft.village.MerchantRecipe;
 public class SlotRecordTradingResult extends Slot
 {
 
-    
+
     /** Merchant's inventory. */
     private final InventoryRecordTrading theMerchantInventory;
 
     /** The Player who's trying to buy/sell stuff. */
-    private EntityPlayer thePlayer;
+    private final EntityPlayer           thePlayer;
 
-    private int field_75231_g;
+    private int                          field_75231_g;
 
-    boolean traded = false;                 // Indicates if a trade was made;
+    boolean                              traded = false;      // Indicates if a trade was made;
 
 
-    public SlotRecordTradingResult(EntityPlayer par1EntityPlayer, InventoryRecordTrading par3InventoryMerchant, int par4, int par5, int par6)
-    {
+    public SlotRecordTradingResult(EntityPlayer par1EntityPlayer, InventoryRecordTrading par3InventoryMerchant, int par4, int par5, int par6) {
         super(par3InventoryMerchant, par4, par5, par6);
         this.thePlayer = par1EntityPlayer;
         this.theMerchantInventory = par3InventoryMerchant;
@@ -34,6 +33,7 @@ public class SlotRecordTradingResult extends Slot
     /**
      * Check if the stack is a valid item for this slot. Always true beside for the armor slots.
      */
+    @Override
     public boolean isItemValid(ItemStack par1ItemStack)
     {
         return false;
@@ -43,10 +43,10 @@ public class SlotRecordTradingResult extends Slot
      * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
      * stack.
      */
+    @Override
     public ItemStack decrStackSize(int par1)
     {
-        if (this.getHasStack())
-        {
+        if (this.getHasStack()) {
             this.field_75231_g += Math.min(par1, this.getStack().stackSize);
         }
 
@@ -57,6 +57,7 @@ public class SlotRecordTradingResult extends Slot
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood. Typically increases an
      * internal count then calls onCrafting(item).
      */
+    @Override
     protected void onCrafting(ItemStack par1ItemStack, int par2)
     {
         this.field_75231_g += par2;
@@ -66,43 +67,30 @@ public class SlotRecordTradingResult extends Slot
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
      */
+    @Override
     protected void onCrafting(ItemStack par1ItemStack)
     {
         par1ItemStack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75231_g);
         this.field_75231_g = 0;
     }
 
+    @Override
     public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack par2ItemStack)
     {
-        sidben.redstonejukebox.helper.LogHelper.info("SlotRecordTradingResult.onPickupFromSlot()");
-        
         this.onCrafting(par2ItemStack);
-        MerchantRecipe slotRecipe = this.theMerchantInventory.getCurrentRecipe();
+        final MerchantRecipe slotRecipe = this.theMerchantInventory.getCurrentRecipe();
 
-        // Debug
-        sidben.redstonejukebox.helper.LogHelper.info("    slot recipe: " + slotRecipe);
 
-        
-        if (slotRecipe != null)
-        {
-            // Debug
-            sidben.redstonejukebox.helper.LogHelper.info("    slot 1: " + this.theMerchantInventory.getStackInSlot(0));
-            sidben.redstonejukebox.helper.LogHelper.info("    slot 2: " + this.theMerchantInventory.getStackInSlot(1));
-            sidben.redstonejukebox.helper.LogHelper.info("    slot sell: " + this.theMerchantInventory.getStackInSlot(2));
-
-            
+        if (slotRecipe != null) {
             ItemStack var4 = this.theMerchantInventory.getStackInSlot(0);
             ItemStack var5 = this.theMerchantInventory.getStackInSlot(1);
 
-            if (this.func_75230_a(slotRecipe, var4, var5) || this.func_75230_a(slotRecipe, var5, var4))
-            {
-                if (var4 != null && var4.stackSize <= 0)
-                {
+            if (this.func_75230_a(slotRecipe, var4, var5) || this.func_75230_a(slotRecipe, var5, var4)) {
+                if (var4 != null && var4.stackSize <= 0) {
                     var4 = null;
                 }
 
-                if (var5 != null && var5.stackSize <= 0)
-                {
+                if (var5 != null && var5.stackSize <= 0) {
                     var5 = null;
                 }
 
@@ -116,20 +104,17 @@ public class SlotRecordTradingResult extends Slot
 
     private boolean func_75230_a(MerchantRecipe par1MerchantRecipe, ItemStack par2ItemStack, ItemStack par3ItemStack)
     {
-        ItemStack var4 = par1MerchantRecipe.getItemToBuy();
-        ItemStack var5 = par1MerchantRecipe.getSecondItemToBuy();
+        final ItemStack var4 = par1MerchantRecipe.getItemToBuy();
+        final ItemStack var5 = par1MerchantRecipe.getSecondItemToBuy();
 
-        if (par2ItemStack != null && par2ItemStack.getItem() == var4.getItem())
-        {
-            if (var5 != null && par3ItemStack != null && var5.getItem() == par3ItemStack.getItem())
-            {
+        if (par2ItemStack != null && par2ItemStack.getItem() == var4.getItem()) {
+            if (var5 != null && par3ItemStack != null && var5.getItem() == par3ItemStack.getItem()) {
                 par2ItemStack.stackSize -= var4.stackSize;
                 par3ItemStack.stackSize -= var5.stackSize;
                 return true;
             }
 
-            if (var5 == null && par3ItemStack == null)
-            {
+            if (var5 == null && par3ItemStack == null) {
                 par2ItemStack.stackSize -= var4.stackSize;
                 return true;
             }
@@ -138,5 +123,5 @@ public class SlotRecordTradingResult extends Slot
         return false;
     }
 
-    
+
 }

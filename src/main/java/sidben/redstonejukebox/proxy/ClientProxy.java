@@ -37,14 +37,14 @@ public class ClientProxy extends CommonProxy
     public static String blankRecordIcon;
 
 
-    
-    
+
     @Override
-    public World getClientWorld() {
+    public World getClientWorld()
+    {
         return FMLClientHandler.instance().getClient().theWorld;
     }
-    
-    
+
+
 
     @Override
     public void pre_initialize()
@@ -60,7 +60,7 @@ public class ClientProxy extends CommonProxy
         ClientProxy.jukeboxBottomIcon = this.getResourceName("redstone_jukebox_bottom");
         ClientProxy.jukeboxSideOnIcon = this.getResourceName("redstone_jukebox_on");
         ClientProxy.jukeboxSideOffIcon = this.getResourceName("redstone_jukebox_off");
-        
+
         ClientProxy.blankRecordIcon = this.getResourceName("blank_record");
 
 
@@ -80,7 +80,7 @@ public class ClientProxy extends CommonProxy
     public void initialize()
     {
         super.initialize();
-        
+
         // Helper classes single instances
         ModRedstoneJukebox.instance.setMusicHelper(new MusicHelper(Minecraft.getMinecraft()));
 
@@ -100,10 +100,9 @@ public class ClientProxy extends CommonProxy
 
         else if (guiID == ModRedstoneJukebox.recordTradingGuiID) {
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
-            Entity villager = world.getEntityByID(x);
-            if (villager instanceof EntityVillager)
-            {
-                return new GuiRecordTrading(player.inventory, (EntityVillager)villager, world, ((EntityVillager) villager).getCustomNameTag());
+            final Entity villager = world.getEntityByID(x);
+            if (villager instanceof EntityVillager) {
+                return new GuiRecordTrading(player.inventory, (EntityVillager) villager, world, ((EntityVillager) villager).getCustomNameTag());
             }
         }
 
@@ -112,11 +111,10 @@ public class ClientProxy extends CommonProxy
 
 
 
-
     private String getResourceName(String name)
     {
         return Reference.ResourcesNamespace + ":" + name;
     }
-    
-    
+
+
 }

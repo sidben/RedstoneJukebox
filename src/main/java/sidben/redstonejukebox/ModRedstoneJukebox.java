@@ -1,11 +1,11 @@
 package sidben.redstonejukebox;
 
-import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.GenericHelper;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
 import sidben.redstonejukebox.proxy.IProxy;
+import sidben.redstonejukebox.reference.Reference;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -22,45 +22,45 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ModRedstoneJukebox
 {
 
-    
+
     // The instance of your mod that Forge uses.
     @Mod.Instance(Reference.ModID)
     public static ModRedstoneJukebox   instance;
 
-    
+
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
-    public static IProxy      proxy;
+    public static IProxy               proxy;
 
 
     // Used to send information between client / server
     public static SimpleNetworkWrapper NetworkWrapper;
 
-    
-    // Global variables
-    public final static int          maxExtraVolume       = 128;        // Maximum amount of extra range for the custom jukebox
-    
-    
-    // Helper classes
-    private GenericHelper genericHelper;
-    private RecordStoreHelper recordStoreHelper;
-    @SideOnly(Side.CLIENT)
-    private MusicHelper musicHelper;
 
-    
-    
+    // Global variables
+    public final static int            maxExtraVolume       = 128;        // Maximum amount of extra range for the custom jukebox
+
+
+    // Helper classes
+    private GenericHelper              genericHelper;
+    private RecordStoreHelper          recordStoreHelper;
+    @SideOnly(Side.CLIENT)
+    private MusicHelper                musicHelper;
+
+
+
     // GUI IDs
-    public static int    redstoneJukeboxGuiID = 0;
-    public static int    recordTradingGuiID   = 1;
+    public static int                  redstoneJukeboxGuiID = 0;
+    public static int                  recordTradingGuiID   = 1;
 
     // Models IDs
-    public static int    redstoneJukeboxModelID;
+    public static int                  redstoneJukeboxModelID;
 
 
-    
+
     // TODO: Commands
     // TODO: Custom records
-    
-    
+
+
     /**
      * Returns a singleton instance of the generic helper class.
      */
@@ -68,7 +68,7 @@ public class ModRedstoneJukebox
     {
         return genericHelper;
     }
-    
+
     /**
      * Returns a singleton instance of the music helper class.
      */
@@ -83,7 +83,7 @@ public class ModRedstoneJukebox
     {
         musicHelper = helper;
     }
-    
+
     /**
      * Returns a singleton instance of the record store helper class.
      */
@@ -91,12 +91,9 @@ public class ModRedstoneJukebox
     {
         return recordStoreHelper;
     }
-    
-    
-    
-    
-    
-    
+
+
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
@@ -117,7 +114,7 @@ public class ModRedstoneJukebox
 
         // Sided initializations
         proxy.initialize();
-        
+
         // Helper classes single instances
         genericHelper = new GenericHelper();
         recordStoreHelper = new RecordStoreHelper();
@@ -132,6 +129,5 @@ public class ModRedstoneJukebox
     }
 
 
-    
-    
+
 }

@@ -1,26 +1,26 @@
 package sidben.redstonejukebox.network;
 
-import net.minecraft.entity.player.EntityPlayerMP;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 
 /**
  * Represents changes on the record trading GUI (changing the current recipe)
- *
+ * 
  */
 public class RecordTradingGUIUpdatedMessage implements IMessage
 {
 
-    
+
     // ---------------------------------------------
     // Fields
     // ---------------------------------------------
     private int recipeIndex;
 
-    
-    
+
+
     // ---------------------------------------------
     // Methods
     // ---------------------------------------------
@@ -33,20 +33,23 @@ public class RecordTradingGUIUpdatedMessage implements IMessage
     }
 
 
-    
+
     /**
      * Updates the player current container.
      * 
      */
-    public void updatePlayer(EntityPlayerMP player) {
-        if (player == null) return;
-        
-        ContainerRecordTrading myTrade = (ContainerRecordTrading) player.openContainer;
+    public void updatePlayer(EntityPlayerMP player)
+    {
+        if (player == null) {
+            return;
+        }
+
+        final ContainerRecordTrading myTrade = (ContainerRecordTrading) player.openContainer;
         myTrade.setCurrentRecipeIndex(this.recipeIndex);
     }
-    
-    
-    
+
+
+
     // Reads the packet
     @Override
     public void fromBytes(ByteBuf buf)
@@ -61,8 +64,8 @@ public class RecordTradingGUIUpdatedMessage implements IMessage
         buf.writeInt(this.recipeIndex);
     }
 
-    
-    
+
+
     @Override
     public String toString()
     {

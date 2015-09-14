@@ -1,8 +1,8 @@
 package sidben.redstonejukebox.network;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import io.netty.buffer.ByteBuf;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
@@ -39,24 +39,26 @@ public class JukeboxGUIUpdatedMessage implements IMessage
         this.z = teJukebox.zCoord;
     }
 
-    
+
     /**
      * Updates the Tile Entity referred by this message.
      * 
      */
-    public void updateJukebox(World world) {
-        if (world == null) return;
-        
-        TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
+    public void updateJukebox(World world)
+    {
+        if (world == null) {
+            return;
+        }
+
+        final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
         if (teCandidate instanceof TileEntityRedstoneJukebox) {
-            TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
+            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
             teJukebox.paramLoop = this.isLoop;
             teJukebox.paramPlayMode = this.playMode;
-            // teJukebox.markDirty();
             teJukebox.resync();
         }
     }
-    
+
 
 
     // Reads the packet

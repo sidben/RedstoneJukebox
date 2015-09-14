@@ -1,6 +1,7 @@
 package sidben.redstonejukebox.handler;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.network.NetworkHelper;
 import net.minecraft.entity.passive.EntityVillager;
@@ -38,11 +39,19 @@ public class PlayerEventHandler
 
                 if (!event.target.worldObj.isRemote) {
                     // Check if the villager have valid trades
-                    MerchantRecipeList tradesList = ModRedstoneJukebox.proxy.getCachedRecordTrades(event.target.getEntityId());
-                    if (tradesList == null) tradesList = new MerchantRecipeList(); 
+                    MerchantRecipeList tradesList = null;
+                    try {
+                        tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(event.target.getEntityId());
+                    }
+                    catch (Throwable ex) {
+                        LogHelper.error("Error loading the custom trades lists for villager ID " + event.target.getEntityId());
+                        LogHelper.error(ex);
+                    }
+                    if (tradesList == null) tradesList = new MerchantRecipeList();
                     
                     // Debug
-                    sidben.redstonejukebox.helper.LogHelper.info("Openning record trading GUI - Entity ID " + event.target.getEntityId() + ", " + tradesList.size() + " offers");
+                    LogHelper.info("Openning record trading GUI - Entity ID " + event.target.getEntityId() + ", " + tradesList.size() + " offers");
+                    ModRedstoneJukebox.instance.getRecordStoreHelper().debugMerchantList(tradesList);
 
                     if (tradesList.size() > 0) {
                         // Sends the shop to the player
@@ -54,6 +63,8 @@ public class PlayerEventHandler
                     } /*else {
                         // Don't have trades, play a sound
                         event.target.playSound("mob.villager.no", 1.0F, (event.target.worldObj.rand.nextFloat() - event.target.worldObj.rand.nextFloat()) * 0.2F + 1.0F);
+                        
+                        // TODO: re-enable and test (villager sound)
                     }*/
                 }
                 

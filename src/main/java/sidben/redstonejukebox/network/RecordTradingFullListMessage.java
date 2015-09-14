@@ -1,12 +1,15 @@
 package sidben.redstonejukebox.network;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyItems;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import io.netty.buffer.ByteBuf;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 
@@ -54,6 +57,9 @@ public class RecordTradingFullListMessage implements IMessage
             byte tradeType = buf.readByte();                // Trade type
             short recordIndex = buf.readShort();            // Record the villager is buying / selling
             short emeraldPrice = buf.readShort();           // Price in emeralds
+            int recipeUses = buf.readInt();                 // Amount of times the trade was used
+            int recipeMaxUses = buf.readInt();              // Maximum amount of times the trade can be used
+            
             
             if (recordIndex > -1 && emeraldPrice > 0) {
                 MerchantRecipe recipe = null;
@@ -69,6 +75,18 @@ public class RecordTradingFullListMessage implements IMessage
                     recipe = new MerchantRecipe(emptyDisc, emeralds, musicDisc);
                 }
                 
+                // Since the tradeUses variable is hard-coded on 7, manually reduces the amount of 
+                // times this trade can be used.
+                if (recipeMaxUses != 7) recipe.func_82783_a(recipeMaxUses - 7);
+
+                // Adds the trade uses
+                if (recipeUses > 0) {
+                    for (int j=0; j<recipeUses; j++) {
+                        recipe.incrementToolUses();
+                    }
+                }
+
+                
                 // Adds to the list
                 this.tradeList.add(recipe);
             }
@@ -79,7 +97,6 @@ public class RecordTradingFullListMessage implements IMessage
     @Override
     public void toBytes(ByteBuf buf)
     {
-        // TODO: add trade uses
         buf.writeShort(this.tradeList.size());
         
         MerchantRecipe recipe;
@@ -110,6 +127,15 @@ public class RecordTradingFullListMessage implements IMessage
                 }
                 
             }
+            
+            // Adds the trade uses
+            Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
+            Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
+            int recipeMaxUses = hiddenMax == null ? -1 : (int)hiddenMax;
+            int recipeUses = hiddenUses == null ? -1 : (int)hiddenUses;
+            
+            buf.writeInt(recipeUses);
+            buf.writeInt(recipeMaxUses);
 
         }
     }
@@ -120,6 +146,9 @@ public class RecordTradingFullListMessage implements IMessage
     public void updateClientSideRecordStore()
     {
         ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore = this.tradeList;
+        
+        LogHelper.info("Local store updated");
+        ModRedstoneJukebox.instance.getRecordStoreHelper().debugMerchantList(this.tradeList);
     }
 
     

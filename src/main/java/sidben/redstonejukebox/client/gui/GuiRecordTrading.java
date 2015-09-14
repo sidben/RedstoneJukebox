@@ -4,6 +4,7 @@ import java.util.Random;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
@@ -51,7 +52,9 @@ public class GuiRecordTrading extends GuiContainer
         
         // int villagerId = ((Entity)merchant).getEntityId();
         // tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
+        LogHelper.info("Trade list from villager GUI");
         tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
+        ModRedstoneJukebox.instance.getRecordStoreHelper().debugMerchantList(tradesList);
     }
 
     

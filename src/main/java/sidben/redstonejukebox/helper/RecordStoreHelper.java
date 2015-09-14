@@ -13,6 +13,7 @@ import sidben.redstonejukebox.init.MyItems;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
@@ -97,7 +98,6 @@ public class RecordStoreHelper
      * not cause a crash (yay). 
      */
     
-    //@SideOnly(Side.SERVER)
     private LoadingCache<Integer, MerchantRecipeList> storeCache = CacheBuilder.newBuilder()
             .maximumSize(ConfigurationHandler.maxStores)
             .expireAfterAccess(ConfigurationHandler.expirationTime, TimeUnit.MINUTES)
@@ -135,7 +135,6 @@ public class RecordStoreHelper
     /**
      * Returns a collection of trade offers for the given villager EntityID.
      */
-    @SideOnly(Side.SERVER)
     public MerchantRecipeList getStore(int villagerId) {
         if (villagerId < 0) return null;
 
@@ -143,7 +142,8 @@ public class RecordStoreHelper
         //System.out.println(cacheStats.toString());
 
         try {
-            return this.storeCache.get(villagerId);
+            MerchantRecipeList list = this.storeCache.get(villagerId);
+            return list;
         } catch (ExecutionException e) {
             LogHelper.error(e.getMessage());
             return null;
@@ -156,9 +156,8 @@ public class RecordStoreHelper
      * Adds one "use" to the recipe.
      */
     public void useRecipe(MerchantRecipe recipe, EntityPlayer player) {
-        if (player.worldObj.isRemote) {
-            recipe.incrementToolUses();
-        }
+        sidben.redstonejukebox.helper.LogHelper.info("RecordStoreHelper.useRecipe()");
+        recipe.incrementToolUses();
     }
 
     
@@ -168,7 +167,6 @@ public class RecordStoreHelper
     /**
      * Creates a random set of record trades. Will contain at least one buying trade and one selling trade.
      */
-    @SideOnly(Side.SERVER)
     @SuppressWarnings("unchecked")
     MerchantRecipeList createRandomStore() 
     {
@@ -231,7 +229,7 @@ public class RecordStoreHelper
             }
             
             
-            if (store.size() >= offersSize + 2) break;
+            if (store.size() >= offersSize) break;
         }
         
         usedRecords = null;
@@ -244,7 +242,6 @@ public class RecordStoreHelper
 
     
     
-    @SideOnly(Side.SERVER)
     MerchantRecipe getRandomRecipe(EnumRecipeType type) 
     {
         ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
@@ -301,6 +298,54 @@ public class RecordStoreHelper
         // returns the recipe
         return recipe;
     }
+
+    
+    
+
+    /**
+     * Prints in the debug console all info about the given MerchantRecipeList
+     */
+    public void debugMerchantList(MerchantRecipeList list) 
+    {
+        LogHelper.info("=========================================");
+        LogHelper.info("MerchantRecipeList Debug");
+        LogHelper.info("-----------------------------------------");
+        LogHelper.info("List size: " + (list == null ? "NULL" : list.size()));
+        LogHelper.info("");
+        
+        if (list != null) {
+            int cont = 0;
+            for (Object obj : list) {
+                MerchantRecipe recipe = (MerchantRecipe) obj;
+                Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
+                Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
+                int recipeMaxUses = hiddenMax == null ? -1 : (int)hiddenMax;
+                int recipeUses = hiddenUses == null ? -1 : (int)hiddenUses;
+
+                cont++;
+                
+                LogHelper.info(String.format("Trade #%d - %s - used %d of %d times", cont, (recipe.isRecipeDisabled() ? "Disabled" : "Enabled"), recipeUses, recipeMaxUses));
+                LogHelper.info("    Buy item 1: " + debugRecipeItem(recipe.getItemToBuy()));
+                LogHelper.info("    Buy item 2: " + debugRecipeItem(recipe.getSecondItemToBuy()));
+                LogHelper.info("    Sell item:  " + debugRecipeItem(recipe.getItemToSell())); 
+            }
+        }
+        
+        LogHelper.info("=========================================");
+    }
+    
+    
+    private String debugRecipeItem(ItemStack stack) {
+        if (stack == null) return "NULL";
+        if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(stack)) {
+            ItemRecord record = (ItemRecord) stack.getItem();
+            return stack.stackSize + "x " + stack.getDisplayName() + " (" + record.recordName + ")";
+        } else {
+            return stack.stackSize + "x " + stack.getDisplayName();
+        }
+    }
+    
+    
     
 
     
@@ -310,5 +355,7 @@ public class RecordStoreHelper
         BUYING_RECORDS,
         SELLING_RECORDS
     }
+ 
+    
     
 }

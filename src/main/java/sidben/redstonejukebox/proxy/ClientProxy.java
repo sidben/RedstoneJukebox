@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.ModRedstoneJukebox;
@@ -120,13 +119,4 @@ public class ClientProxy extends CommonProxy
     }
     
     
-    
-    @Override
-    public MerchantRecipeList getCachedRecordTrades(int entityId)
-    {
-        sidben.redstonejukebox.helper.LogHelper.info("CLIENT - getCachedRecordTrades()");
-        
-        return null;
-    }
-
 }

@@ -234,6 +234,8 @@ public class InventoryRecordTrading implements IInventory
 
     public void resetRecipeAndSlots()
     {
+        sidben.redstonejukebox.helper.LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots()");
+
         this.currentRecipe = null;
         ItemStack slot1 = this.theInventory[0];
         ItemStack slot2 = this.theInventory[1];
@@ -245,15 +247,31 @@ public class InventoryRecordTrading implements IInventory
         }
 
         
+        // Debug
+        sidben.redstonejukebox.helper.LogHelper.info("    slot 1: " + slot1);
+        sidben.redstonejukebox.helper.LogHelper.info("    slot 2: " + slot2);
+
+        
+        
         if (slot1 == null)
         {
             this.setInventorySlotContents(2, (ItemStack)null);
         }
         else
         {
-            // MerchantRecipeList merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
-            MerchantRecipeList merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
+            MerchantRecipeList merchantrecipelist;
+            if (this.thePlayer.worldObj.isRemote) {
+                merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;    
+                sidben.redstonejukebox.helper.LogHelper.info(" - getting recipe from client");
+            } else {
+                merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
+                sidben.redstonejukebox.helper.LogHelper.info(" - getting recipe from server");
+            }
+            
+            // DEBUG
+            sidben.redstonejukebox.helper.LogHelper.info(" - list size: " + merchantrecipelist.size());
 
+            
             if (merchantrecipelist != null)
             {
                 MerchantRecipe merchantrecipe = merchantrecipelist.canRecipeBeUsed(slot1, slot2, this.currentRecipeIndex);
@@ -286,7 +304,11 @@ public class InventoryRecordTrading implements IInventory
 
         }
         
+        
+        sidben.redstonejukebox.helper.LogHelper.info("    slot sell: " + this.theInventory[2]);
+        
 
+        // Villager sounds (yes or no)
         this.theMerchant.func_110297_a_(this.getStackInSlot(2));
     }
 

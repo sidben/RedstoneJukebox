@@ -74,11 +74,23 @@ public class SlotRecordTradingResult extends Slot
 
     public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack par2ItemStack)
     {
+        sidben.redstonejukebox.helper.LogHelper.info("SlotRecordTradingResult.onPickupFromSlot()");
+        
         this.onCrafting(par2ItemStack);
         MerchantRecipe slotRecipe = this.theMerchantInventory.getCurrentRecipe();
 
+        // Debug
+        sidben.redstonejukebox.helper.LogHelper.info("    slot recipe: " + slotRecipe);
+
+        
         if (slotRecipe != null)
         {
+            // Debug
+            sidben.redstonejukebox.helper.LogHelper.info("    slot 1: " + this.theMerchantInventory.getStackInSlot(0));
+            sidben.redstonejukebox.helper.LogHelper.info("    slot 2: " + this.theMerchantInventory.getStackInSlot(1));
+            sidben.redstonejukebox.helper.LogHelper.info("    slot sell: " + this.theMerchantInventory.getStackInSlot(2));
+
+            
             ItemStack var4 = this.theMerchantInventory.getStackInSlot(0);
             ItemStack var5 = this.theMerchantInventory.getStackInSlot(1);
 

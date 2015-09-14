@@ -17,7 +17,7 @@ import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-// TODO: Volume indicator on the GUI, volume icon and tooltip "Range: 128 blocks"
+// TODO: Volume indicator on the GUI - volume icon and tooltip "Range: 128 blocks"
 
 @SideOnly(Side.CLIENT)
 public class GuiRedstoneJukebox extends GuiContainer

@@ -4,7 +4,7 @@ public class Reference {
 
     public static final String  ModID              	= "SidbenRedstoneJukebox";
     public static final String  ModName            	= "Redstone Jukebox";
-    public static final String  ModVersion         	= "2.1";
+    public static final String  ModVersion         	= "2.1.1";
     public static final String  ModChannel          = "CH_RSJUKEBOX";
     public static final String  ResourcesNamespace  = "redstonejukebox";
 

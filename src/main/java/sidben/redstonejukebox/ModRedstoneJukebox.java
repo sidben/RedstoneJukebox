@@ -4,6 +4,7 @@ import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.GenericHelper;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
+import sidben.redstonejukebox.init.MyCommands;
 import sidben.redstonejukebox.proxy.IProxy;
 import sidben.redstonejukebox.reference.Reference;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -12,6 +13,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
@@ -92,6 +94,9 @@ public class ModRedstoneJukebox
         return recordStoreHelper;
     }
 
+    
+    
+    
 
 
     @Mod.EventHandler
@@ -128,6 +133,11 @@ public class ModRedstoneJukebox
         proxy.post_initialize();
     }
 
-
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event)
+    {
+        // Custom commands
+        MyCommands.register(event);
+    }
 
 }

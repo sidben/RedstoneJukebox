@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import sidben.redstonejukebox.reference.Reference;
+import cpw.mods.fml.client.config.GuiConfigEntries;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -104,6 +105,7 @@ public class ConfigurationHandler
 
         prop = config.get(CATEGORY_TRADING, "store_chance", DEFAULT_shopChance, "", 0, 100);
         prop.setLanguageKey("sidben.redstonejukebox.config.store_chance");
+        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
         shopChance = prop.getInt(DEFAULT_shopChance);
         propOrder.add(prop.getName());
 
@@ -121,21 +123,25 @@ public class ConfigurationHandler
 
         prop = config.get(CATEGORY_TRADING, "record_buy_price_min", DEFAULT_recordPriceBuyMin, "", 1, 64);
         prop.setLanguageKey("sidben.redstonejukebox.config.record_buy_price_min");
+        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
         recordPriceBuyMin = prop.getInt(DEFAULT_recordPriceBuyMin);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_buy_price_max", DEFAULT_recordPriceBuyMax, "", 1, 64);
         prop.setLanguageKey("sidben.redstonejukebox.config.record_buy_price_max");
+        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
         recordPriceBuyMax = prop.getInt(DEFAULT_recordPriceBuyMax);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_sell_price_min", DEFAULT_recordPriceSellMin, "", 1, 64);
         prop.setLanguageKey("sidben.redstonejukebox.config.record_sell_price_min");
+        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
         recordPriceSellMin = prop.getInt(DEFAULT_recordPriceSellMin);
         propOrder.add(prop.getName());
 
         prop = config.get(CATEGORY_TRADING, "record_sell_price_max", DEFAULT_recordPriceSellMax, "", 1, 64);
         prop.setLanguageKey("sidben.redstonejukebox.config.record_sell_price_max");
+        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
         recordPriceSellMax = prop.getInt(DEFAULT_recordPriceSellMax);
         propOrder.add(prop.getName());
 

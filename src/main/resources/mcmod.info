@@ -9,7 +9,7 @@
 "updateUrl": "",
 "authorList": [ "sidben" ],
 "credits": "Jukebox texture by Zomxilla (SubtleCraft Texture Pack)",
-"logoFile": "/ModRedstoneJukebox-logo.png",
+"logoFile": "ModRedstoneJukebox-logo.png",
 "screenshots": [ ],
 "parent": "",
 "dependencies": [ ]

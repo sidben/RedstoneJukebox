@@ -72,7 +72,12 @@ public class GenericHelper
                 return element.time;
             }
         }
-        return 0;
+        
+        // If didn't find the record, plays for 2 minutes
+        return 120;
+        
+        
+        // TODO: if the item is a valid ItemRecord, but I don't know the exact time, return an estimate (file size? Actual OGG check?) - OBS: getURLForSoundResource
     }
 
 
@@ -80,6 +85,7 @@ public class GenericHelper
      * Returns what is the position of a vanilla record in the inner array.
      * Used to send packets to the client (e.g. TileEntityRedstoneJukebox.receiveClientEvent())
      */
+    @Deprecated
     public int getVanillaRecordIndex(ItemStack s)
     {
         if (s != null) {

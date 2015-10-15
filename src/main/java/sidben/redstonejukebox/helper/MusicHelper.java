@@ -153,22 +153,44 @@ public class MusicHelper
      * Starts playing a vanilla record on the given coordinates.
      * 
      * @param index
-     *            Index of the record in the internal recordCollection array, used to tell the client whick record should be played. This is NOT the current slot being played.
+     *            Index of the record in the internal recordCollection array, used to tell the client which record should be played. This is NOT the current slot being played.
      */
+    @Deprecated
     public void playVanillaRecordAt(World world, int x, int y, int z, int index, boolean showName, float volumeExtender)
     {
         if (index >= 0 && index < ModRedstoneJukebox.instance.getGenericHelper().getRecordCollectionSize()) {
             final ItemRecord record = ModRedstoneJukebox.instance.getGenericHelper().getRecordFromCollection(index);
             if (record != null) {
                 // Found a record, plays the song
+                /*
                 final String resourceName = "records." + record.recordName;
-                this.innerPlayRecord(resourceName, x, y, z, showName, volumeExtender);
+                */
+                final ResourceLocation resource = record.getRecordResource(record.recordName);
+                this.innerPlayRecord(resource, x, y, z, showName, volumeExtender);
             } else {
                 // Didn't find a record, stops the music
                 final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
                 this.stopPlayingAt(chunkcoordinates);
             }
 
+        }
+    }
+    
+    
+    /**
+     * Starts playing the given record on the given coordinates
+     * 
+     */
+    public void playRecordAt(World world, int x, int y, int z, ItemRecord record, boolean showName, float volumeExtender)
+    {
+        if (record != null) {
+            // Valid record, plays the song
+            final ResourceLocation resource = record.getRecordResource("records." + record.recordName);
+            this.innerPlayRecord(resource, x, y, z, showName, volumeExtender);
+        } else {
+            // Not a valid record, stops the music
+            final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
+            this.stopPlayingAt(chunkcoordinates);
         }
     }
 
@@ -193,10 +215,17 @@ public class MusicHelper
      * Override of the playRecord method on RenderGlobal.
      * 
      */
-    private void innerPlayRecord(String recordResourceName, int x, int y, int z, boolean showName, float volumeExtender)
+    private void innerPlayRecord(ResourceLocation recordResource, int x, int y, int z, boolean showName, float volumeExtender)
     {
         float volumeRange = 64F;
 
+        // DEBUG
+        System.out.println("innerPlayRecord()");
+        System.out.println("    " + recordResource.getResourceDomain());
+        System.out.println("    " + recordResource.getResourcePath());
+        System.out.println("    " + recordResource.toString());
+        
+        
 
         // adjusts the volume range
         if (volumeExtender >= 1 && volumeExtender <= 128) {
@@ -211,19 +240,17 @@ public class MusicHelper
         this.stopPlayingAt(chunkcoordinates);
 
 
-        if (recordResourceName != null) {
-            final ItemRecord itemrecord = ItemRecord.getRecord(recordResourceName);
+        if (recordResource != null) {
 
-            ResourceLocation resource = null;
+            // TODO: Fix name display
+            /*
             if (itemrecord != null && showName) {
                 mc.ingameGUI.setRecordPlayingMessage(itemrecord.getRecordNameLocal());
                 resource = itemrecord.getRecordResource(recordResourceName);
             }
+            */
 
-            if (resource == null) {
-                resource = new ResourceLocation(recordResourceName);
-            }
-            final PositionedSoundRecord sound = new PositionedSoundRecord(resource, volumeRange, 1.0F, x, y, z);
+            final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, x, y, z);
             this.mapJukeboxesPositions.put(chunkcoordinates, sound);
             mc.getSoundHandler().playSound(sound);
         }

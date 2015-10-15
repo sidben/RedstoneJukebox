@@ -1,25 +1,30 @@
 Sidben Redstone Jukebox
 =======================
 
-Minecraft Mod, requires Forge.
+Minecraft Mod that adds a redstone-powered jukebox that can hold up to 8 records.
 
-Adds a new and improved redstone jukebox, with many cool features. 
+- Mod info on the [Minecraft Forums](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1287056)
+- Downloads on [CurseForge](http://minecraft.curseforge.com/projects/sidben-redstone-jukebox/files)
+- BugTracker on [GitHub](https://github.com/sidben/RedstoneJukebox/issues)
+- Full documentation on [Wikia](http://sidbenmods.wikia.com/wiki/Redstone_Jukebox_Mod) (incomplete)
 
 
-
-Downloads
+Features
 ---------
 
-* v1.1 for Minecraft 1.5.2 - (http://adf.ly/Ohl3v)
-* v1.0 for Minecraft 1.4.7 - (http://adf.ly/OQHtT)
-* v0.6 for Minecraft 1.4.5 - (http://adf.ly/FbSsg)
+- **New block:** Redstone Jukebox - holds up to 8 records;
+- **New item:** Blank record - used to trade records with villagers;
+- **New game mechanic:** Record trading - right-click a villager with a blank record in hand and it will open a special trading GUI. NOTE: Not all villagers can buy/sell records, but most do;
+- Redstone jukebox play modes: Play once or Loop;
+- Redstone jukebox play order: Sequence or Shuffled;
+- Redstone jukebox outputs redstone signal to comparators, signal strength indicates current active slot;
+- Noteblocks around the redstone jukebox can be used to amplify the sound range - up to 16 noteblocks that makes the music reach extra 128 blocks;
+- Many parameters of this mod can be configured in-game, on the mod options;
 
 
-Minecraft Forums
-----------------
-http://www.minecraftforum.net/topic/1590479-152-sidben-redstone-jukebox-v11-forge-now-with-custom-records/
-
-
-Developer Blog
+Planned features for future releases
 --------------
-http://sidbenmc.wordpress.com/
+
+- [ ] Compatibility with records / music discs from other mods;
+- [ ] Custom Records;
+- [ ] Commands;

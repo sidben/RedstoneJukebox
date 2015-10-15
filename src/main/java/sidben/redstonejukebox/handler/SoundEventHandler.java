@@ -16,10 +16,11 @@ public class SoundEventHandler
     {
         final String soundName = event.name;
         final SoundCategory soundCat = event.category;
+        boolean isWorldRunning = (ModRedstoneJukebox.proxy.getClientWorld() != null);
 
-        // TODO: Avoid checks on the title screen
-
-        if (soundName != null) {
+        
+        // Avoids checks if the world is not loaded
+        if (isWorldRunning && soundName != null) {
             // When a record starts playing, stops all background music
             // OBS: Note blocks also have the "Records" sound category, so another condition is needed.
             if (soundCat == SoundCategory.RECORDS && soundName.startsWith("records.")) {

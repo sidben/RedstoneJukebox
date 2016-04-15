@@ -185,7 +185,7 @@ public class MusicHelper
     {
         if (record != null) {
             // Valid record, plays the song
-            final ResourceLocation resource = record.getRecordResource("records." + record.recordName);
+            final ResourceLocation resource = record.getRecordResource("records." + record.recordName);     // TODO: encapsulate this method
             this.innerPlayRecord(resource, x, y, z, showName, volumeExtender);
         } else {
             // Not a valid record, stops the music

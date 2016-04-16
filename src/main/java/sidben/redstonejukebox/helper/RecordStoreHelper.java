@@ -203,11 +203,11 @@ public class RecordStoreHelper
             recipe = this.getRandomRecipe(t);
 
             // Finds out the record of the recipe
-            if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(recipe.getItemToBuy())) {
+            if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(recipe.getItemToBuy())) {
                 record = recipe.getItemToBuy();
-            } else if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(recipe.getItemToSell())) {
+            } else if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(recipe.getItemToSell())) {
                 record = recipe.getItemToSell();
-            } else if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(recipe.getSecondItemToBuy())) {
+            } else if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(recipe.getSecondItemToBuy())) {
                 record = recipe.getSecondItemToBuy();
             } else {
                 record = null;
@@ -255,7 +255,7 @@ public class RecordStoreHelper
 
 
         // gets a random disc
-        musicDisc = ModRedstoneJukebox.instance.getGenericHelper().getRandomRecord(this.rand);
+        musicDisc = ModRedstoneJukebox.instance.getRecordInfoManager().getRandomRecord(this.rand);
 
 
         // sets the price
@@ -336,7 +336,7 @@ public class RecordStoreHelper
         if (stack == null) {
             return "NULL";
         }
-        if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(stack)) {
+        if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(stack)) {
             final ItemRecord record = (ItemRecord) stack.getItem();
             return stack.stackSize + "x " + stack.getDisplayName() + " (" + record.recordName + ")";
         } else {

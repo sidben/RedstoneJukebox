@@ -1,7 +1,7 @@
 package sidben.redstonejukebox;
 
 import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.helper.GenericHelper;
+import sidben.redstonejukebox.helper.RecordInfoManager;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
 import sidben.redstonejukebox.init.MyCommands;
@@ -43,7 +43,7 @@ public class ModRedstoneJukebox
 
 
     // Helper classes
-    private GenericHelper              genericHelper;
+    private RecordInfoManager          recordInfoManager;
     private RecordStoreHelper          recordStoreHelper;
     @SideOnly(Side.CLIENT)
     private MusicHelper                musicHelper;
@@ -64,11 +64,11 @@ public class ModRedstoneJukebox
 
 
     /**
-     * Returns a singleton instance of the generic helper class.
+     * Returns a singleton instance of the record info class.
      */
-    public GenericHelper getGenericHelper()
+    public RecordInfoManager getRecordInfoManager()
     {
-        return genericHelper;
+        return recordInfoManager;
     }
 
     /**
@@ -121,7 +121,7 @@ public class ModRedstoneJukebox
         proxy.initialize();
 
         // Helper classes single instances
-        genericHelper = new GenericHelper();
+        recordInfoManager = new RecordInfoManager();
         recordStoreHelper = new RecordStoreHelper();
     }
 

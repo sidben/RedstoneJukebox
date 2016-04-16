@@ -22,7 +22,7 @@ public class SlotRedstoneJukeboxRecord extends Slot
     @Override
     public boolean isItemValid(ItemStack s)
     {
-        return ModRedstoneJukebox.instance.getGenericHelper().isRecord(s);
+        return ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(s);
     }
 
 

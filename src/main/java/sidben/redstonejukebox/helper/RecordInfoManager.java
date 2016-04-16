@@ -1,0 +1,206 @@
+package sidben.redstonejukebox.helper;
+
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import com.google.common.collect.Maps;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemRecord;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChunkCoordinates;
+
+
+/**
+ * Class to provide info about records, from vanilla and mods.
+ * 
+ */
+public class RecordInfoManager
+{
+
+    private final Map<Integer, RecordInfo> recordsInfoCollection;
+
+    /*
+     * TODO: Find the music length by reading the OGG files (will revisit when adding custom records)
+     * 
+     * http://www.jsresources.org/faq_audio.html#file_length)
+     * http://fossies.org/linux/www/webCDwriter-2.8.2.tar.gz/webCDwriter-2.8.2/webCDcreator/Ogg.java?m=t
+     * 
+     * minecraft:sounds/records/wait.ogg
+     * mcsounddomain:minecraft:sounds/records/wait.ogg
+     * 
+     * OBS: getURLForSoundResource
+     */
+    
+    
+    
+    public RecordInfoManager() {
+        this.recordsInfoCollection = Maps.newHashMap();
+        int idCount = 0;
+        
+        // Adds the vanilla records
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.13", 178, "item.record.13.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.cat", 184, "item.record.cat.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.blocks", 345, "item.record.blocks.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.chirp", 185, "item.record.chirp.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.far", 174, "item.record.far.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mall", 197, "item.record.mall.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mellohi", 96, "item.record.mellohi.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.stal", 150, "item.record.stal.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.strad", 188, "item.record.strad.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.ward", 251, "item.record.ward.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.11", 71, "item.record.11.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.wait", 237, "item.record.wait.desc"));
+        
+
+        // Adds other mods records
+        
+        // TODO: only add records if mod is installed (really necessary?)
+        recordsInfoCollection.put(idCount++, new RecordInfo("portalgun:records.radioloop", 21, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("portalgun:records.stillalive", 176, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("portalgun:records.wantyougone", 141, ""));
+
+        recordsInfoCollection.put(idCount++, new RecordInfo("biomesoplenty:records.wanderer", 289, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("biomesoplenty:records.corruption", 183, ""));
+
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:LoveIsWar", 234, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:Melt", 257, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:OnlineGameAddictsSprechchor", 287, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:RollingGirl", 188, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:RomeoAndCinderella", 275, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:SPiCa", 213, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:TellYourWorld", 252, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:TwoFacedLovers", 182, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:WeekenderGirl", 209, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:WorldIsMine", 251, ""));
+        recordsInfoCollection.put(idCount++, new RecordInfo("vocaloidmod:Yellow", 196, ""));
+
+    }
+    
+    
+
+
+
+    /*
+     * ======================================================================================
+     * 
+     * Records Info
+     * 
+     * ======================================================================================
+     */
+
+    /**
+     * Returns if the given ItemStack is a record.
+     * 
+     */
+    public boolean isRecord(ItemStack s)
+    {
+        return s != null && s.getItem() instanceof ItemRecord;
+    }
+    
+    
+    
+    public String getRecordResourceUrl(ItemRecord record) {
+        if (record == null) return "";
+        
+        String resourceName = record.getRecordResource("records." + record.recordName).toString();
+        return resourceName;
+    }
+    
+
+    
+    
+    /**
+     * Finds the ID of the given record in the internal record info collection.
+     * 
+     */
+    public int getRecordInfoId(ItemStack s) {
+        if (!isRecord(s)) {
+            return -1;
+        }
+
+        ItemRecord record = (ItemRecord) s.getItem();
+        String resourceName = getRecordResourceUrl(record);
+                
+        for (final Entry<Integer, RecordInfo> entry : this.recordsInfoCollection.entrySet()) {
+            if (entry.getValue().recordUrl.equalsIgnoreCase(resourceName)) {
+                return entry.getKey();
+            }
+        }
+        
+        return -1;
+    }
+    
+    
+    
+    
+    public RecordInfo getRecordInfoFromId(int recordInfoId) {
+        if (this.recordsInfoCollection.containsKey(recordInfoId)) {
+            return this.recordsInfoCollection.get(recordInfoId);
+        }
+        
+        return null;
+    }
+    
+    
+    
+
+    /**
+     * Returns the time in seconds that a record should be playing.
+     * 
+     */
+    public int getSongTime(ItemStack s)
+    {
+        int infoId;
+        RecordInfo recordInfo;
+        
+        infoId = getRecordInfoId(s);
+        recordInfo = getRecordInfoFromId(infoId);
+        if (recordInfo != null) return recordInfo.recordDurationSeconds;
+
+        // If didn't find the record, plays for 2 minutes
+        return 120;         // TODO: make this a config
+    }
+
+
+
+    @Deprecated
+    public int getRecordCollectionSize()
+    {
+        // return this.recordCollection.length;
+        return -1;
+    }
+
+
+    @Deprecated
+    public ItemRecord getRecordFromCollection(int index)
+    {
+        // final ItemRecord record = (ItemRecord) recordCollection[index].record;
+        // return record;
+        return null;
+    }
+
+
+
+    /*
+     * ======================================================================================
+     * 
+     * Record Trading
+     * 
+     * ======================================================================================
+     */
+
+    /**
+     * Returns a random record.
+     */
+    @Deprecated
+    public ItemStack getRandomRecord(Random rand)
+    {
+        //final int index = rand.nextInt(this.recordCollection.length);
+        //return new ItemStack(this.recordCollection[index].record, 1);
+        return null;
+    }
+
+
+}

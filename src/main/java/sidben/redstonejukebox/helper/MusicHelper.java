@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import com.google.common.collect.Maps;
@@ -158,8 +159,8 @@ public class MusicHelper
     @Deprecated
     public void playVanillaRecordAt(World world, int x, int y, int z, int index, boolean showName, float volumeExtender)
     {
-        if (index >= 0 && index < ModRedstoneJukebox.instance.getGenericHelper().getRecordCollectionSize()) {
-            final ItemRecord record = ModRedstoneJukebox.instance.getGenericHelper().getRecordFromCollection(index);
+        if (index >= 0 && index < ModRedstoneJukebox.instance.getRecordInfoManager().getRecordCollectionSize()) {
+            final ItemRecord record = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordFromCollection(index);
             if (record != null) {
                 // Found a record, plays the song
                 /*
@@ -176,21 +177,29 @@ public class MusicHelper
         }
     }
     
+
+    
+    
     
     /**
      * Starts playing the given record on the given coordinates
      * 
      */
-    public void playRecordAt(World world, int x, int y, int z, ItemRecord record, boolean showName, float volumeExtender)
+    public void playRecordAt(World world, int x, int y, int z, int recordInfoId, boolean showName, float volumeExtender)
     {
-        if (record != null) {
+        // Find the record
+        RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
+        
+        
+        if (recordInfo != null) {
             // Valid record, plays the song
-            final ResourceLocation resource = record.getRecordResource("records." + record.recordName);     // TODO: encapsulate this method
-            this.innerPlayRecord(resource, x, y, z, showName, volumeExtender);
+            this.innerPlayRecord(recordInfo, x, y, z, showName, volumeExtender);
+            
         } else {
             // Not a valid record, stops the music
             final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
             this.stopPlayingAt(chunkcoordinates);
+            
         }
     }
 
@@ -211,13 +220,19 @@ public class MusicHelper
 
 
 
+    @Deprecated
+    private void innerPlayRecord(ResourceLocation recordResource, int x, int y, int z, boolean showName, float volumeExtender) {
+    }
+    
+    
     /**
      * Override of the playRecord method on RenderGlobal.
      * 
      */
-    private void innerPlayRecord(ResourceLocation recordResource, int x, int y, int z, boolean showName, float volumeExtender)
+    private void innerPlayRecord(RecordInfo recordInfo, int x, int y, int z, boolean showName, float volumeExtender)
     {
         float volumeRange = 64F;
+        ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
 
         // DEBUG
         System.out.println("innerPlayRecord()");
@@ -242,14 +257,13 @@ public class MusicHelper
 
         if (recordResource != null) {
 
-            // TODO: Fix name display
-            /*
-            if (itemrecord != null && showName) {
-                mc.ingameGUI.setRecordPlayingMessage(itemrecord.getRecordNameLocal());
-                resource = itemrecord.getRecordResource(recordResourceName);
+            // Displays the song name
+            if (showName && !recordInfo.recordName.isEmpty()) {
+                String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                mc.ingameGUI.setRecordPlayingMessage(recordTitle);   
             }
-            */
 
+            // Plays the record
             final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, x, y, z);
             this.mapJukeboxesPositions.put(chunkcoordinates, sound);
             mc.getSoundHandler().playSound(sound);

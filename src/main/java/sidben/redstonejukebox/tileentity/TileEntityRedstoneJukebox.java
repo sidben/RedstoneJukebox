@@ -241,7 +241,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public boolean isItemValidForSlot(int i, ItemStack s)
     {
-        return ModRedstoneJukebox.instance.getGenericHelper().isRecord(s);
+        return ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(s);
     }
 
 
@@ -406,17 +406,16 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             if (action == TileEntityRedstoneJukebox.actionPlayVanillaRecord) {
 
-                // The parameter should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record item ID
+                // The parameter should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record Info Id
                 // In other words, the first digit will always be a number between 1 and 9, representing the slot. The following
-                // digits should represent the record id.
+                // digits should represent the record.
                 final String auxParam = Integer.toString(param);
                 if (auxParam.length() < 2) {
                     LogHelper.error("Error decoding PlayVanillaRecord parameter. Value: " + param);
                     return false;
                 }
                 final byte auxSlot = (byte) (Integer.parseInt(auxParam.substring(0, 1)) - 1);
-                final int auxItemId = Integer.parseInt(auxParam.substring(1));
-                final Item record = Item.getItemById(auxItemId);
+                final int recordInfoId = Integer.parseInt(auxParam.substring(1));
 
 
                 // DEBUG
@@ -424,7 +423,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 System.out.println("    slot = " + auxSlot);
                 System.out.println("    inv  = " + this.jukeboxItems);
                 System.out.println("    item = " + this.jukeboxItems[auxSlot]);
-                System.out.println("    aux  = " + record);
+                System.out.println("    info = " + recordInfoId);
 
                 
                 // Sets the slot
@@ -432,8 +431,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
                 // Play the record
                 final float extraVolume = this.getExtraVolume();
-                //ModRedstoneJukebox.instance.getMusicHelper().playVanillaRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, auxRecordIndex, true, extraVolume);
-                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, (ItemRecord) record, true, extraVolume);
+                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, recordInfoId, true, extraVolume);
 
             } else if (action == TileEntityRedstoneJukebox.actionStopPlaying) {
 
@@ -559,6 +557,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     // This is where the groove starts :)
     // --------------------------------------------------------------------
 
+    /**
+     * Makes the jukebox start playing a sequence of records (playlist).
+     * 
+     * That consists in reseting some variables and setting the playlist order.
+     */
     public void startPlaying()
     {
         if (this.isEmpty()) {
@@ -573,6 +576,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     }
 
 
+    /**
+     * Makes the jukebox stop playing the current sequence (playlist).
+     */
     public void stopPlaying()
     {
         this.currentIndex = -1;
@@ -587,6 +593,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     }
 
 
+    /**
+     * Makes the jukebox play the next record of the current sequence (playlist).
+     */
     private void playNextRecord()
     {
         // Advances to the next slot
@@ -608,13 +617,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         } else if (this.currentIndex >= 0 && this.currentIndex <= 7) {
             // reads the selected slot to find a record and get the time of the song
             this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
-            final ItemStack record = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            final int auxSongTime = ModRedstoneJukebox.instance.getGenericHelper().getSongTime(record);
-            int recordInternalId = -1;
+            final ItemStack recordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
+            final int auxSongTime = ModRedstoneJukebox.instance.getRecordInfoManager().getSongTime(recordStack);
+            int recordInfoId = -1;
             
             // Finds the item ID of the record
-            if (record != null) {
-                recordInternalId = Item.getIdFromItem(record.getItem());
+            if (recordStack != null) {
+                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoId(recordStack);
             }
             
             
@@ -622,19 +631,18 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             System.out.println("Starting to play record");
             System.out.println("    slot = " + this.currentJukeboxPlaySlot);
             System.out.println("    item = " + this.jukeboxItems[this.currentJukeboxPlaySlot]);
-            System.out.println("    id   = " + recordInternalId);
+            System.out.println("    id   = " + recordInfoId);
             System.out.println("    time = " + auxSongTime);
             
             
             
             // Check if it has a valid item id and a valid song time
-            if (auxSongTime > 0 && recordInternalId > -1) {
+            if (auxSongTime > 0 && recordInfoId > -1) {
                 // Record found
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
-                // final int recordIndex = ModRedstoneJukebox.instance.getGenericHelper().getVanillaRecordIndex(record);
 
-                // Sets the block event parameter. It should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record item ID
-                final int blockParam = Integer.parseInt(Integer.toString(this.currentJukeboxPlaySlot + 1) + Integer.toString(recordInternalId));
+                // Sets the block event parameter. It should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record info ID
+                final int blockParam = Integer.parseInt(Integer.toString(this.currentJukeboxPlaySlot + 1) + Integer.toString(recordInfoId));
                 
                 /*
                  * OBS: I need to pass the item ID on the blockParam because if I pass just the slot, when the client check that
@@ -645,6 +653,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                  * records, since I plan to use a single item and NBT + UUID to identify the song.
                  * 
                  * If I do not find a way to sync the client, I'll have to use custom packets.
+                 * 
+                 * OBS 2: I now use the record info id, which is an arbitrary number from an internal collection of all supported records.
                  */
 
                 // Send update to clients
@@ -696,7 +706,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             // check every slot to search for records.
             final ItemStack s = this.getStackInSlot(i);
-            if (ModRedstoneJukebox.instance.getGenericHelper().isRecord(s)) {
+            if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(s)) {
                 validRecord = true;
 
                 /*

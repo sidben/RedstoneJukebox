@@ -3,7 +3,9 @@ package sidben.redstonejukebox.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.common.config.Configuration;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.reference.Reference;
 import cpw.mods.fml.client.config.DummyConfigElement;
@@ -35,6 +37,15 @@ public class ModGuiConfig extends GuiConfig
         // Custom Records
         customRecordConfigs = new ConfigElement(ConfigurationHandler.config.getCategory(ConfigurationHandler.CATEGORY_CUSTOM)).getChildElements();
         list.add(new DummyConfigElement.DummyCategoryElement(ConfigurationHandler.CATEGORY_CUSTOM, "sidben.redstonejukebox.config.category.custom_records", customRecordConfigs));
+
+        
+        // General config
+        final List<IConfigElement> generalConfigs = new ArrayList<IConfigElement>();
+        final ConfigCategory generalCat = ConfigurationHandler.config.getCategory(Configuration.CATEGORY_GENERAL);
+
+        generalConfigs.add(new ConfigElement(generalCat.get("song_time")));
+
+        list.addAll(generalConfigs);
 
 
         return list;

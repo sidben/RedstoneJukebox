@@ -3,6 +3,7 @@ package sidben.redstonejukebox.helper;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.Maps;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.init.Items;
@@ -55,8 +56,6 @@ public class RecordInfoManager
         
 
         // Adds other mods records
-        
-        // TODO: only add records if mod is installed (really necessary?)
         recordsInfoCollection.put(idCount++, new RecordInfo("portalgun:records.radioloop", 21, ""));
         recordsInfoCollection.put(idCount++, new RecordInfo("portalgun:records.stillalive", 176, ""));
         recordsInfoCollection.put(idCount++, new RecordInfo("portalgun:records.wantyougone", 141, ""));
@@ -157,10 +156,12 @@ public class RecordInfoManager
         
         infoId = getRecordInfoId(s);
         recordInfo = getRecordInfoFromId(infoId);
-        if (recordInfo != null) return recordInfo.recordDurationSeconds;
 
-        // If didn't find the record, plays for 2 minutes
-        return 120;         // TODO: make this a config
+        if (recordInfo != null && recordInfo.recordDurationSeconds > 0) { 
+            return recordInfo.recordDurationSeconds;
+        } else {
+            return ConfigurationHandler.defaultSongTime;
+        }
     }
 
 

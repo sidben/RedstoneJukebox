@@ -53,6 +53,9 @@ public class ConfigurationHandler
 
     /** Ratio of buying records VS selling records trades. By default, 60% of the offers will be to buy records from players. */
     public static final int     buyingOffersRatio          = 60;
+    
+    /** Default value for the song time, when not defined */
+    public static int           defaultSongTime;
 
 
 
@@ -65,6 +68,7 @@ public class ConfigurationHandler
     private static final int    DEFAULT_recordPriceSellMin = 8;
     private static final int    DEFAULT_recordPriceSellMax = 15;
     private static final int    DEFAULT_shopChance         = 70;
+    private static final int    DEFAULT_defaultSongTime    = 120;
 
 
 
@@ -150,6 +154,9 @@ public class ConfigurationHandler
         config.setCategoryPropertyOrder(CATEGORY_TRADING, propOrder);
 
 
+        defaultSongTime = config.getInt("song_time", Configuration.CATEGORY_GENERAL, DEFAULT_defaultSongTime, 1, 3600, "", "sidben.redstonejukebox.config.song_time");
+
+        
 
         // saving the configuration to its file
         if (config.hasChanged()) {

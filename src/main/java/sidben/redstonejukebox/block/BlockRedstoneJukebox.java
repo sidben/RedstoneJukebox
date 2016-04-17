@@ -547,6 +547,8 @@ public class BlockRedstoneJukebox extends BlockContainer
     @Override
     public int getComparatorInputOverride(World par1World, int x, int y, int z, int par5)
     {
+        // TODO: Add support for when a comparator is pulling energy through a block (like from a chest)
+        
         final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) par1World.getTileEntity(x, y, z);
         return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
     }

@@ -63,7 +63,8 @@ public class RecordTradingFullListMessage implements IMessage
             if (recordIndex > -1 && emeraldPrice > 0) {
                 MerchantRecipe recipe = null;
                 final ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
-                final ItemStack musicDisc = new ItemStack(ModRedstoneJukebox.instance.getRecordInfoManager().getRecordFromCollection(recordIndex), 1);
+                // final ItemStack musicDisc = new ItemStack(ModRedstoneJukebox.instance.getRecordInfoManager().getRecordFromCollection(recordIndex), 1);
+                final ItemStack musicDisc = null; // TODO: fix this 
                 final ItemStack emeralds = new ItemStack(Items.emerald, emeraldPrice);
 
                 // Create the trade

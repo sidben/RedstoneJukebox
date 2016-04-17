@@ -166,21 +166,7 @@ public class RecordInfoManager
 
 
 
-    @Deprecated
-    public int getRecordCollectionSize()
-    {
-        // return this.recordCollection.length;
-        return -1;
-    }
 
-
-    @Deprecated
-    public ItemRecord getRecordFromCollection(int index)
-    {
-        // final ItemRecord record = (ItemRecord) recordCollection[index].record;
-        // return record;
-        return null;
-    }
 
 
 
@@ -198,6 +184,8 @@ public class RecordInfoManager
     @Deprecated
     public ItemStack getRandomRecord(Random rand)
     {
+        // NOTE: Only consider vanilla or custom records from this mod.
+        
         //final int index = rand.nextInt(this.recordCollection.length);
         //return new ItemStack(this.recordCollection[index].record, 1);
         return null;

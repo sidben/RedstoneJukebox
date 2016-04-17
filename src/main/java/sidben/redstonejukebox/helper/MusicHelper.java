@@ -150,39 +150,9 @@ public class MusicHelper
      * ======================================================================================
      */
 
-    /**
-     * Starts playing a vanilla record on the given coordinates.
-     * 
-     * @param index
-     *            Index of the record in the internal recordCollection array, used to tell the client which record should be played. This is NOT the current slot being played.
-     */
-    @Deprecated
-    public void playVanillaRecordAt(World world, int x, int y, int z, int index, boolean showName, float volumeExtender)
-    {
-        if (index >= 0 && index < ModRedstoneJukebox.instance.getRecordInfoManager().getRecordCollectionSize()) {
-            final ItemRecord record = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordFromCollection(index);
-            if (record != null) {
-                // Found a record, plays the song
-                /*
-                final String resourceName = "records." + record.recordName;
-                */
-                final ResourceLocation resource = record.getRecordResource(record.recordName);
-                this.innerPlayRecord(resource, x, y, z, showName, volumeExtender);
-            } else {
-                // Didn't find a record, stops the music
-                final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-                this.stopPlayingAt(chunkcoordinates);
-            }
-
-        }
-    }
-    
-
-    
-    
     
     /**
-     * Starts playing the given record on the given coordinates
+     * Starts playing a record on the given coordinates
      * 
      */
     public void playRecordAt(World world, int x, int y, int z, int recordInfoId, boolean showName, float volumeExtender)
@@ -219,10 +189,6 @@ public class MusicHelper
     }
 
 
-
-    @Deprecated
-    private void innerPlayRecord(ResourceLocation recordResource, int x, int y, int z, boolean showName, float volumeExtender) {
-    }
     
     
     /**

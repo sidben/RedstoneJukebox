@@ -30,7 +30,7 @@ public class SoundEventHandler
             // When a background music is about to start, check if a Redstone Jukebox is playing
             // (inspired by the mp3Jukebox mod)
             else if (soundCat == SoundCategory.MUSIC) {
-                if (ModRedstoneJukebox.instance.getMusicHelper().AnyJukeboxPlaying()) {
+                if (ModRedstoneJukebox.instance.getMusicHelper().AnyJukeboxPlaying() || ModRedstoneJukebox.instance.getMusicHelper().IsCustomBackgroundMusicPlaying()) {
                     event.result = null;
                     event.setResult(Result.DENY);
                 }

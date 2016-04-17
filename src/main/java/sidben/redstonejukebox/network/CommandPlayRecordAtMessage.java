@@ -8,10 +8,10 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 
 /**
- * Parameters from the /playrecord command.
+ * Parameters from the /playrecordat command.
  *  
  */
-public class CommandPlayRecordMessage implements IMessage
+public class CommandPlayRecordAtMessage implements IMessage
 {
 
     // ---------------------------------------------
@@ -19,6 +19,8 @@ public class CommandPlayRecordMessage implements IMessage
     // ---------------------------------------------
     private int     recordInfoId;
     private boolean showName;
+    private double  x, y, z;
+    private int     range;
 
 
 
@@ -26,12 +28,16 @@ public class CommandPlayRecordMessage implements IMessage
     // Methods
     // ---------------------------------------------
 
-    public CommandPlayRecordMessage() {
+    public CommandPlayRecordAtMessage() {
     }
 
-    public CommandPlayRecordMessage(int recordInfoId, boolean showName) {
+    public CommandPlayRecordAtMessage(int recordInfoId, boolean showName, double x, double y, double z, int range) {
         this.recordInfoId = recordInfoId;
         this.showName = showName;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.range = range;
     }
 
 
@@ -44,6 +50,10 @@ public class CommandPlayRecordMessage implements IMessage
     {
         this.recordInfoId = buf.readInt();
         this.showName = buf.readBoolean();
+        this.x = buf.readDouble();
+        this.y = buf.readDouble();
+        this.z = buf.readDouble();
+        this.range = buf.readInt();
     }
 
     // Write the packet
@@ -52,6 +62,10 @@ public class CommandPlayRecordMessage implements IMessage
     {
         buf.writeInt(this.recordInfoId);
         buf.writeBoolean(this.showName);
+        buf.writeDouble(this.x);
+        buf.writeDouble(this.y);
+        buf.writeDouble(this.z);
+        buf.writeInt(this.range);
     }
 
 
@@ -60,7 +74,7 @@ public class CommandPlayRecordMessage implements IMessage
     public void playRecord() {
         World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-            ModRedstoneJukebox.instance.getMusicHelper().playRecord(this.recordInfoId, this.showName);
+            ModRedstoneJukebox.instance.getMusicHelper().playRecordAt((int)this.x, (int)this.y, (int)this.z, this.recordInfoId, this.showName, this.range);
         }
     }
 
@@ -76,6 +90,14 @@ public class CommandPlayRecordMessage implements IMessage
         r.append(this.recordInfoId);
         r.append(", Show record name = ");
         r.append(this.showName);
+        r.append(", Coords = ");
+        r.append(this.x);
+        r.append(", ");
+        r.append(this.y);
+        r.append(", ");
+        r.append(this.z);
+        r.append(", Extra range = ");
+        r.append(this.range);
 
         return r.toString();
     }

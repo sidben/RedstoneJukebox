@@ -5,7 +5,11 @@ tile.redstonejukebox:redstone_jukebox.name=Redstone Jukebox
 item.redstonejukebox:blank_record.name=Blank Record
 
 # Commands
-commands.playrecordat.usage=/playrecordat <record name> <player> [showname] [x] [y] [z] [range]
+commands.playrecord.usage=/playrecord <record name> [showname true|false]
+commands.playrecord.success=Playing record '%s'
+commands.playrecord.record_not_found=Record '%s' not found
+commands.playrecordat.usage=/playrecordat <record name> <player> [showname true|false] [x] [y] [z] [range]
+commands.playrecordat.success=Playing record '%s' to %s
 commands.playrecordat.record_not_found=Record '%s' not found
 commands.stopallrecords.usage=/stopallrecords <player>
 commands.stopallrecords.success=Stopping all records and background music

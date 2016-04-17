@@ -1,6 +1,5 @@
 package sidben.redstonejukebox.init;
 
-import sidben.redstonejukebox.command.CommandPlayBgMusic;
 import sidben.redstonejukebox.command.CommandPlayRecord;
 import sidben.redstonejukebox.command.CommandPlayRecordAt;
 import sidben.redstonejukebox.command.CommandStopAllRecords;
@@ -16,7 +15,6 @@ public class MyCommands
         // register custom commands
         event.registerServerCommand(new CommandPlayRecord());
         event.registerServerCommand(new CommandPlayRecordAt());
-        event.registerServerCommand(new CommandPlayBgMusic());
         event.registerServerCommand(new CommandStopAllRecords());
 
     }

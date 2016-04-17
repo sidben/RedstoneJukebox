@@ -1,22 +1,16 @@
 package sidben.redstonejukebox.command;
 
 import java.util.List;
+import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.network.NetworkHelper;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 
 
 public class CommandPlayRecord extends CommandBase
 {
 
-    /*
-     * Command syntax:
-     * <name> = required
-     * [name] = optional
-     */
-    private static final String myUsage = "/playrecord <record name> [showName true|false]";
-
-    
-    
     
     @Override
     public String getCommandName()
@@ -25,9 +19,9 @@ public class CommandPlayRecord extends CommandBase
     }
 
     @Override
-    public String getCommandUsage(ICommandSender p_71518_1_)
+    public String getCommandUsage(ICommandSender sender)
     {
-        return CommandPlayRecord.myUsage;
+        return "commands.playrecord.usage";
     }
     
     /**
@@ -39,9 +33,45 @@ public class CommandPlayRecord extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender p_71515_1_, String[] p_71515_2_)
+    public void processCommand(ICommandSender sender, String[] args)
     {
-        // TODO Auto-generated method stub
+        if (args.length < 1)
+        {
+            throw new CommandException(this.getCommandUsage(sender), new Object[0]);
+        }
+        else
+        {
+            /*
+             * Command syntax:
+             * playrecord <record name> [showname true|false]
+             *  
+             */
+            
+            String recordName = args[0];
+            int recordInfoId = -1;
+            boolean showName = false;
+            
+
+            // Find the info id of the given record name (url). Throws exception if the id is invalid.
+            recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromUrl(recordName);
+            if (recordInfoId < 0) {
+                throw new CommandException("commands.playrecord.record_not_found", new Object[] {recordName});
+            }
+            
+            
+            if (args.length > 1) {
+                showName = parseBoolean(sender, args[1]);
+            }
+
+
+            
+            // Send packet requesting record play
+            NetworkHelper.sendCommandPlayRecordMessage(recordInfoId, showName);
+
+            
+            // Writes text on the chat
+            func_152373_a(sender, this, "commands.playrecord.success", new Object[] {recordName});
+        }
         
     }
 
@@ -52,9 +82,12 @@ public class CommandPlayRecord extends CommandBase
      */
     @Override
     @SuppressWarnings("rawtypes")
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return CommandBase.getListOfStringsMatchingLastWord(args, ModRedstoneJukebox.instance.getRecordInfoManager().getRecordNames());
+        }
+        
         return null;
-        // return par2ArrayOfStr.length == 1 ? CommandBase.getListOfStringsMatchingLastWord(par2ArrayOfStr, CustomRecordHelper.getRecordNamesList()) : null;
     }
 
 }

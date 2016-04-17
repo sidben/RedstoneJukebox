@@ -19,7 +19,6 @@ public class RecordInfoManager
 
     private final Map<Integer, RecordInfo> recordsInfoCollection;
     private String[] recordNamesList;
-    private String[] bgMusicNamesList;
     
 
     /*
@@ -91,7 +90,6 @@ public class RecordInfoManager
         recordNames = recordNames.substring(1);
         
         recordNamesList = recordNames.split(";");
-        bgMusicNamesList = "calm;hal;nuance;piano".split(";");
     }
     
     
@@ -121,9 +119,6 @@ public class RecordInfoManager
         return this.recordNamesList;
     }
     
-    public String[] getBackgroundMusicNames() {
-        return this.bgMusicNamesList;
-    }
     
     
     

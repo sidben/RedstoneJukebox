@@ -86,10 +86,22 @@ public class NetworkHelper
      */
     public static void sendCommandPlayRecordAtMessage(int recordInfoId, boolean showName, double x, double y, double z, int range, EntityPlayerMP entityPlayer)
     {
-        final CommandPlayRecordMessage message = new CommandPlayRecordMessage(recordInfoId, showName, x, y, z, range);
+        final CommandPlayRecordAtMessage message = new CommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, range);
         ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
     }
 
+
+    /**
+     * Sends to the client a command to play a record as background music.
+     * 
+     * Server -> Client
+     */
+    public static void sendCommandPlayRecordMessage(int recordInfoId, boolean showName)
+    {
+        final CommandPlayRecordMessage message = new CommandPlayRecordMessage(recordInfoId, showName);
+        ModRedstoneJukebox.NetworkWrapper.sendToAll(message);
+    }
+    
 
     /**
      * Sends to the client a command to stop playing all records and background music.
@@ -199,14 +211,32 @@ public class NetworkHelper
     }
 
     
-    public static class CommandPlayRecordAtHandler implements IMessageHandler<CommandPlayRecordMessage, IMessage>
+    public static class CommandPlayRecordAtHandler implements IMessageHandler<CommandPlayRecordAtMessage, IMessage>
+    {
+
+        @Override
+        public IMessage onMessage(CommandPlayRecordAtMessage message, MessageContext ctx)
+        {
+            // DEBUG
+            LogHelper.info("Receiving CommandPlayRecordAt message");
+            LogHelper.info("    " + message);
+
+            message.playRecord();
+
+            return null;
+        }
+
+    }
+
+    
+    public static class CommandPlayRecordHandler implements IMessageHandler<CommandPlayRecordMessage, IMessage>
     {
 
         @Override
         public IMessage onMessage(CommandPlayRecordMessage message, MessageContext ctx)
         {
             // DEBUG
-            LogHelper.info("Receiving CommandPlayRecordAt message");
+            LogHelper.info("Receiving CommandPlayRecord message");
             LogHelper.info("    " + message);
 
             message.playRecord();

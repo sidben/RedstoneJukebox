@@ -93,7 +93,7 @@ public class JukeboxPlayRecordMessage implements IMessage
                 final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
                 ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
             } else {
-                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(world, (int)this.x, (int)this.y, (int)this.z, this.recordInfoId, true, this.extraRange);
+                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt((int)this.x, (int)this.y, (int)this.z, this.recordInfoId, true, this.extraRange);
             }
         }
     }

@@ -54,7 +54,7 @@ public class CommandStopAllRecords extends CommandBase
             NetworkHelper.sendCommandStopAllRecordsMessage(player);
 
             
-            // Writes text on the chat (TODO: correct the message)
+            // Writes text on the chat 
             func_152373_a(sender, this, "commands.stopallrecords.success", new Object[0]);
         }
         

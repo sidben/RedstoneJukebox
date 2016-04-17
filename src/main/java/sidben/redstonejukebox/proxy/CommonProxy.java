@@ -12,6 +12,7 @@ import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.init.MyRecipes;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
+import sidben.redstonejukebox.network.CommandPlayRecordAtMessage;
 import sidben.redstonejukebox.network.CommandPlayRecordMessage;
 import sidben.redstonejukebox.network.CommandStopAllRecordsMessage;
 import sidben.redstonejukebox.network.JukeboxGUIUpdatedMessage;
@@ -49,7 +50,8 @@ public abstract class CommonProxy implements IProxy
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxPlayRecordHandler.class, JukeboxPlayRecordMessage.class, packetdId++, Side.CLIENT);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingGUIHandler.class, RecordTradingGUIUpdatedMessage.class, packetdId++, Side.SERVER);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingFullListHandler.class, RecordTradingFullListMessage.class, packetdId++, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordAtHandler.class, CommandPlayRecordMessage.class, packetdId++, Side.CLIENT);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordAtHandler.class, CommandPlayRecordAtMessage.class, packetdId++, Side.CLIENT);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordHandler.class, CommandPlayRecordMessage.class, packetdId++, Side.CLIENT);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandStopAllRecordsHandler.class, CommandStopAllRecordsMessage.class, packetdId++, Side.CLIENT);
 
 

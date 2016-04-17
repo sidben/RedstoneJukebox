@@ -9,7 +9,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 
-// TODO: arg to stop other records and background
 public class CommandPlayRecordAt extends CommandBase
 {
     
@@ -93,8 +92,8 @@ public class CommandPlayRecordAt extends CommandBase
             NetworkHelper.sendCommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, extraVolumeRange, player);
 
             
-            // Writes text on the chat (TODO: correct the message)
-            func_152373_a(sender, this, "TEST record (%s) id (%s) at (%s, %s, %s)", new Object[] {recordName, recordInfoId, x, y, z});
+            // Writes text on the chat
+            func_152373_a(sender, this, "commands.playrecordat.success", new Object[] {recordName, player.getCommandSenderName()});
         }
         
     }

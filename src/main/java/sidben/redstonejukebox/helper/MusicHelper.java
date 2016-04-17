@@ -9,11 +9,9 @@ import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.item.ItemRecord;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
@@ -77,6 +75,9 @@ public class MusicHelper
      * Holds a reference to the private field [mapSoundPositions] from the RenderGlobal.
      */
     private final Map<ChunkCoordinates, ISound> vanillaSoundPositions;
+    
+    
+    private ISound backgroundMusic;
 
 
 
@@ -155,25 +156,65 @@ public class MusicHelper
      * Starts playing a record on the given coordinates
      * 
      */
-    public void playRecordAt(World world, int x, int y, int z, int recordInfoId, boolean showName, float volumeExtender)
+    public void playRecordAt(int x, int y, int z, int recordInfoId, boolean showName, float volumeExtender)
     {
+        final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
+
         // Find the record
         RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
         
         
         if (recordInfo != null) {
             // Valid record, plays the song
-            this.innerPlayRecord(recordInfo, x, y, z, showName, volumeExtender);
+            float volumeRange = 64F;
+            ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
+
+            // DEBUG
+            System.out.println("playRecordAt()");
+            System.out.println("    " + recordResource.getResourceDomain());
+            System.out.println("    " + recordResource.getResourcePath());
+            System.out.println("    " + recordResource.toString());
             
+            
+
+            // adjusts the volume range
+            if (volumeExtender >= 1 && volumeExtender <= 128) {
+                volumeRange += volumeExtender;
+            }
+            volumeRange = volumeRange / 16F;
+
+
+            // Stops any record that may be playing at the given coordinate
+            // before starting a new one.
+            this.stopPlayingAt(chunkcoordinates);
+
+
+            if (recordResource != null) {
+
+                // Displays the song name
+                if (showName && !recordInfo.recordName.isEmpty()) {
+                    String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                    mc.ingameGUI.setRecordPlayingMessage(recordTitle);   
+                }
+
+                // Override of the playRecord method on RenderGlobal, since I need to set extra volume range.
+                
+                // Plays the record
+                final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, x, y, z);
+                this.mapJukeboxesPositions.put(chunkcoordinates, sound);
+                mc.getSoundHandler().playSound(sound);
+            }
+            
+
         } else {
             // Not a valid record, stops the music
-            final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
             this.stopPlayingAt(chunkcoordinates);
             
         }
     }
 
-
+    
+    
     /**
      * Stops the record being played at the given coordinates.
      * 
@@ -190,54 +231,37 @@ public class MusicHelper
 
 
     
-    
     /**
-     * Override of the playRecord method on RenderGlobal.
+     * Starts playing a record as background music.
      * 
      */
-    private void innerPlayRecord(RecordInfo recordInfo, int x, int y, int z, boolean showName, float volumeExtender)
+    public void playRecord(int recordInfoId, boolean showName)
     {
-        float volumeRange = 64F;
-        ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
-
-        // DEBUG
-        System.out.println("innerPlayRecord()");
-        System.out.println("    " + recordResource.getResourceDomain());
-        System.out.println("    " + recordResource.getResourcePath());
-        System.out.println("    " + recordResource.toString());
+        // Find the record
+        RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
         
-        
+        if (recordInfo != null) {
+            ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
 
-        // adjusts the volume range
-        if (volumeExtender >= 1 && volumeExtender <= 128) {
-            volumeRange += volumeExtender;
-        }
-        volumeRange = volumeRange / 16F;
+            if (recordResource != null) {
 
+                // Displays the song name
+                if (showName && !recordInfo.recordName.isEmpty()) {
+                    String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                    mc.ingameGUI.setRecordPlayingMessage(recordTitle);   
+                }
+                
+                this.StopAllBackgroundMusic();
 
-        // Stops any record that may be playing at the given coordinate
-        // before starting a new one.
-        final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-        this.stopPlayingAt(chunkcoordinates);
-
-
-        if (recordResource != null) {
-
-            // Displays the song name
-            if (showName && !recordInfo.recordName.isEmpty()) {
-                String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
-                mc.ingameGUI.setRecordPlayingMessage(recordTitle);   
+                // Plays the record as background music
+                this.backgroundMusic = PositionedSoundRecord.func_147673_a(recordResource);     // TODO: respect the volume config
+                mc.getSoundHandler().playSound(this.backgroundMusic);
             }
 
-            // Plays the record
-            final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, x, y, z);
-            this.mapJukeboxesPositions.put(chunkcoordinates, sound);
-            mc.getSoundHandler().playSound(sound);
         }
-
-
     }
-
+    
+    
 
 
     public void StopAllBackgroundMusic()
@@ -260,6 +284,11 @@ public class MusicHelper
                     mc.getSoundHandler().stopSound(currentSound);
                 }
             }
+        }
+        
+        // Check this mod background music
+        if (this.IsCustomBackgroundMusicPlaying()) {
+            mc.getSoundHandler().stopSound(this.backgroundMusic);
         }
 
     }
@@ -300,7 +329,19 @@ public class MusicHelper
     
 
 
-
+    /**
+     * Informs if this mod is playing any background music.
+     */
+    public boolean IsCustomBackgroundMusicPlaying()
+    {
+        if (this.backgroundMusic != null) {
+            return mc.getSoundHandler().isSoundPlaying(this.backgroundMusic);
+        }
+        
+        return false;
+    }
+    
+    
     /**
      * Informs if there is any record being played by a vanilla or Redstone Jukebox.
      */

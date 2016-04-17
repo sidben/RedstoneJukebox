@@ -15,6 +15,7 @@ import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.CommandPlayRecordMessage;
 import sidben.redstonejukebox.network.CommandStopAllRecordsMessage;
 import sidben.redstonejukebox.network.JukeboxGUIUpdatedMessage;
+import sidben.redstonejukebox.network.JukeboxPlayRecordMessage;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.network.RecordTradingFullListMessage;
 import sidben.redstonejukebox.network.RecordTradingGUIUpdatedMessage;
@@ -41,12 +42,15 @@ public abstract class CommonProxy implements IProxy
     public void pre_initialize()
     {
         // Register network messages
+        int packetdId = 0;
+        
         ModRedstoneJukebox.NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, 0, Side.SERVER);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingGUIHandler.class, RecordTradingGUIUpdatedMessage.class, 1, Side.SERVER);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingFullListHandler.class, RecordTradingFullListMessage.class, 2, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordAtHandler.class, CommandPlayRecordMessage.class, 3, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandStopAllRecordsHandler.class, CommandStopAllRecordsMessage.class, 4, Side.CLIENT);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, packetdId++, Side.SERVER);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxPlayRecordHandler.class, JukeboxPlayRecordMessage.class, packetdId++, Side.CLIENT);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingGUIHandler.class, RecordTradingGUIUpdatedMessage.class, packetdId++, Side.SERVER);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingFullListHandler.class, RecordTradingFullListMessage.class, packetdId++, Side.CLIENT);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordAtHandler.class, CommandPlayRecordMessage.class, packetdId++, Side.CLIENT);
+        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandStopAllRecordsHandler.class, CommandStopAllRecordsMessage.class, packetdId++, Side.CLIENT);
 
 
         // Register items

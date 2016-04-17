@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -35,6 +36,23 @@ public class NetworkHelper
         ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
 
     }
+    
+    
+    /**
+     * Starts playing a record from a Redstone Jukebox.
+     * 
+     * Server -> Client
+     */
+    public static void sendJukeboxPlayRecordMessage(TileEntityRedstoneJukebox teJukebox, int recordInfoId, byte slot, int volumeExtender)
+    {
+        final int defaultJukeboxRange = 64;
+        final int extraRangeForNearbyPlayers = 32;
+        int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;          
+        
+        final JukeboxPlayRecordMessage message = new JukeboxPlayRecordMessage(teJukebox, recordInfoId, slot, volumeExtender);
+        final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);      
+        ModRedstoneJukebox.NetworkWrapper.sendToAllAround(message, target);
+    }    
 
 
     /**
@@ -115,6 +133,22 @@ public class NetworkHelper
 
     }
 
+    public static class JukeboxPlayRecordHandler implements IMessageHandler<JukeboxPlayRecordMessage, IMessage>
+    {
+
+        @Override
+        public IMessage onMessage(JukeboxPlayRecordMessage message, MessageContext ctx)
+        {
+            // DEBUG
+            LogHelper.info("Receiving Jukebox PlayRecord message");
+            LogHelper.info("    " + message);
+
+            message.updateJukeboxAndPlayRecord();
+
+            return null;
+        }
+
+    }
 
 
     public static class RecordTradingGUIHandler implements IMessageHandler<RecordTradingGUIUpdatedMessage, IMessage>

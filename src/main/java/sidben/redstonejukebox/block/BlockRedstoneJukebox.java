@@ -279,11 +279,8 @@ public class BlockRedstoneJukebox extends BlockContainer
 
             if (teJukebox != null) {
                 teJukebox.ejectAll(par1World, x, y, z);
+                teJukebox.stopPlaying();
             }
-
-            // Stops playing
-            final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-            ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
         }
 
         super.breakBlock(par1World, x, y, z, par5, par6);
@@ -317,14 +314,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     }
 
 
-    @Override
-    public boolean onBlockEventReceived(World world, int x, int y, int z, int action, int param)
-    {
-        final TileEntity tileentity = world.getTileEntity(x, y, z);
-        final boolean r = tileentity != null ? tileentity.receiveClientEvent(action, param) : false;
 
-        return r;
-    }
 
 
 

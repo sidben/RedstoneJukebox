@@ -3,8 +3,6 @@ package sidben.redstonejukebox.tileentity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -13,12 +11,11 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
-import sidben.redstonejukebox.init.MyBlocks;
+import sidben.redstonejukebox.network.NetworkHelper;
 
 
 
@@ -82,10 +79,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private boolean          schedulePlayNextRecord  = false;
     private boolean          scheduleStartPlaying    = false;
     private boolean          scheduleStopPlaying     = false;
-
-
-    private static final int actionPlayVanillaRecord = 5;
-    private static final int actionStopPlaying       = 6;
 
 
     private String           customName;
@@ -393,62 +386,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
     }
 
-
-    /**
-     * Called when a client event is received with the event number and argument.
-     */
-    @Override
-    public boolean receiveClientEvent(int action, int param)
-    {
-
-        // Only process Client-Side
-        if (this.worldObj.isRemote) {
-
-            if (action == TileEntityRedstoneJukebox.actionPlayVanillaRecord) {
-
-                // The parameter should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record Info Id
-                // In other words, the first digit will always be a number between 1 and 9, representing the slot. The following
-                // digits should represent the record.
-                final String auxParam = Integer.toString(param);
-                if (auxParam.length() < 2) {
-                    LogHelper.error("Error decoding PlayVanillaRecord parameter. Value: " + param);
-                    return false;
-                }
-                final byte auxSlot = (byte) (Integer.parseInt(auxParam.substring(0, 1)) - 1);
-                final int recordInfoId = Integer.parseInt(auxParam.substring(1));
-
-
-                // DEBUG
-                System.out.println("RecieveClientEvent");
-                System.out.println("    slot = " + auxSlot);
-                System.out.println("    inv  = " + this.jukeboxItems);
-                System.out.println("    item = " + this.jukeboxItems[auxSlot]);
-                System.out.println("    info = " + recordInfoId);
-
-                
-                // Sets the slot
-                this.setCurrentJukeboxPlaySlot(auxSlot);
-
-                // Play the record
-                final float extraVolume = this.getExtraVolume();
-                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(worldObj, this.xCoord, this.yCoord, this.zCoord, recordInfoId, true, extraVolume);
-
-            } else if (action == TileEntityRedstoneJukebox.actionStopPlaying) {
-
-                // Stops the record
-                final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(this.xCoord, this.yCoord, this.zCoord);
-                ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
-
-                // Sets the slot
-                this.setCurrentJukeboxPlaySlot((byte) -1);
-
-            }
-
-
-        }
-
-        return true;
-    }
+    
+    
 
 
 
@@ -587,9 +526,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.scheduleStopPlaying = false;
 
         // Send update to clients
-        this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, (this.isBlockPowered ? MyBlocks.redstoneJukeboxActive : MyBlocks.redstoneJukebox),
-                TileEntityRedstoneJukebox.actionStopPlaying, 0);
-        this.resync();
+        NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte)0, this.getExtraVolume());
     }
 
 
@@ -618,7 +555,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // reads the selected slot to find a record and get the time of the song
             this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
             final ItemStack recordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            final int auxSongTime = ModRedstoneJukebox.instance.getRecordInfoManager().getSongTime(recordStack);
+            final int auxSongTime = ModRedstoneJukebox.instance.getRecordInfoManager().getSongTime(recordStack);        // TODO: maybe the song timer should be global
             int recordInfoId = -1;
             
             // Finds the item ID of the record
@@ -641,25 +578,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 // Record found
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
 
-                // Sets the block event parameter. It should be an integer composed by [AB], where A == Current inventory slot + 1, B == Record info ID
-                final int blockParam = Integer.parseInt(Integer.toString(this.currentJukeboxPlaySlot + 1) + Integer.toString(recordInfoId));
-                
-                /*
-                 * OBS: I need to pass the item ID on the blockParam because if I pass just the slot, when the client check that
-                 * slot on the jukebox inventory, it will return null. Actual items are only stored on the server.
-                 * 
-                 * When I pass the item id I can be sure that the client will know which record to play, regardless of the server
-                 * inventory. This will work with any non-vanilla record that extends ItemRecord, but it won't work with my custom
-                 * records, since I plan to use a single item and NBT + UUID to identify the song.
-                 * 
-                 * If I do not find a way to sync the client, I'll have to use custom packets.
-                 * 
-                 * OBS 2: I now use the record info id, which is an arbitrary number from an internal collection of all supported records.
-                 */
-
                 // Send update to clients
-                this.worldObj.addBlockEvent(this.xCoord, this.yCoord, this.zCoord, MyBlocks.redstoneJukeboxActive, TileEntityRedstoneJukebox.actionPlayVanillaRecord, blockParam);
-                // this.resync(); // OBS: Looks like it's not needed
+                NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.currentJukeboxPlaySlot, this.getExtraVolume());
+
 
                 // To update comparators
                 this.worldObj.notifyBlockOfNeighborChange(this.xCoord - 1, this.yCoord, this.zCoord, this.getBlockType());
@@ -762,7 +683,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * Checks the redstone jukebox block for the note blocks that will increase the volume range.
      * 
      */
-    private float getExtraVolume()
+    private int getExtraVolume()
     {
         return BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.xCoord, this.yCoord, this.zCoord);
     }

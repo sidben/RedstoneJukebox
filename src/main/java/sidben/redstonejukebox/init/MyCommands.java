@@ -3,6 +3,7 @@ package sidben.redstonejukebox.init;
 import sidben.redstonejukebox.command.CommandPlayBgMusic;
 import sidben.redstonejukebox.command.CommandPlayRecord;
 import sidben.redstonejukebox.command.CommandPlayRecordAt;
+import sidben.redstonejukebox.command.CommandStopAllRecords;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
 
@@ -16,6 +17,7 @@ public class MyCommands
         event.registerServerCommand(new CommandPlayRecord());
         event.registerServerCommand(new CommandPlayRecordAt());
         event.registerServerCommand(new CommandPlayBgMusic());
+        event.registerServerCommand(new CommandStopAllRecords());
 
     }
     

@@ -61,6 +61,28 @@ public class NetworkHelper
     }
 
 
+    /**
+     * Sends to the client a command to play a record at a given coordinate.
+     * 
+     * Server -> Client
+     */
+    public static void sendCommandPlayRecordAtMessage(int recordInfoId, boolean showName, double x, double y, double z, int range, EntityPlayerMP entityPlayer)
+    {
+        final CommandPlayRecordMessage message = new CommandPlayRecordMessage(recordInfoId, showName, x, y, z, range);
+        ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
+    }
+
+
+    /**
+     * Sends to the client a command to stop playing all records and background music.
+     * 
+     * Server -> Client
+     */
+    public static void sendCommandStopAllRecordsMessage(EntityPlayerMP entityPlayer)
+    {
+        final CommandStopAllRecordsMessage message = new CommandStopAllRecordsMessage();
+        ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
+    }
 
 
 
@@ -142,4 +164,39 @@ public class NetworkHelper
 
     }
 
+    
+    public static class CommandPlayRecordAtHandler implements IMessageHandler<CommandPlayRecordMessage, IMessage>
+    {
+
+        @Override
+        public IMessage onMessage(CommandPlayRecordMessage message, MessageContext ctx)
+        {
+            // DEBUG
+            LogHelper.info("Receiving CommandPlayRecordAt message");
+            LogHelper.info("    " + message);
+
+            message.playRecord();
+
+            return null;
+        }
+
+    }
+
+    
+    public static class CommandStopAllRecordsHandler implements IMessageHandler<CommandStopAllRecordsMessage, IMessage>
+    {
+
+        @Override
+        public IMessage onMessage(CommandStopAllRecordsMessage message, MessageContext ctx)
+        {
+            // DEBUG
+            LogHelper.info("Receiving CommandStopAllRecords message");
+
+            message.stopMusic();
+
+            return null;
+        }
+
+    }
+    
 }

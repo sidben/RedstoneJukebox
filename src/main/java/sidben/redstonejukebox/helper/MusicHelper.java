@@ -263,6 +263,41 @@ public class MusicHelper
         }
 
     }
+    
+    
+    
+    @SuppressWarnings("rawtypes")
+    public void StopAllRecordsPlaying() {
+
+        // Ref: SoundManager.updateAllSounds()
+        Iterator iterator;
+
+
+        // Check vanilla jukeboxes
+        iterator = this.vanillaSoundPositions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Entry entry = (Entry) iterator.next();
+            final ISound isound = (ISound) entry.getValue();
+            final boolean p = mc.getSoundHandler().isSoundPlaying(isound);
+            if (p) {
+                mc.getSoundHandler().stopSound(isound);
+            }
+        }
+
+
+        // Check redstone jukeboxes
+        iterator = this.mapJukeboxesPositions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Entry entry = (Entry) iterator.next();
+            final ISound isound = (ISound) entry.getValue();
+            final boolean p = mc.getSoundHandler().isSoundPlaying(isound);
+            if (p) {
+                mc.getSoundHandler().stopSound(isound);
+            }
+        }        
+        
+    }
+    
 
 
 

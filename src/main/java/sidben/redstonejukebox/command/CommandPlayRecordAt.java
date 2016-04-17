@@ -1,22 +1,17 @@
 package sidben.redstonejukebox.command;
 
 import java.util.List;
+import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.network.NetworkHelper;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 
+// TODO: arg to stop other records and background
 public class CommandPlayRecordAt extends CommandBase
 {
-
-    /*
-     * Command syntax:
-     * <name> = required
-     * [name] = optional
-     */
-    private static final String myUsage = "/playrecordat <record name> <player> [showname] [x] [y] [z] [range]";
-
-    
-    
     
     @Override
     public String getCommandName()
@@ -25,9 +20,9 @@ public class CommandPlayRecordAt extends CommandBase
     }
 
     @Override
-    public String getCommandUsage(ICommandSender p_71518_1_)
+    public String getCommandUsage(ICommandSender sender)
     {
-        return CommandPlayRecordAt.myUsage;
+        return "commands.playrecordat.usage";
     }
 
     /**
@@ -39,9 +34,68 @@ public class CommandPlayRecordAt extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender p_71515_1_, String[] p_71515_2_)
+    public void processCommand(ICommandSender sender, String[] args)
     {
-        // TODO Auto-generated method stub
+        if (args.length < 2)
+        {
+            throw new CommandException(this.getCommandUsage(sender), new Object[0]);
+        }
+        else
+        {
+            /*
+             * Command syntax:
+             * playrecordat <record name> <player> [showname] [x] [y] [z] [range]
+             *  
+             */
+            
+            String recordName = args[0];
+            EntityPlayerMP player = getPlayer(sender, args[1]);
+            int recordInfoId = -1;
+            boolean showName = false;
+            double x = player.posX;
+            double y = player.posY;
+            double z = player.posZ;
+            int extraVolumeRange = 0;
+            
+            
+            
+
+            // Find the info id of the given record name (url). Throws exception if the id is invalid.
+            recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromUrl(recordName);
+            if (recordInfoId < 0) {
+                throw new CommandException("commands.playrecordat.record_not_found", new Object[] {recordName});
+            }
+            
+
+            
+            if (args.length > 2) {
+                showName = parseBoolean(sender, args[2]);
+            }
+
+            if (args.length > 3) {
+                x = parseDouble(sender, args[3]);
+            }
+            
+            if (args.length > 4) {
+                y = parseDoubleWithMin(sender, args[4], 0);
+            }
+
+            if (args.length > 5) {
+                z = parseDouble(sender, args[5]);
+            }
+
+            if (args.length > 6) {
+                extraVolumeRange = parseInt(sender, args[6]);
+            }
+            
+            
+            // Send packet requesting record play
+            NetworkHelper.sendCommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, extraVolumeRange, player);
+
+            
+            // Writes text on the chat (TODO: correct the message)
+            func_152373_a(sender, this, "TEST record (%s) id (%s) at (%s, %s, %s)", new Object[] {recordName, recordInfoId, x, y, z});
+        }
         
     }
 
@@ -51,9 +105,12 @@ public class CommandPlayRecordAt extends CommandBase
      */
     @Override
     @SuppressWarnings("rawtypes")
-    public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return CommandBase.getListOfStringsMatchingLastWord(args, ModRedstoneJukebox.instance.getRecordInfoManager().getRecordNames());
+        }
+        
         return null;
-        // return par2ArrayOfStr.length == 1 ? CommandBase.getListOfStringsMatchingLastWord(par2ArrayOfStr, CustomRecordHelper.getRecordNamesList()) : null;
     }
 
 }

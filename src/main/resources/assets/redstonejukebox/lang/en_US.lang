@@ -4,6 +4,12 @@ tile.redstonejukebox:redstone_jukebox.name=Redstone Jukebox
 # Items
 item.redstonejukebox:blank_record.name=Blank Record
 
+# Commands
+commands.playrecordat.usage=/playrecordat <record name> <player> [showname] [x] [y] [z] [range]
+commands.playrecordat.record_not_found=Record '%s' not found
+commands.stopallrecords.usage=/stopallrecords <player>
+commands.stopallrecords.success=Stopping all records and background music
+
 # Config GUI
 sidben.redstonejukebox.config.category.record_trading=Record Trading
 sidben.redstonejukebox.config.category.custom_records=Custom Records

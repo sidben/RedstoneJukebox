@@ -1,12 +1,8 @@
 package sidben.redstonejukebox.handler;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import sidben.redstonejukebox.reference.Reference;
-import cpw.mods.fml.client.config.GuiConfigEntries;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -92,69 +88,22 @@ public class ConfigurationHandler
 
     private static void loadConfig()
     {
-        final List<String> propOrder = new ArrayList<String>();
-        Property prop;
 
-
-        // Load properties
-        prop = config.get(CATEGORY_TRADING, "max_stores", DEFAULT_maxStores, "", 16, 1024);
-        prop.setLanguageKey("sidben.redstonejukebox.config.max_stores");
-        maxStores = prop.getInt(DEFAULT_maxStores);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "expiration_store", DEFAULT_expirationTime, "", 1, 1440);
-        prop.setLanguageKey("sidben.redstonejukebox.config.expiration_store");
-        expirationTime = prop.getInt(DEFAULT_expirationTime);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "store_chance", DEFAULT_shopChance, "", 0, 100);
-        prop.setLanguageKey("sidben.redstonejukebox.config.store_chance");
-        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
-        shopChance = prop.getInt(DEFAULT_shopChance);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "max_new_trades", DEFAULT_maxOffers, "", 3, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.config.max_trades");
-        maxOffers = prop.getInt(DEFAULT_maxOffers);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "record_trade_count", DEFAULT_tradeUses, "", 1, Integer.MAX_VALUE);
-        prop.setLanguageKey("sidben.redstonejukebox.config.record_trade_count");
-        tradeUses = prop.getInt(DEFAULT_tradeUses);
-        propOrder.add(prop.getName());
-
-
-
-        prop = config.get(CATEGORY_TRADING, "record_buy_price_min", DEFAULT_recordPriceBuyMin, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.config.record_buy_price_min");
-        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
-        recordPriceBuyMin = prop.getInt(DEFAULT_recordPriceBuyMin);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "record_buy_price_max", DEFAULT_recordPriceBuyMax, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.config.record_buy_price_max");
-        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
-        recordPriceBuyMax = prop.getInt(DEFAULT_recordPriceBuyMax);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "record_sell_price_min", DEFAULT_recordPriceSellMin, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.config.record_sell_price_min");
-        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
-        recordPriceSellMin = prop.getInt(DEFAULT_recordPriceSellMin);
-        propOrder.add(prop.getName());
-
-        prop = config.get(CATEGORY_TRADING, "record_sell_price_max", DEFAULT_recordPriceSellMax, "", 1, 64);
-        prop.setLanguageKey("sidben.redstonejukebox.config.record_sell_price_max");
-        prop.setConfigEntryClass(GuiConfigEntries.NumberSliderEntry.class);
-        recordPriceSellMax = prop.getInt(DEFAULT_recordPriceSellMax);
-        propOrder.add(prop.getName());
-
-
-
-        config.setCategoryPropertyOrder(CATEGORY_TRADING, propOrder);
-
-
+        // Load properties - general
         defaultSongTime = config.getInt("song_time", Configuration.CATEGORY_GENERAL, DEFAULT_defaultSongTime, 1, 3600, "", "sidben.redstonejukebox.config.song_time");
+        
+
+        // Load properties - record trading
+        maxStores = config.getInt("max_stores", CATEGORY_TRADING, DEFAULT_maxStores, 16, 1024, "", "sidben.redstonejukebox.config.max_stores");
+        expirationTime = config.getInt("expiration_store", CATEGORY_TRADING, DEFAULT_expirationTime, 1, 1440, "", "sidben.redstonejukebox.config.expiration_store");
+        shopChance = config.getInt("store_chance", CATEGORY_TRADING, DEFAULT_shopChance, 0, 100, "", "sidben.redstonejukebox.config.store_chance");
+        maxStores = config.getInt("max_new_trades", CATEGORY_TRADING, DEFAULT_maxOffers, 3, 64, "", "sidben.redstonejukebox.config.max_trades");
+        tradeUses = config.getInt("record_trade_count", CATEGORY_TRADING, DEFAULT_tradeUses, 1, Integer.MAX_VALUE, "", "sidben.redstonejukebox.config.record_trade_count");
+        
+        recordPriceBuyMin = config.getInt("record_buy_price_min", CATEGORY_TRADING, DEFAULT_recordPriceBuyMin, 1, 64, "", "sidben.redstonejukebox.config.record_buy_price_min");
+        recordPriceBuyMax = config.getInt("record_buy_price_max", CATEGORY_TRADING, DEFAULT_recordPriceBuyMax, 1, 64, "", "sidben.redstonejukebox.config.record_buy_price_max");
+        recordPriceSellMin = config.getInt("record_sell_price_min", CATEGORY_TRADING, DEFAULT_recordPriceSellMin, 1, 64, "", "sidben.redstonejukebox.config.record_sell_price_min");
+        recordPriceSellMax = config.getInt("record_sell_price_max", CATEGORY_TRADING, DEFAULT_recordPriceSellMax, 1, 64, "", "sidben.redstonejukebox.config.record_sell_price_max");
 
         
 

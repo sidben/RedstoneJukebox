@@ -623,7 +623,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             
             // Finds the item ID of the record
             if (recordStack != null) {
-                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoId(recordStack);
+                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(recordStack);
             }
             
             

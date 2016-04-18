@@ -184,25 +184,31 @@ public class GuiRecordTrading extends GuiContainer
             GL11.glEnable(GL11.GL_COLOR_MATERIAL);
             GL11.glEnable(GL11.GL_LIGHTING);
             itemRender.zLevel = 100.0F;
-            itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var9, var5 + 36, var6 + 24);
-            itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var9, var5 + 36, var6 + 24);
-
+            
+            if (var9 != null) {
+                itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var9, var5 + 36, var6 + 24);
+                itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var9, var5 + 36, var6 + 24);
+            }
+            
             if (var10 != null) {
                 itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var10, var5 + 62, var6 + 24);
                 itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var10, var5 + 62, var6 + 24);
             }
 
-            itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var11, var5 + 120, var6 + 24);
-            itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var11, var5 + 120, var6 + 24);
+            if (var11 != null) {
+                itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var11, var5 + 120, var6 + 24);
+                itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var11, var5 + 120, var6 + 24);
+            }
+            
             itemRender.zLevel = 0.0F;
             GL11.glDisable(GL11.GL_LIGHTING);
 
             // OBS: func_146978_c() == isPointInRegion()
-            if (this.func_146978_c(36, 24, 16, 16, par1, par2)) {
+            if (var9 != null && this.func_146978_c(36, 24, 16, 16, par1, par2)) {
                 this.renderToolTip(var9, par1, par2);
             } else if (var10 != null && this.func_146978_c(62, 24, 16, 16, par1, par2)) {
                 this.renderToolTip(var10, par1, par2);
-            } else if (this.func_146978_c(120, 24, 16, 16, par1, par2)) {
+            } else if (var11 != null && this.func_146978_c(120, 24, 16, 16, par1, par2)) {
                 this.renderToolTip(var11, par1, par2);
             }
 

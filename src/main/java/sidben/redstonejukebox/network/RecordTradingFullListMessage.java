@@ -2,10 +2,12 @@ package sidben.redstonejukebox.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.RecordInfo;
 import sidben.redstonejukebox.init.MyItems;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -49,23 +51,25 @@ public class RecordTradingFullListMessage implements IMessage
         this.tradeList = new MerchantRecipeList();
         final int listSize = buf.readShort();
 
-        // TODO: check what happens if the ByteBuf can't read anymore
 
         // Loop to parse all trades
         for (short i = 0; i < listSize; i++) {
-            final byte tradeType = buf.readByte();                // Trade type
-            final short recordIndex = buf.readShort();            // Record the villager is buying / selling
-            final short emeraldPrice = buf.readShort();           // Price in emeralds
-            final int recipeUses = buf.readInt();                 // Amount of times the trade was used
-            final int recipeMaxUses = buf.readInt();              // Maximum amount of times the trade can be used
+            final byte tradeType = buf.readByte();                  // Trade type
+            final int recordInfoId = buf.readInt();                 // Record the villager is buying / selling
+            final short emeraldPrice = buf.readShort();             // Price in emeralds
+            final int recipeUses = buf.readInt();                   // Amount of times the trade was used
+            final int recipeMaxUses = buf.readInt();                // Maximum amount of times the trade can be used
 
 
-            if (recordIndex > -1 && emeraldPrice > 0) {
+            if (recordInfoId > -1 && emeraldPrice > 0) {
                 MerchantRecipe recipe = null;
+                final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
+                final Item recordItem = Item.getItemById(recordInfo.recordItemId);
+
                 final ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
-                // final ItemStack musicDisc = new ItemStack(ModRedstoneJukebox.instance.getRecordInfoManager().getRecordFromCollection(recordIndex), 1);
-                final ItemStack musicDisc = null; // TODO: fix this 
+                final ItemStack musicDisc = new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
                 final ItemStack emeralds = new ItemStack(Items.emerald, emeraldPrice);
+
 
                 // Create the trade
                 if (tradeType == TYPE_BUYING) {
@@ -107,40 +111,42 @@ public class RecordTradingFullListMessage implements IMessage
             final ItemStack slotBuy1 = recipe.getItemToBuy();
             final ItemStack slotBuy2 = recipe.getSecondItemToBuy();
             final ItemStack slotSell = recipe.getItemToSell();
+            int recordInfoId = -1;
 
             // Checks the recipe type
             if (slotSell.getItem() == Items.emerald) {
-                //final int recordIndex = ModRedstoneJukebox.instance.getGenericHelper().getVanillaRecordIndex(slotBuy1);
-                // TODO: fix (?)
-                final int recordIndex = 1;
-                if (recordIndex > -1) {
+                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(slotBuy1);
+
+                if (recordInfoId > -1) {
                     // Villager is buying records
                     buf.writeByte(TYPE_BUYING);             // Trade type
-                    buf.writeShort(recordIndex);            // Record the villager is buying
+                    buf.writeInt(recordInfoId);             // Record the villager is buying
                     buf.writeShort(slotSell.stackSize);     // Price in emeralds
                 }
 
             } else {
-                // final int recordIndex = ModRedstoneJukebox.instance.getGenericHelper().getVanillaRecordIndex(slotSell);
-                // TODO: fix (?)
-                final int recordIndex = 1;
-                if (recordIndex > -1) {
+                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(slotSell);
+
+                if (recordInfoId > -1) {
                     // Villager is selling records
                     buf.writeByte(TYPE_SELLING);            // Trade type
-                    buf.writeShort(recordIndex);            // Record the villager is selling
+                    buf.writeInt(recordInfoId);             // Record the villager is selling
                     buf.writeShort(slotBuy2.stackSize);     // Price in emeralds
                 }
 
             }
 
-            // Adds the trade uses
-            final Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
-            final Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
-            final int recipeMaxUses = hiddenMax == null ? -1 : (int) hiddenMax;
-            final int recipeUses = hiddenUses == null ? -1 : (int) hiddenUses;
 
-            buf.writeInt(recipeUses);
-            buf.writeInt(recipeMaxUses);
+            if (recordInfoId > -1) {
+                // Adds the trade uses
+                final Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
+                final Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
+                final int recipeMaxUses = hiddenMax == null ? -1 : (int) hiddenMax;
+                final int recipeUses = hiddenUses == null ? -1 : (int) hiddenUses;
+
+                buf.writeInt(recipeUses);
+                buf.writeInt(recipeMaxUses);
+            }
 
         }
     }
@@ -150,11 +156,6 @@ public class RecordTradingFullListMessage implements IMessage
     public void updateClientSideRecordStore()
     {
         ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore = this.tradeList;
-        /*
-        // DEBUG
-        LogHelper.info("Local store updated");
-        ModRedstoneJukebox.instance.getRecordStoreHelper().debugMerchantList(this.tradeList);
-        */
     }
 
 

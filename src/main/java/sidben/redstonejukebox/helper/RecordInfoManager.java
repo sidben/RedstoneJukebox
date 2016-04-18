@@ -6,6 +6,8 @@ import java.util.Random;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.Loader;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 
@@ -19,6 +21,7 @@ public class RecordInfoManager
 
     private final Map<Integer, RecordInfo> recordsInfoCollection;
     private String[] recordNamesList;
+    private int[] recordsInfoIdRandomCandidates;
     
 
     /*
@@ -38,20 +41,25 @@ public class RecordInfoManager
     public RecordInfoManager() {
         this.recordsInfoCollection = Maps.newHashMap();
         int idCount = 0;
+        int countVanillaRecords = 0;
+        int countCustomRecords = 0;
+        
         
         // Adds the vanilla records
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.13", 178, "item.record.13.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.cat", 184, "item.record.cat.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.blocks", 345, "item.record.blocks.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.chirp", 185, "item.record.chirp.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.far", 174, "item.record.far.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mall", 197, "item.record.mall.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mellohi", 96, "item.record.mellohi.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.stal", 150, "item.record.stal.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.strad", 188, "item.record.strad.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.ward", 251, "item.record.ward.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.11", 71, "item.record.11.desc"));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.wait", 237, "item.record.wait.desc"));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.13", 178, "item.record.13.desc", Item.getIdFromItem(Items.record_13), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.cat", 184, "item.record.cat.desc", Item.getIdFromItem(Items.record_cat), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.blocks", 345, "item.record.blocks.desc", Item.getIdFromItem(Items.record_blocks), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.chirp", 185, "item.record.chirp.desc", Item.getIdFromItem(Items.record_chirp), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.far", 174, "item.record.far.desc", Item.getIdFromItem(Items.record_far), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mall", 197, "item.record.mall.desc", Item.getIdFromItem(Items.record_mall), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mellohi", 96, "item.record.mellohi.desc", Item.getIdFromItem(Items.record_mellohi), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.stal", 150, "item.record.stal.desc", Item.getIdFromItem(Items.record_stal), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.strad", 188, "item.record.strad.desc", Item.getIdFromItem(Items.record_strad), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.ward", 251, "item.record.ward.desc", Item.getIdFromItem(Items.record_ward), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.11", 71, "item.record.11.desc", Item.getIdFromItem(Items.record_11), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.wait", 237, "item.record.wait.desc", Item.getIdFromItem(Items.record_wait), 0));
+        
+        countVanillaRecords = idCount;
         
 
         // Adds other mods records (TODO: test mods)
@@ -90,6 +98,13 @@ public class RecordInfoManager
         recordNames = recordNames.substring(1);
         
         recordNamesList = recordNames.split(";");
+        
+        
+        // records that are valid for record trading
+        recordsInfoIdRandomCandidates = new int[countVanillaRecords + countCustomRecords];
+        for (int i = 0; i < countVanillaRecords; i++) {
+            recordsInfoIdRandomCandidates[i] = i;
+        }
     }
     
     
@@ -215,14 +230,22 @@ public class RecordInfoManager
     /**
      * Returns a random record.
      */
-    @Deprecated
     public ItemStack getRandomRecord(Random rand)
     {
         // NOTE: Only consider vanilla or custom records from this mod.
+        final int randomPosition = rand.nextInt(this.recordsInfoIdRandomCandidates.length);
+        final int randomInfoId = this.recordsInfoIdRandomCandidates[randomPosition];
+        final RecordInfo recordInfo = this.recordsInfoCollection.get(randomInfoId);
+        final Item recordItem = Item.getItemById(recordInfo.recordItemId);
         
-        //final int index = rand.nextInt(this.recordCollection.length);
-        //return new ItemStack(this.recordCollection[index].record, 1);
-        return null;
+        LogHelper.info("getRandomRecord");
+        LogHelper.info("    position: " + randomPosition);
+        LogHelper.info("    info id: " + randomInfoId);
+        LogHelper.info("    info: " + recordInfo);
+        LogHelper.info("    item id: " + recordInfo.recordItemId);
+        LogHelper.info("    item: " + recordItem);
+
+        return new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
     }
 
 

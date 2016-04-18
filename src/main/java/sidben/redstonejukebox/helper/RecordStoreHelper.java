@@ -172,7 +172,8 @@ public class RecordStoreHelper
 
 
         // Decides how many offers will be added. The minimum is 3 trades.
-        final int offersSize = rand.nextInt(ConfigurationHandler.maxOffers - 2) + 3;
+        int offersSize = rand.nextInt(ConfigurationHandler.maxOffers);
+        if (offersSize < 3) { offersSize = 3; }
 
         // Adds one buying offers and one selling offer, by default (extra if for extra randomness)
         if (rand.nextInt(10) < 5) {

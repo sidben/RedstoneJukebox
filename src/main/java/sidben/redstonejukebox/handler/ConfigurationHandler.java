@@ -97,7 +97,7 @@ public class ConfigurationHandler
         maxStores = config.getInt("max_stores", CATEGORY_TRADING, DEFAULT_maxStores, 16, 1024, "", "sidben.redstonejukebox.config.max_stores");
         expirationTime = config.getInt("expiration_store", CATEGORY_TRADING, DEFAULT_expirationTime, 1, 1440, "", "sidben.redstonejukebox.config.expiration_store");
         shopChance = config.getInt("store_chance", CATEGORY_TRADING, DEFAULT_shopChance, 0, 100, "", "sidben.redstonejukebox.config.store_chance");
-        maxStores = config.getInt("max_new_trades", CATEGORY_TRADING, DEFAULT_maxOffers, 3, 64, "", "sidben.redstonejukebox.config.max_trades");
+        maxOffers = config.getInt("max_new_trades", CATEGORY_TRADING, DEFAULT_maxOffers, 3, 64, "", "sidben.redstonejukebox.config.max_trades");
         tradeUses = config.getInt("record_trade_count", CATEGORY_TRADING, DEFAULT_tradeUses, 1, Integer.MAX_VALUE, "", "sidben.redstonejukebox.config.record_trade_count");
         
         recordPriceBuyMin = config.getInt("record_buy_price_min", CATEGORY_TRADING, DEFAULT_recordPriceBuyMin, 1, 64, "", "sidben.redstonejukebox.config.record_buy_price_min");

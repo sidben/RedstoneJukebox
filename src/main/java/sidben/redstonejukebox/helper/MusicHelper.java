@@ -254,7 +254,8 @@ public class MusicHelper
                 this.StopAllBackgroundMusic();
 
                 // Plays the record as background music
-                this.backgroundMusic = PositionedSoundRecord.func_147673_a(recordResource);     // TODO: respect the volume config
+                // OBS: The volume that controls this sound is the Noteblock/Jukebox one.
+                this.backgroundMusic = PositionedSoundRecord.func_147673_a(recordResource);
                 mc.getSoundHandler().playSound(this.backgroundMusic);
             }
 
@@ -290,6 +291,8 @@ public class MusicHelper
         if (this.IsCustomBackgroundMusicPlaying()) {
             mc.getSoundHandler().stopSound(this.backgroundMusic);
         }
+        
+        // TODO: stop sounds from /playsound records.* command
 
     }
     

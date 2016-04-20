@@ -21,6 +21,10 @@ import sidben.redstonejukebox.network.NetworkHelper;
 
 public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 {
+    
+    
+    // TODO: test lag - what happens when the game skip ticks?
+    
 
     // --------------------------------------------------------------------
     // Constants and Variables

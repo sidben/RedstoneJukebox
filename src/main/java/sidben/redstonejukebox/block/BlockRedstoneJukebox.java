@@ -44,6 +44,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class BlockRedstoneJukebox extends BlockContainer
 {
 
+    //TODO: allow levers and buttons to be placed on the jukebox
+    
     // --------------------------------------------------------------------
     // Constants and Variables
     // --------------------------------------------------------------------

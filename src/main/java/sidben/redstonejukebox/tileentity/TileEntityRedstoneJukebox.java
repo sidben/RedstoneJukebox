@@ -531,6 +531,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         // Send update to clients
         NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte)0, this.getExtraVolume());
+
+        // To update comparators
+        BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
     }
 
 
@@ -587,13 +590,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
                 // To update comparators
-                this.worldObj.notifyBlockOfNeighborChange(this.xCoord - 1, this.yCoord, this.zCoord, this.getBlockType());
-                this.worldObj.notifyBlockOfNeighborChange(this.xCoord + 1, this.yCoord, this.zCoord, this.getBlockType());
-                this.worldObj.notifyBlockOfNeighborChange(this.xCoord, this.yCoord, this.zCoord - 1, this.getBlockType());
-                this.worldObj.notifyBlockOfNeighborChange(this.xCoord, this.yCoord, this.zCoord + 1, this.getBlockType());
+                BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+
             } else {
                 // if it's not a valid record, skip to the next one
                 this.schedulePlayNextRecord = true;
+                
             }
 
         }

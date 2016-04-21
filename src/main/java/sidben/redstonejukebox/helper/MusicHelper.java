@@ -210,8 +210,6 @@ public class MusicHelper
                 mc.getSoundHandler().playSound(sound);
             }
             
-            // TODO: Add log to track when sounds stop / play 
-
         } else {
             // Not a valid record, stops the music
             this.stopPlayingAt(chunkcoordinates);

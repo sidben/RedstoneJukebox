@@ -10,6 +10,8 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class ConfigurationHandler
 {
 
+    
+    
     /*
      * NOTE: To understand about record trading and the reason for some of
      * this parameters, check sidben.redstonejukebox.helper.RecordStoreHelper.
@@ -17,6 +19,16 @@ public class ConfigurationHandler
 
     public static final String  CATEGORY_TRADING           = "record_trading";
     public static final String  CATEGORY_CUSTOM            = "custom_records";
+    
+    
+    
+    
+    public static final boolean DEBUG_SOUNDEVENTS           = true;
+    public static final boolean DEBUG_MUSICHELPER           = true;
+    public static final boolean DEBUG_RECORDINFOMANAGER     = true;
+    public static final boolean DEBUG_JUKEBOX_SONGTIMER     = false;
+    public static final boolean DEBUG_JUKEBOX_RECORDPLAY    = true;
+    
 
 
 

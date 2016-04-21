@@ -1,8 +1,10 @@
 package sidben.redstonejukebox.tileentity;
 
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -14,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.network.NetworkHelper;
 
@@ -23,7 +26,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 {
     
     
-    // TODO: test lag - what happens when the game skip ticks?
+    /* 
+     * LAG TEST
+     * -------------------------------------------------------------------------------
+     * When the game lags, the TileEntity counts slower, but it doesn't skip ticks. 
+     * That means the song will end but the counter keeps counting for several more seconds.
+     * 
+     * Maybe I should use the system clock to count, but I have to remember that when the 
+     * game is paused, the music stops and so should the counter.
+     * 
+     * The music itself doesn't lag at all, so system clock may be viable.
+     */
     
 
     // --------------------------------------------------------------------
@@ -453,17 +466,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 this.ratioTimer = TileEntityRedstoneJukebox.ratio;
 
 
-                // Debug
-                /*
-                LogHelper.info("TileEntityRedstoneJukebox.updateEntity()");
-                LogHelper.info("    started   " + this.isPlaylistStarted);
-                LogHelper.info("    finished  " + this.isPlaylistFinished);
-                LogHelper.info("    isPlaying " + this.isPlaying());
-                LogHelper.info("    loop      " + this.paramLoop);
-                LogHelper.info("    song timer: " + this.songTimer);
-                */
-
-
 
                 if (!this.isPlaylistFinished) {
                     // Still playing, check song timer
@@ -488,6 +490,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             } // ratio timer
 
+            
+            
+            //--- Debug ---
+            if (ConfigurationHandler.DEBUG_JUKEBOX_SONGTIMER) {
+                LogHelper.info("Jukebox @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - songTimer: " + this.songTimer);
+            }
+            
+
+            
 
         } // world.isremote
 
@@ -528,6 +539,11 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.currentJukeboxPlaySlot = -1;
         this.songTimer = 0;
         this.scheduleStopPlaying = false;
+        
+        //--- Debug ---
+        if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+            LogHelper.info("Jukebox @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - Stop playing");
+        }
 
         // Send update to clients
         NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte)0, this.getExtraVolume());
@@ -562,37 +578,61 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // reads the selected slot to find a record and get the time of the song
             this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
             final ItemStack recordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            final int auxSongTime = ModRedstoneJukebox.instance.getRecordInfoManager().getSongTime(recordStack);        // TODO: maybe the song timer should be global
+            int auxSongTime = 0;        
             int recordInfoId = -1;
+            
+         // TODO: maybe the song timer should be global
+            
+            
+            //--- Debug ---
+            if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                LogHelper.info("Jukebox @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - Playing next record");
+
+                if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(recordStack)) {
+                    ItemRecord debugRecord = (ItemRecord)(recordStack.getItem());
+                    LogHelper.info("    * recordName:       " + debugRecord.recordName);    
+                    LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
+                    LogHelper.info("    * record resource:  " + debugRecord.getRecordResource(debugRecord.recordName));
+                }
+
+                LogHelper.info("    Current slot:   " + this.currentJukeboxPlaySlot);
+                LogHelper.info("    Slot item:      " + recordStack);
+            }
+
+            
             
             // Finds the item ID of the record
             if (recordStack != null) {
                 recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(recordStack);
+                auxSongTime = ModRedstoneJukebox.instance.getRecordInfoManager().getSongTime(recordStack);
+                
+                // TODO: use recordinfo object
             }
-            
-            
-            // DEBUG
-            System.out.println("Starting to play record");
-            System.out.println("    slot = " + this.currentJukeboxPlaySlot);
-            System.out.println("    item = " + this.jukeboxItems[this.currentJukeboxPlaySlot]);
-            System.out.println("    id   = " + recordInfoId);
-            System.out.println("    time = " + auxSongTime);
-            
             
             
             // Check if it has a valid item id and a valid song time
             if (auxSongTime > 0 && recordInfoId > -1) {
+                //--- Debug ---
+                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                    LogHelper.info("    Record info id: " + recordInfoId);
+                    LogHelper.info("    Song time:      " + auxSongTime + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
+                }
+                
                 // Record found
                 this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
 
                 // Send update to clients
                 NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.currentJukeboxPlaySlot, this.getExtraVolume());
 
-
                 // To update comparators
                 BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
 
             } else {
+                //--- Debug ---
+                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                    LogHelper.info("    Invalid record, skipping to next slot");
+                }
+
                 // if it's not a valid record, skip to the next one
                 this.schedulePlayNextRecord = true;
                 

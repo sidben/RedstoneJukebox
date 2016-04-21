@@ -3,9 +3,12 @@ package sidben.redstonejukebox.handler;
 import net.minecraft.client.audio.SoundCategory;
 import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
 import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
+// TODO: playing jukebox don't stop background music (tested with mods)
+//      commands also don't work :(
 
 
 public class SoundEventHandler
@@ -19,8 +22,23 @@ public class SoundEventHandler
         boolean isWorldRunning = (ModRedstoneJukebox.proxy.getClientWorld() != null);
 
         
+        // Avoids the error Unable to play unknown soundEvent: minecraft:none
+        if (soundName.equals("none")) {
+            event.result = null;
+        }
+        
+        
         // Avoids checks if the world is not loaded
-        if (isWorldRunning && soundName != null) {
+        else if (isWorldRunning && soundName != null) {
+
+            //--- Debug ---
+            if (ConfigurationHandler.DEBUG_SOUNDEVENTS) {
+                if (soundCat == SoundCategory.RECORDS || soundCat == SoundCategory.MUSIC) {
+                    LogHelper.info("onPlaySound() - " + soundCat + " - " + soundName);
+                }
+            }
+            
+            
             // When a record starts playing, stops all background music
             // OBS: Note blocks also have the "Records" sound category, so another condition is needed.
             if (soundCat == SoundCategory.RECORDS && soundName.startsWith("records.")) {
@@ -30,7 +48,17 @@ public class SoundEventHandler
             // When a background music is about to start, check if a Redstone Jukebox is playing
             // (inspired by the mp3Jukebox mod)
             else if (soundCat == SoundCategory.MUSIC) {
-                if (ModRedstoneJukebox.instance.getMusicHelper().AnyJukeboxPlaying() || ModRedstoneJukebox.instance.getMusicHelper().IsCustomBackgroundMusicPlaying()) {
+                boolean isJukeboxPlaying = ModRedstoneJukebox.instance.getMusicHelper().AnyJukeboxPlaying();
+                boolean isCustomBgPlaying = ModRedstoneJukebox.instance.getMusicHelper().IsCustomBackgroundMusicPlaying();
+                
+                //--- Debug ---
+                if (ConfigurationHandler.DEBUG_SOUNDEVENTS) {
+                    LogHelper.info("    Any jukebox playing:    " + isJukeboxPlaying);
+                    LogHelper.info("    Custom BgMusic playing: " + isCustomBgPlaying);
+                    LogHelper.info("    Should deny:            " + (isJukeboxPlaying || isCustomBgPlaying));
+                }
+
+                if (isJukeboxPlaying || isCustomBgPlaying) {
                     event.result = null;
                     event.setResult(Result.DENY);
                 }

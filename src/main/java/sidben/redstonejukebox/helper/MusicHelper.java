@@ -8,11 +8,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -163,18 +165,21 @@ public class MusicHelper
         // Find the record
         RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
         
+        //--- Debug ---
+        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+            LogHelper.info("MusicHelper.playRecordAt()");
+            LogHelper.info("    Coords:         " + x + ", " + y + ", " + z);
+            LogHelper.info("    Show name:      " + showName);
+            LogHelper.info("    Extra volume:   " + volumeExtender);
+            LogHelper.info("    Record info id: " + recordInfoId);
+            LogHelper.info("    Record info:    " + recordInfo);
+        }
+
         
         if (recordInfo != null) {
             // Valid record, plays the song
             float volumeRange = 64F;
             ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
-
-            // DEBUG
-            System.out.println("playRecordAt()");
-            System.out.println("    " + recordResource.getResourceDomain());
-            System.out.println("    " + recordResource.getResourcePath());
-            System.out.println("    " + recordResource.toString());
-            
             
 
             // adjusts the volume range
@@ -205,6 +210,7 @@ public class MusicHelper
                 mc.getSoundHandler().playSound(sound);
             }
             
+            // TODO: Add log to track when sounds stop / play 
 
         } else {
             // Not a valid record, stops the music
@@ -223,6 +229,13 @@ public class MusicHelper
     {
         final ISound isound = this.mapJukeboxesPositions.get(chunkcoordinates);
 
+        //--- Debug ---
+        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+            LogHelper.info("MusicHelper.stopPlayingAt()");
+            LogHelper.info("    Coords:  " + chunkcoordinates.posX + ", " + chunkcoordinates.posY + ", " + chunkcoordinates.posZ);
+            LogHelper.info("    iSound:  " + isound);
+        }
+
         if (isound != null) {
             mc.getSoundHandler().stopSound(isound);
             this.mapJukeboxesPositions.remove(chunkcoordinates);
@@ -239,6 +252,15 @@ public class MusicHelper
     {
         // Find the record
         RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
+        
+        //--- Debug ---
+        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+            LogHelper.info("MusicHelper.playRecord()");
+            LogHelper.info("    Show name:      " + showName);
+            LogHelper.info("    Record info id: " + recordInfoId);
+            LogHelper.info("    Record info:    " + recordInfo);
+        }
+        
         
         if (recordInfo != null) {
             ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
@@ -267,6 +289,13 @@ public class MusicHelper
 
     public void StopAllBackgroundMusic()
     {
+        //--- Debug ---
+        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+            LogHelper.info("MusicHelper.StopAllBackgroundMusic()");
+            LogHelper.info("    Custom BGMusic: " + this.IsCustomBackgroundMusicPlaying());
+        }
+        
+        
         // Check the music ticker for a background music being played.
         if (this.mcMusicTicker != null && this.fieldCurrentMusic != null) {
             ISound currentSound = null;
@@ -278,9 +307,20 @@ public class MusicHelper
                 LogHelper.error("Error checking mcMusicTicker via reflection: " + e.getMessage());
             }
 
+            //--- Debug ---
+            if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+                LogHelper.info("    Current isound: " + currentSound);
+            }
+
             // Check if that music is still playing and shut it down.
             if (currentSound != null) {
                 final boolean isPlaying = mc.getSoundHandler().isSoundPlaying(currentSound);
+
+                //--- Debug ---
+                if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+                    LogHelper.info("    Is playing: " + isPlaying);
+                }
+
                 if (isPlaying) {
                     mc.getSoundHandler().stopSound(currentSound);
                 }

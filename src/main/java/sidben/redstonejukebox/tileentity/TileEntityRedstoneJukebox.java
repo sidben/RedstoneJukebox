@@ -1,6 +1,5 @@
 package sidben.redstonejukebox.tileentity;
 
-import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -25,81 +24,72 @@ import sidben.redstonejukebox.network.NetworkHelper;
 
 public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 {
-    
-    
-    /* 
+
+
+    /*
      * LAG TEST
      * -------------------------------------------------------------------------------
-     * When the game lags, the TileEntity counts slower, but it doesn't skip ticks. 
+     * When the game lags, the TileEntity counts slower, but it doesn't skip ticks.
      * That means the song will end but the counter keeps counting for several more seconds.
      * 
-     * Maybe I should use the system clock to count, but I have to remember that when the 
+     * Maybe I should use the system clock to count, but I have to remember that when the
      * game is paused, the music stops and so should the counter.
      * 
      * The music itself doesn't lag at all, so system clock may be viable.
      */
-    
+
 
     // --------------------------------------------------------------------
     // Constants and Variables
     // --------------------------------------------------------------------
 
-    /** The delay (in ticks) before a update check */
-    private static int       ratio                   = 20;
-
-    /** Counter for the update delay timer */
-    public int               ratioTimer              = TileEntityRedstoneJukebox.ratio;
-
-
-    private int              lastUpdateTick          = 0;
-
     /** Items of this jukebox */
-    private ItemStack[]      jukeboxItems            = new ItemStack[8];
+    private ItemStack[] jukeboxItems           = new ItemStack[8];
 
     /** Play mode: 0 = Simple (in order) / 1 = Shuffle */
-    public short             paramPlayMode           = 0;
+    public short        paramPlayMode          = 0;
 
     /** Indicates if it should loop when reach the end of a playlist */
-    public boolean           paramLoop               = false;
+    public boolean      paramLoop              = false;
 
     /** Array with the order in which the records will play (playlist). used for the shuffle option. */
-    private byte[]           playOrder               = new byte[8];
+    private byte[]      playOrder              = new byte[8];
 
 
     /** Indicates if the block is being powered */
-    private boolean          isBlockPowered          = false;
+    private boolean     isBlockPowered         = false;
 
     /** Indicates if this jukebox started to play a playlist */
-    private boolean          isPlaylistStarted       = false;
+    private boolean     isPlaylistStarted      = false;
 
     /** Used to detect when the jukebox finished playing all records */
-    private boolean          isPlaylistFinished      = false;
+    private boolean     isPlaylistFinished     = false;
 
     /** Slot currently playing. This refers to the [playOrder] array, not the GUI inventory, so slot 0 is the first slot of the playOrder, not the jukebox */
-    private int              currentIndex            = -1;
+    private int         currentIndex           = -1;
 
     /** Slot of the jukebox with the current playing record. */
-    private byte             currentJukeboxPlaySlot  = -1;
+    private byte        currentJukeboxPlaySlot = -1;
 
     /** Amount of seconds that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer */
-    private static int       songInterval            = 2;
+    private static int  songInterval           = 2;
 
     /** Timer of the song being played */
-    public int               songTimer               = 0;
+    public int          songTimer              = 0;
 
 
     /*
      * Flags to call some method without doing it recursively, I believe this will perform better.
      * 
      * Instead of making the 3 main Play Control methods call each other, I use this variables
-     * to schedule the calls. Every method call is now performed by the UpdateEntity loop, when needed.
+     * to schedule the calls. Every method call is now performed by the tickJukebox loop, when needed.
      */
-    private boolean          schedulePlayNextRecord  = false;
-    private boolean          scheduleStartPlaying    = false;
-    private boolean          scheduleStopPlaying     = false;
+    private boolean     schedulePlayNextRecord = false;
+    private boolean     scheduleStartPlaying   = false;
+    private boolean     scheduleStopPlaying    = false;
 
 
-    private String           customName;
+    private String      customName;
 
 
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
@@ -366,10 +356,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet)
     {
         // DEBUG
-        sidben.redstonejukebox.helper.LogHelper.info("onDataPacket()");
-        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
         /*
-        */
+         * sidben.redstonejukebox.helper.LogHelper.info("onDataPacket()");
+         * sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+         */
 
         // Read NBT packet from the server
         final NBTTagCompound tag = packet.func_148857_g();
@@ -388,11 +378,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public Packet getDescriptionPacket()
     {
         // Debug
-        sidben.redstonejukebox.helper.LogHelper.info("getDescriptionPacket()");
-        sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
         /*
-        */
-        // TODO: Check if I can avoid sending packet when the world loads. Maybe just active jukeboxes?
+         * sidben.redstonejukebox.helper.LogHelper.info("getDescriptionPacket()");
+         * sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+         */
 
         // Send the NBT Packet to client
         final NBTTagCompound tag = new NBTTagCompound();
@@ -404,37 +393,33 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 0, tag);
     }
 
-    
-    
-
 
 
     // --------------------------------------------------------------------
     // Events
     // --------------------------------------------------------------------
 
-    /**
-     * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count
-     * ticks and creates a new spawn inside its implementation.
-     */
-    @Override
-    public void updateEntity()
-    {
 
+    /**
+     * Process one tick of jukebox-related events. Kind of a custom updateEntity implementation that
+     * should run once per second (20 ticks).
+     */
+    public void tickJukebox()
+    {
         if (!this.worldObj.isRemote) {
 
-            /*
-             * Prevents multiple calls per tick due to game bug.
-             * Check BlockRedstoneJukebox.updateJukeboxBlockState for more info.
-             */
-            final int thisTick = MinecraftServer.getServer().getTickCounter();
-            if (thisTick == this.lastUpdateTick) {
-                return;     // bugged call
-            } else {
-                this.lastUpdateTick = thisTick;
-            }
-
-
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_JUKEBOX_TICK) {
+                LogHelper.info("Jukebox.tickJukebox() @ " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + 
+                        " - isBlockPowered: " + this.isBlockPowered +
+                        " - schdPlayNext: " + this.schedulePlayNextRecord +
+                        " - schdStart: " + this.scheduleStartPlaying +
+                        " - schdStop: " + this.scheduleStopPlaying +
+                        " - playlistFinish: " + this.isPlaylistFinished +
+                        " - songTimer: " + this.songTimer + 
+                        " - gameTick: " + MinecraftServer.getServer().getTickCounter());
+            }        
+            
 
             /*
              * Special cases where the code must execute some scheduled methods.
@@ -443,10 +428,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 this.playNextRecord();
             } else if (this.scheduleStartPlaying) {
                 this.startPlaying();
+                this.playNextRecord();
             } else if (this.scheduleStopPlaying) {
-                this.stopPlaying();
+                this.stopPlaying(true);
             }
-
 
 
             // Only process the method when the block is powered
@@ -455,51 +440,26 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             }
 
 
+            if (!this.isPlaylistFinished) {
+                // Still playing, check song timer
+                if (this.songTimer > 0) {
+                    // Still counting...
+                    --this.songTimer;
 
-            /*
-             * Only executes the checks at the given ratio (default = 20 ticks = 1 second)
-             */
-            if (this.ratioTimer > 0) {
-                --this.ratioTimer;
-                return;
-            } else {
-                // Resets the delay
-                this.ratioTimer = TileEntityRedstoneJukebox.ratio;
-
-
-
-                if (!this.isPlaylistFinished) {
-                    // Still playing, check song timer
-                    if (this.songTimer > 0) {
-                        // Still counting...
-                        --this.songTimer;
-
-                        // Check the jukebox slot, skip to the next record if the current slot is empty (most likely removed by player)
-                        if (this.currentJukeboxPlaySlot > -1) {
-                            final ItemStack record = this.jukeboxItems[this.currentJukeboxPlaySlot];
-                            if (record == null) {
-                                this.schedulePlayNextRecord = true;
-                            }
+                    // Check the jukebox slot, skip to the next record if the current slot is empty (most likely removed by player)
+                    if (this.currentJukeboxPlaySlot > -1) {
+                        final ItemStack record = this.jukeboxItems[this.currentJukeboxPlaySlot];
+                        if (record == null) {
+                            this.schedulePlayNextRecord = true;
                         }
-                    } else {
-                        // Time to play the next record
-                        this.schedulePlayNextRecord = true;
                     }
-
+                } else {
+                    // Time to play the next record
+                    this.schedulePlayNextRecord = true;
                 }
 
-
-            } // ratio timer
-
-            
-            
-            //--- Debug ---
-            if (ConfigurationHandler.DEBUG_JUKEBOX_SONGTIMER) {
-                LogHelper.info("Jukebox @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - songTimer: " + this.songTimer);
             }
-            
 
-            
 
         } // world.isremote
 
@@ -519,12 +479,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     public void startPlaying()
     {
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+            LogHelper.info("Jukebox.startPlaying() @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - Empty: " + this.isEmpty());
+        }
+
         if (this.isEmpty()) {
             return;
         }
+
         this.isPlaylistFinished = false;
         this.isPlaylistStarted = true;
-        this.ratioTimer = 0;
         this.setPlaylistOrder();
         this.scheduleStartPlaying = false;
         this.schedulePlayNextRecord = true;
@@ -534,23 +499,25 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     /**
      * Makes the jukebox stop playing the current sequence (playlist).
      */
-    public void stopPlaying()
+    public void stopPlaying(boolean updateNeighbors)
     {
         this.currentIndex = -1;
         this.currentJukeboxPlaySlot = -1;
         this.songTimer = 0;
         this.scheduleStopPlaying = false;
-        
-        //--- Debug ---
+
+        // --- Debug ---
         if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
-            LogHelper.info("Jukebox @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - Stop playing");
+            LogHelper.info("Jukebox.stopPlaying() @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ")");
         }
 
         // Send update to clients
-        NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte)0, this.getExtraVolume());
+        NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte) 0, this.getExtraVolume());
 
-        // To update comparators
-        BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+        if (updateNeighbors) {
+            // To update comparators
+            BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+        }
     }
 
 
@@ -559,11 +526,105 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     private void playNextRecord()
     {
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+            LogHelper.info("Jukebox.playNextRecord() @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - playlist index: " + this.currentIndex + " - current slot: " + this.currentJukeboxPlaySlot + " - Empty: " + this.isEmpty());
+        }
+        
+        if (this.isEmpty()) {
+            return;
+        }
+
         // Advances to the next slot
         ++this.currentIndex;
         this.schedulePlayNextRecord = false;
+        
+        // TODO: fix the note on GUI
+
+        
+        if (this.currentIndex >= 0 && this.currentIndex <= 7) {          // TODO: replace 7 by the playlist size
+        
+            // Find the next valid record
+            ItemStack nextRecordStack = null;
+
+            for (int i = 0; i < 8; i++) {
+                this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
+                nextRecordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
+
+                // --- Debug ---
+                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                    LogHelper.info("    checking item #" + this.currentIndex + " on slot " + this.currentJukeboxPlaySlot + ": " + nextRecordStack);
+                }
+                
+                if (nextRecordStack == null) {
+                    ++this.currentIndex;      
+                    if (this.currentIndex > 7) break;
+                } else {
+                    break;
+                }
+            }
+            
+            
+            int recordInfoId = -1;
+            RecordInfo recordInfo = null;
+
+            // TODO: maybe the song timer should be global
 
 
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+
+                if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(nextRecordStack)) {
+                    final ItemRecord debugRecord = (ItemRecord) (nextRecordStack.getItem());
+                    LogHelper.info("    * recordName:       " + debugRecord.recordName);
+                    LogHelper.info("    * record resource:  " + debugRecord.getRecordResource(debugRecord.recordName));
+                    if (this.worldObj.isRemote) {
+                        LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
+                    }
+                }
+
+            }
+
+
+
+            // Finds the item ID of the record
+            if (nextRecordStack != null) {
+                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(nextRecordStack);
+                recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
+            }
+
+
+            // Check if it has a valid item id and a valid song time
+            if (recordInfo != null && recordInfo.recordDurationSeconds > 0) {
+                // --- Debug ---
+                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                    LogHelper.info("    Record info id: " + recordInfoId);
+                    LogHelper.info("    Song time:      " + recordInfo.recordDurationSeconds + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
+                }
+
+                // Record found
+                this.songTimer = recordInfo.recordDurationSeconds + TileEntityRedstoneJukebox.songInterval;
+
+                // Send update to clients
+                NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.currentJukeboxPlaySlot, this.getExtraVolume());
+
+                // To update comparators
+                BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+
+            } else {
+                // --- Debug ---
+                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                    LogHelper.info("    Invalid record, skipping to next slot");
+                }
+
+                // if it's not a valid record, skip to the next one
+                this.schedulePlayNextRecord = true;
+
+            }
+
+        }
+        
+        
         if (this.currentIndex > 7) {
             // Reached the end
             this.isPlaylistFinished = true;
@@ -575,71 +636,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 // No loop, stops
                 this.scheduleStopPlaying = true;
             }
-        } else if (this.currentIndex >= 0 && this.currentIndex <= 7) {
-            // reads the selected slot to find a record and get the time of the song
-            this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
-            final ItemStack recordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            int recordInfoId = -1;
-            RecordInfo recordInfo = null;
-            
-         // TODO: maybe the song timer should be global
-            
-            
-            //--- Debug ---
-            if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
-                LogHelper.info("Jukebox @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - Playing next record");
 
-                if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(recordStack)) {
-                    ItemRecord debugRecord = (ItemRecord)(recordStack.getItem());
-                    LogHelper.info("    * recordName:       " + debugRecord.recordName);    
-                    LogHelper.info("    * record resource:  " + debugRecord.getRecordResource(debugRecord.recordName));
-                    if (this.worldObj.isRemote) {
-                        LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
-                    }
-                }
-
-                LogHelper.info("    Current slot:   " + this.currentJukeboxPlaySlot);
-                LogHelper.info("    Slot item:      " + recordStack);
-            }
-
-            
-            
-            // Finds the item ID of the record
-            if (recordStack != null) {
-                recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(recordStack);
-                recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
-            }
-            
-            
-            // Check if it has a valid item id and a valid song time
-            if (recordInfo != null && recordInfo.recordDurationSeconds > 0) {
-                //--- Debug ---
-                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
-                    LogHelper.info("    Record info id: " + recordInfoId);
-                    LogHelper.info("    Song time:      " + recordInfo.recordDurationSeconds + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
-                }
-                
-                // Record found
-                this.songTimer = recordInfo.recordDurationSeconds + TileEntityRedstoneJukebox.songInterval;
-
-                // Send update to clients
-                NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.currentJukeboxPlaySlot, this.getExtraVolume());
-
-                // To update comparators
-                BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
-
-            } else {
-                //--- Debug ---
-                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
-                    LogHelper.info("    Invalid record, skipping to next slot");
-                }
-
-                // if it's not a valid record, skip to the next one
-                this.schedulePlayNextRecord = true;
-                
-            }
-
-        }
+        }        
 
     }
 
@@ -652,9 +650,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private void setPlaylistOrder()
     {
         /*
-        // DEBUG
-        LogHelper.info("TileEntityRedstoneJukebox.setPlaylistOrder() - Shuffle: " + (this.paramPlayMode == 1));
-        */
+         * // DEBUG
+         * LogHelper.info("TileEntityRedstoneJukebox.setPlaylistOrder() - Shuffle: " + (this.paramPlayMode == 1));
+         */
 
         int totalRecords = 0;
         boolean validRecord = false;
@@ -714,12 +712,12 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
         // Debug
         /*
-        String debugOrder = "";
-        for (final byte element : this.playOrder) {
-            debugOrder += "[" + element + "]";
-        }
-        LogHelper.info("    Playlist slot order: " + debugOrder + ", amount of actual records: " + totalRecords);
-        */
+         * String debugOrder = "";
+         * for (final byte element : this.playOrder) {
+         * debugOrder += "[" + element + "]";
+         * }
+         * LogHelper.info("    Playlist slot order: " + debugOrder + ", amount of actual records: " + totalRecords);
+         */
 
 
     }

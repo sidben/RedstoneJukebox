@@ -17,6 +17,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
@@ -129,6 +130,19 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         return Item.getItemFromBlock(MyBlocks.redstoneJukebox);
     }
+    
+    
+    /**
+     * How many world ticks before ticking
+     */
+    @Override
+    public int tickRate(World world)
+    {
+        return 20;
+    }
+
+    
+    
 
 
 
@@ -291,7 +305,7 @@ public class BlockRedstoneJukebox extends BlockContainer
 
             if (teJukebox != null) {
                 teJukebox.ejectAll(par1World, x, y, z);
-                teJukebox.stopPlaying();
+                teJukebox.stopPlaying(false);
             }
         }
 
@@ -311,7 +325,7 @@ public class BlockRedstoneJukebox extends BlockContainer
             final boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
 
-
+            
             if (this.isActive && !haveEnergy) {
                 // Turns the jukebox off
                 BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
@@ -322,8 +336,30 @@ public class BlockRedstoneJukebox extends BlockContainer
                 teJukebox.updateJukeboxTileState(haveEnergy);
             }
 
+            // Schedule the [updateTick] event, that ticks the TileEntity
+            world.scheduleBlockUpdate(x, y, z, this, 0);
         }
     }
+    
+    
+    /**
+     * Ticks the block if it's been scheduled
+     */
+    @Override
+    public void updateTick(World world, int x, int y, int z, Random rand)
+    {
+        // LogHelper.info("BlockJukebox.updateTick() @ " + x + ", " + y + ", " + z + " - Active: " + this.isActive);
+
+        if (!world.isRemote)
+        {
+            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+            teJukebox.tickJukebox();
+            
+            // Schedule the next tick only when powered
+            if (this.isActive) world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+        }
+    }
+    
 
 
 

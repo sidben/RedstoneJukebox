@@ -1,20 +1,20 @@
 package sidben.redstonejukebox.helper;
 
-import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.audio.SoundCategory;
+import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.audio.SoundManager;
 import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.relauncher.Side;
@@ -58,30 +58,15 @@ public class MusicHelper
     /** Currently playing Redstone Jukeboxes. Type: HashMap<ChunkCoordinates, ISound> */
     private final Map<ChunkCoordinates, ISound> mapJukeboxesPositions = Maps.newHashMap();
 
-
-
-    /**
-     * Holds a reference to [mcMusicTicker], a class that triggers random
-     * background music.
-     */
-    private MusicTicker                         mcMusicTicker         = null;
-
-    /**
-     * Holds a reference to the private field of mcMusicTicker that hold the current
-     * background music, so it can be accessed via reflection.
-     */
-    private Field                               fieldCurrentMusic     = null;
-
-
     /**
      * Holds a reference to the private field [mapSoundPositions] from the RenderGlobal.
      */
     private final Map<ChunkCoordinates, ISound> vanillaSoundPositions;
-    
-    
-    private ISound backgroundMusic;
 
+    /** Access to the [playingSounds] private map in SoundManager */
+    private final HashBiMap<String, ISound>     vanillaPlayingSounds;
 
+    private ISound                              customBackgroundMusic;
 
     private final Minecraft                     mc;
 
@@ -94,52 +79,30 @@ public class MusicHelper
         this.mc = minecraft;
 
 
-        // Debug
-        LogHelper.info("Loading MusicTicker using Reflection...");
+        // Finds the [playingSounds] map
+        final SoundManager auxSndManager = ObfuscationReflectionHelper.getPrivateValue(SoundHandler.class, mc.getSoundHandler(), "field_147694_f", "sndManager");
+        this.vanillaPlayingSounds = ObfuscationReflectionHelper.getPrivateValue(SoundManager.class, auxSndManager, "field_148629_h", "playingSounds");
 
-
-        // Loops through each field in order to find the private mcMusicTicker.
-        //
-        // I'm using this approach because searching by name requires a double check, one
-        // for dev environment and one for the obfuscated environment. Also, the field names
-        // may change with each Forge build, so using this one-time loop I can get what I
-        // need with no mistake.
-        for (final Field f : mc.getClass().getDeclaredFields()) {
-            if (f.getType() == MusicTicker.class) {
-                try {
-                    f.setAccessible(true);
-                    this.mcMusicTicker = (MusicTicker) f.get(mc);
-                    LogHelper.info("MusicTicker found.");
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    this.mcMusicTicker = null;
-                    LogHelper.error("Error loading mcMusicTicker via reflection: " + e.getMessage());
-                }
-                break;
-            }
+        // --- Debug ---
+        if (this.vanillaPlayingSounds != null) {
+            LogHelper.info("Vanilla playing sounds Map loaded.");
+        } else {
+            LogHelper.warn("Error loading vanilla playing sounds Map.");
         }
 
 
-        // If the MusicTicker class was found, seek the field that hold the
-        // current playing music, so it can be checked later.
-        if (this.mcMusicTicker != null) {
-
-            // Debug
-            LogHelper.info("Loading ISound using Reflection...");
-
-            for (final Field f : this.mcMusicTicker.getClass().getDeclaredFields()) {
-                if (f.getType() == ISound.class) {
-                    f.setAccessible(true);
-                    this.fieldCurrentMusic = f;
-                    LogHelper.info("ISound found.");
-                    break;
-                }
-            }
-        }
-
-
-        // Finds the private [mapSoundPositions] inside RenderGlobal. Since
-        // the field is a generic 'Map' type, I have to seek by name
+        // Finds the private [mapSoundPositions] inside RenderGlobal.
         this.vanillaSoundPositions = ObfuscationReflectionHelper.getPrivateValue(RenderGlobal.class, mc.renderGlobal, "field_147593_P", "mapSoundPositions");
+
+        // --- Debug ---
+        if (this.vanillaSoundPositions != null) {
+            LogHelper.info("Vanilla sound positions Map loaded.");
+        } else {
+            LogHelper.warn("Error loading vanilla sound positions Map.");
+        }
+
+
+        // TODO: check if vanillaSoundPositions can be replaced by vanillaPlayingSounds
 
     }
 
@@ -153,7 +116,7 @@ public class MusicHelper
      * ======================================================================================
      */
 
-    
+
     /**
      * Starts playing a record on the given coordinates
      * 
@@ -163,9 +126,9 @@ public class MusicHelper
         final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
 
         // Find the record
-        RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
-        
-        //--- Debug ---
+        final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
+
+        // --- Debug ---
         if (ConfigurationHandler.DEBUG_MUSICHELPER) {
             LogHelper.info("MusicHelper.playRecordAt()");
             LogHelper.info("    Coords:         " + x + ", " + y + ", " + z);
@@ -175,12 +138,12 @@ public class MusicHelper
             LogHelper.info("    Record info:    " + recordInfo);
         }
 
-        
+
         if (recordInfo != null) {
             // Valid record, plays the song
             float volumeRange = 64F;
-            ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
-            
+            final ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
+
 
             // adjusts the volume range
             if (volumeExtender >= 1 && volumeExtender <= 128) {
@@ -198,27 +161,27 @@ public class MusicHelper
 
                 // Displays the song name
                 if (showName && !recordInfo.recordName.isEmpty()) {
-                    String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
-                    mc.ingameGUI.setRecordPlayingMessage(recordTitle);   
+                    final String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                    mc.ingameGUI.setRecordPlayingMessage(recordTitle);
                 }
 
                 // Override of the playRecord method on RenderGlobal, since I need to set extra volume range.
-                
+
                 // Plays the record
                 final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, x, y, z);
                 this.mapJukeboxesPositions.put(chunkcoordinates, sound);
                 mc.getSoundHandler().playSound(sound);
             }
-            
+
         } else {
             // Not a valid record, stops the music
             this.stopPlayingAt(chunkcoordinates);
-            
+
         }
     }
 
-    
-    
+
+
     /**
      * Stops the record being played at the given coordinates.
      * 
@@ -227,7 +190,7 @@ public class MusicHelper
     {
         final ISound isound = this.mapJukeboxesPositions.get(chunkcoordinates);
 
-        //--- Debug ---
+        // --- Debug ---
         if (ConfigurationHandler.DEBUG_MUSICHELPER) {
             LogHelper.info("MusicHelper.stopPlayingAt()");
             LogHelper.info("    Coords:  " + chunkcoordinates.posX + ", " + chunkcoordinates.posY + ", " + chunkcoordinates.posZ);
@@ -241,7 +204,7 @@ public class MusicHelper
     }
 
 
-    
+
     /**
      * Starts playing a record as background music.
      * 
@@ -249,125 +212,90 @@ public class MusicHelper
     public void playRecord(int recordInfoId, boolean showName)
     {
         // Find the record
-        RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
-        
-        //--- Debug ---
+        final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
+
+        // --- Debug ---
         if (ConfigurationHandler.DEBUG_MUSICHELPER) {
             LogHelper.info("MusicHelper.playRecord()");
             LogHelper.info("    Show name:      " + showName);
             LogHelper.info("    Record info id: " + recordInfoId);
             LogHelper.info("    Record info:    " + recordInfo);
         }
-        
-        
+
+
         if (recordInfo != null) {
-            ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
+            final ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
 
             if (recordResource != null) {
 
                 // Displays the song name
                 if (showName && !recordInfo.recordName.isEmpty()) {
-                    String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
-                    mc.ingameGUI.setRecordPlayingMessage(recordTitle);   
+                    final String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                    mc.ingameGUI.setRecordPlayingMessage(recordTitle);
                 }
-                
+
                 this.StopAllBackgroundMusic();
 
                 // Plays the record as background music
                 // OBS: The volume that controls this sound is the Noteblock/Jukebox one.
-                this.backgroundMusic = PositionedSoundRecord.func_147673_a(recordResource);
-                mc.getSoundHandler().playSound(this.backgroundMusic);
+                this.customBackgroundMusic = PositionedSoundRecord.func_147673_a(recordResource);
+                mc.getSoundHandler().playSound(this.customBackgroundMusic);
             }
 
         }
     }
-    
-    
+
 
 
     public void StopAllBackgroundMusic()
     {
-        //--- Debug ---
+        // --- Debug ---
         if (ConfigurationHandler.DEBUG_MUSICHELPER) {
             LogHelper.info("MusicHelper.StopAllBackgroundMusic()");
             LogHelper.info("    Custom BGMusic: " + this.IsCustomBackgroundMusicPlaying());
         }
-        
-        
-        // Check the music ticker for a background music being played.
-        if (this.mcMusicTicker != null && this.fieldCurrentMusic != null) {
-            ISound currentSound = null;
 
-            // Use reflection to access the private field that hold the last music played.
-            try {
-                currentSound = (ISound) this.fieldCurrentMusic.get(this.mcMusicTicker);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                LogHelper.error("Error checking mcMusicTicker via reflection: " + e.getMessage());
-            }
+        if (this.vanillaPlayingSounds == null) {
+            return;
+        }
 
-            //--- Debug ---
-            if (ConfigurationHandler.DEBUG_MUSICHELPER) {
-                LogHelper.info("    Current isound: " + currentSound);
-            }
 
-            // Check if that music is still playing and shut it down.
-            if (currentSound != null) {
-                final boolean isPlaying = mc.getSoundHandler().isSoundPlaying(currentSound);
 
-                //--- Debug ---
+        /*
+         * I was checking the MusicTicker class to know when a bgmusic is playing, but
+         * mods like the HardcoreEnderExpansion replaces the vanilla MusicTicker, so
+         * my code fails.
+         * 
+         * Now I check the playingSounds map for a pattern.
+         */
+
+        final Iterator<Entry<String, ISound>> iterator = this.vanillaPlayingSounds.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Entry<String, ISound> entry = iterator.next();
+            final String soundId = entry.getKey();
+            final ISound soundObj = entry.getValue();
+
+            if (soundObj.getPositionedSoundLocation().getResourcePath().startsWith("music.") || soundObj.getAttenuationType() == ISound.AttenuationType.NONE
+                    || (soundObj.getXPosF() == 0F && soundObj.getYPosF() == 0F && soundObj.getZPosF() == 0F)) {
+
                 if (ConfigurationHandler.DEBUG_MUSICHELPER) {
-                    LogHelper.info("    Is playing: " + isPlaying);
+                    LogHelper.info("    Stopping sound [" + soundId + "] - " + soundObj.getPositionedSoundLocation());
                 }
 
-                if (isPlaying) {
-                    mc.getSoundHandler().stopSound(currentSound);
-                }
+                mc.getSoundHandler().stopSound(soundObj);
             }
+
         }
-        
-        // Check this mod background music
-        if (this.IsCustomBackgroundMusicPlaying()) {
-            mc.getSoundHandler().stopSound(this.backgroundMusic);
-        }
-        
-        // TODO: stop sounds from /playsound records.* command
+
 
     }
-    
-    
-    
-    @SuppressWarnings("rawtypes")
-    public void StopAllRecordsPlaying() {
-
-        // Ref: SoundManager.updateAllSounds()
-        Iterator iterator;
 
 
-        // Check vanilla jukeboxes
-        iterator = this.vanillaSoundPositions.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Entry entry = (Entry) iterator.next();
-            final ISound isound = (ISound) entry.getValue();
-            final boolean p = mc.getSoundHandler().isSoundPlaying(isound);
-            if (p) {
-                mc.getSoundHandler().stopSound(isound);
-            }
-        }
 
-
-        // Check redstone jukeboxes
-        iterator = this.mapJukeboxesPositions.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Entry entry = (Entry) iterator.next();
-            final ISound isound = (ISound) entry.getValue();
-            final boolean p = mc.getSoundHandler().isSoundPlaying(isound);
-            if (p) {
-                mc.getSoundHandler().stopSound(isound);
-            }
-        }        
-        
+    public void StopAllSounds()
+    {
+        mc.getSoundHandler().stopSounds();
     }
-    
 
 
     /**
@@ -375,14 +303,14 @@ public class MusicHelper
      */
     public boolean IsCustomBackgroundMusicPlaying()
     {
-        if (this.backgroundMusic != null) {
-            return mc.getSoundHandler().isSoundPlaying(this.backgroundMusic);
+        if (this.customBackgroundMusic != null) {
+            return mc.getSoundHandler().isSoundPlaying(this.customBackgroundMusic);
         }
-        
+
         return false;
     }
-    
-    
+
+
     /**
      * Informs if there is any record being played by a vanilla or Redstone Jukebox.
      */

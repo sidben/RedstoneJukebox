@@ -25,7 +25,7 @@ public class ConfigurationHandler
     
     public static final boolean DEBUG_SOUNDEVENTS           = true;
     public static final boolean DEBUG_MUSICHELPER           = true;
-    public static final boolean DEBUG_RECORDINFOMANAGER     = true;
+    public static final boolean DEBUG_RECORDINFOMANAGER     = false;
     public static final boolean DEBUG_JUKEBOX_SONGTIMER     = false;
     public static final boolean DEBUG_JUKEBOX_RECORDPLAY    = true;
     

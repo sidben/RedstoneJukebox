@@ -8,8 +8,6 @@ import cpw.mods.fml.common.eventhandler.Event.Result;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 
-// TODO: playing jukebox don't stop background music (tested with mods)
-// commands also don't work :(
 
 
 public class SoundEventHandler

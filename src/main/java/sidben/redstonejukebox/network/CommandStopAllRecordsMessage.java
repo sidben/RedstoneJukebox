@@ -45,8 +45,7 @@ public class CommandStopAllRecordsMessage implements IMessage
     public void stopMusic() {
         World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-            ModRedstoneJukebox.instance.getMusicHelper().StopAllBackgroundMusic();
-            ModRedstoneJukebox.instance.getMusicHelper().StopAllRecordsPlaying();
+            ModRedstoneJukebox.instance.getMusicHelper().StopAllSounds();
         }
     }
 

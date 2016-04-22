@@ -31,7 +31,7 @@ public class RecordInfo
     
     
     public int getRecordDurationSeconds() {
-        return Math.min(this._recordDurationSeconds, ConfigurationHandler.MAX_SONG_TIME_SECONDS);
+        return Math.min((this._recordDurationSeconds > 0 ? this._recordDurationSeconds : ConfigurationHandler.defaultSongTime), ConfigurationHandler.MAX_SONG_TIME_SECONDS);
     }
     
     

@@ -25,12 +25,12 @@ public class ConfigurationHandler
     
     public static final boolean DEBUG_SOUNDEVENTS           = true;
     public static final boolean DEBUG_MUSICHELPER           = false;
-    public static final boolean DEBUG_RECORDINFOMANAGER     = true;
+    public static final boolean DEBUG_RECORDINFOMANAGER     = false;
     public static final boolean DEBUG_JUKEBOX_TICK          = false;
     public static final boolean DEBUG_JUKEBOX_RECORDPLAY    = true;
 
     
-    public static final int MAX_SONG_TIME_SECONDS           = 20;         // TODO: make this a GUI config
+    public static final int MAX_SONG_TIME_SECONDS           = 1800;         // TODO: make this a GUI config
     
 
 

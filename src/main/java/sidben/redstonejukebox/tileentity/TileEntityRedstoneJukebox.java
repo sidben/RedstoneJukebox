@@ -364,13 +364,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.currentJukeboxPlaySlot = tag.getByte("InvSlot");
 
         // DEBUG
+        /*
         LogHelper.info("onDataPacket()");
         LogHelper.info("    PlayMode: " + this.paramPlayMode);
         LogHelper.info("    Loop:     " + this.paramLoop);
         LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
         LogHelper.info("    Index:    " + this.currentIndex);
-        /*
-        * sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        LogHelper.info("    Coords:   " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
         */
     }
 
@@ -382,14 +382,14 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public Packet getDescriptionPacket()
     {
         // Debug
+        /*
         LogHelper.info("getDescriptionPacket()");
         LogHelper.info("    PlayMode: " + this.paramPlayMode);
         LogHelper.info("    Loop:     " + this.paramLoop);
         LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
         LogHelper.info("    Index:    " + this.currentIndex);
-        /*
-         * sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
-         */
+        LogHelper.info("    Coords:   " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        */
 
         // Send the NBT Packet to client
         final NBTTagCompound tag = new NBTTagCompound();
@@ -550,7 +550,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         
 
         
-        if (this.currentIndex >= 0 && this.currentIndex <= 7) {          // TODO: replace 7 by the playlist size
+        if (this.currentIndex >= 0 && this.currentIndex < this.getSizeInventory()) {
         
             // Find the next valid record
             ItemStack nextRecordStack = null;
@@ -566,7 +566,6 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 
                 if (nextRecordStack == null) {
                     ++this.currentIndex;      
-                    if (this.currentIndex > 7) break;
                 } else {
                     break;
                 }
@@ -633,7 +632,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         }
         
         
-        if (this.currentIndex > 7) {
+        if (this.currentIndex >= this.getSizeInventory()) {
             // Reached the end
             this.isPlaylistFinished = true;
 

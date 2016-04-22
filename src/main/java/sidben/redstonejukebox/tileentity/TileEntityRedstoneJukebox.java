@@ -18,6 +18,7 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.LogHelper;
+import sidben.redstonejukebox.helper.RecordInfo;
 import sidben.redstonejukebox.network.NetworkHelper;
 
 
@@ -364,10 +365,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet)
     {
-        /*
         // DEBUG
         sidben.redstonejukebox.helper.LogHelper.info("onDataPacket()");
         sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        /*
         */
 
         // Read NBT packet from the server
@@ -386,10 +387,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public Packet getDescriptionPacket()
     {
-        /*
         // Debug
         sidben.redstonejukebox.helper.LogHelper.info("getDescriptionPacket()");
         sidben.redstonejukebox.helper.LogHelper.info("    at " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        /*
         */
         // TODO: Check if I can avoid sending packet when the world loads. Maybe just active jukeboxes?
 
@@ -578,8 +579,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // reads the selected slot to find a record and get the time of the song
             this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
             final ItemStack recordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
-            int auxSongTime = 0;        
             int recordInfoId = -1;
+            RecordInfo recordInfo = null;
             
          // TODO: maybe the song timer should be global
             
@@ -591,8 +592,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(recordStack)) {
                     ItemRecord debugRecord = (ItemRecord)(recordStack.getItem());
                     LogHelper.info("    * recordName:       " + debugRecord.recordName);    
-                    LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
                     LogHelper.info("    * record resource:  " + debugRecord.getRecordResource(debugRecord.recordName));
+                    if (this.worldObj.isRemote) {
+                        LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
+                    }
                 }
 
                 LogHelper.info("    Current slot:   " + this.currentJukeboxPlaySlot);
@@ -604,22 +607,20 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // Finds the item ID of the record
             if (recordStack != null) {
                 recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(recordStack);
-                auxSongTime = ModRedstoneJukebox.instance.getRecordInfoManager().getSongTime(recordStack);
-                
-                // TODO: use recordinfo object
+                recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
             }
             
             
             // Check if it has a valid item id and a valid song time
-            if (auxSongTime > 0 && recordInfoId > -1) {
+            if (recordInfo != null && recordInfo.recordDurationSeconds > 0) {
                 //--- Debug ---
                 if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
                     LogHelper.info("    Record info id: " + recordInfoId);
-                    LogHelper.info("    Song time:      " + auxSongTime + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
+                    LogHelper.info("    Song time:      " + recordInfo.recordDurationSeconds + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
                 }
                 
                 // Record found
-                this.songTimer = auxSongTime + TileEntityRedstoneJukebox.songInterval;
+                this.songTimer = recordInfo.recordDurationSeconds + TileEntityRedstoneJukebox.songInterval;
 
                 // Send update to clients
                 NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.currentJukeboxPlaySlot, this.getExtraVolume());

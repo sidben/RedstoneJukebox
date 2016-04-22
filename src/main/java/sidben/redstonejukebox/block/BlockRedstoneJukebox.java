@@ -15,6 +15,7 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.proxy.ClientProxy;
@@ -44,7 +45,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class BlockRedstoneJukebox extends BlockContainer
 {
 
-    //TODO: allow levers and buttons to be placed on the jukebox
     
     // --------------------------------------------------------------------
     // Constants and Variables
@@ -100,6 +100,16 @@ public class BlockRedstoneJukebox extends BlockContainer
     }
 
 
+    /**
+     * Checks if the block is a solid face on the given side, used by placement logic.
+     */
+    @Override
+    public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
+    {
+        return true;
+    }
+
+    
     /**
      * Returns the ItemBlock to drop on destruction.
      */

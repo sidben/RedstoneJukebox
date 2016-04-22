@@ -90,6 +90,9 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
     private String      customName;
+    
+    
+    private int _jukeboxExtraVolumeCached = -1;
 
 
     // TODO: When placing the jukebox in a powered block, activate it (? maybe invalid, since the new Jukebox will be empty. Try using a Shift-Middle click NBT one)
@@ -521,7 +524,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         }
 
         // Send update to clients
-        NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte) -1, this.getExtraVolume());
+        NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte) -1, 0);
 
         if (updateNeighbors) {
             // To update comparators
@@ -613,7 +616,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 this.songTimer = recordInfo.getRecordDurationSeconds() + TileEntityRedstoneJukebox.songInterval;
 
                 // Send update to clients
-                NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.getCurrentJukeboxPlaySlot(), this.getExtraVolume());
+                NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.getCurrentJukeboxPlaySlot(), this.getExtraVolume(true));
 
                 // To update comparators
                 BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.xCoord, this.yCoord, this.zCoord);
@@ -735,9 +738,13 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      * Checks the redstone jukebox block for the note blocks that will increase the volume range.
      * 
      */
-    private int getExtraVolume()
+    public int getExtraVolume(boolean mustRefresh)
     {
-        return BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.xCoord, this.yCoord, this.zCoord);
+        if (_jukeboxExtraVolumeCached < 0 || mustRefresh) {
+            _jukeboxExtraVolumeCached = BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.xCoord, this.yCoord, this.zCoord); 
+        }
+        
+        return _jukeboxExtraVolumeCached;
     }
 
 

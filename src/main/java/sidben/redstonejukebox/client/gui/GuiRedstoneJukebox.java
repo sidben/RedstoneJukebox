@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
+import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
@@ -17,7 +18,7 @@ import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-// TODO: Volume indicator on the GUI - volume icon and tooltip "Range: 128 blocks"
+
 
 @SideOnly(Side.CLIENT)
 public class GuiRedstoneJukebox extends GuiContainer
@@ -57,6 +58,8 @@ public class GuiRedstoneJukebox extends GuiContainer
         this.buttonList.add(new GuiRedstoneJukeboxButtonLoop(0, this.guiLeft + 7, this.guiTop + 41, GuiRedstoneJukebox.guiMainTexture));
         this.buttonList.add(new GuiRedstoneJukeboxButtonLoop(1, this.guiLeft + 32, this.guiTop + 41, GuiRedstoneJukebox.guiMainTexture));
         this.buttonList.add(new GuiRedstoneJukeboxButtonPlayMode(2, this.guiLeft + 77, this.guiTop + 41, GuiRedstoneJukebox.guiMainTexture));
+        
+        this.jukeboxInventory.getExtraVolume(true);
     }
 
 
@@ -150,6 +153,10 @@ public class GuiRedstoneJukebox extends GuiContainer
                     this.drawCreativeTabHoveringText("Play mode: Shuffle", x - this.guiLeft, y - this.guiTop + 21);
                     break;
             }
+        } else if (x >= this.guiLeft + 8 && x <= this.guiLeft + 20 && y >= this.guiTop + 27 && y <= this.guiTop + 35) {
+            int jukeboxExtraVolumeRange = 64 + this.jukeboxInventory.getExtraVolume(false);
+            this.drawCreativeTabHoveringText("Jukebox range: " + jukeboxExtraVolumeRange + " blocks", x - this.guiLeft, y - this.guiTop + 21);
+            
         }
 
     }
@@ -203,7 +210,13 @@ public class GuiRedstoneJukebox extends GuiContainer
         }
 
 
+        // -- Volume range indicator
+        int jukeboxExtraVolumeRange = this.jukeboxInventory.getExtraVolume(false);
+        int volumeFactor = (int) Math.floor(((float)jukeboxExtraVolumeRange / (float)ModRedstoneJukebox.maxExtraVolume) * 8);
+        this.drawTexturedModalRect(j + 10, k + 27, 176, 42, 1 + volumeFactor, 8);
 
+        
+        
         // -- play mode indicator
         final int spacer = 18;
         final int pStartX = 78;
@@ -232,6 +245,7 @@ public class GuiRedstoneJukebox extends GuiContainer
                 break;
 
         }
+        
 
         GuiScreen.itemRender.zLevel = 0.0F;
 

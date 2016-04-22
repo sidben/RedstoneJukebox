@@ -342,10 +342,10 @@ public class RecordInfoManager
         infoId = getRecordInfoIdFromItemStack(s);
         recordInfo = getRecordInfoFromId(infoId);
 
-        if (recordInfo != null && recordInfo.recordDurationSeconds >= 0) {
-            returnValue = recordInfo.recordDurationSeconds;
+        if (recordInfo != null && recordInfo.getRecordDurationSeconds() >= 0) {
+            returnValue = recordInfo.getRecordDurationSeconds();
         }
-
+        
 
         // --- Debug ---
         if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {

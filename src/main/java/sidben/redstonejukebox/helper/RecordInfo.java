@@ -1,10 +1,12 @@
 package sidben.redstonejukebox.helper;
 
+import sidben.redstonejukebox.handler.ConfigurationHandler;
+
 
 public class RecordInfo
 {
 
-    public int recordDurationSeconds;
+    private int _recordDurationSeconds;
     public String recordUrl;
     public String recordName;
     public int recordItemId;
@@ -19,11 +21,19 @@ public class RecordInfo
 
     public RecordInfo(String url, int duration, String name, int itemId, int damage) {
         this.recordUrl = url;
-        this.recordDurationSeconds = duration;
+        this._recordDurationSeconds = duration;
         this.recordName = name;
         this.recordItemId = itemId;
         this.recordItemDamage = damage;
     }
+    
+    
+    
+    
+    public int getRecordDurationSeconds() {
+        return Math.min(this._recordDurationSeconds, ConfigurationHandler.MAX_SONG_TIME_SECONDS);
+    }
+    
     
     
 
@@ -35,8 +45,10 @@ public class RecordInfo
         r.append("Record url = ");
         r.append(this.recordUrl);
         r.append(", Song duration = ");
-        r.append(this.recordDurationSeconds);
-        r.append("s, Record name = ");
+        r.append(this.getRecordDurationSeconds());
+        r.append("s (really ");
+        r.append(this._recordDurationSeconds);
+        r.append("), Record name = ");
         r.append(this.recordName);
         r.append(", Item id = ");
         r.append(this.recordItemId);

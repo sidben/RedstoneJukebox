@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
@@ -74,10 +75,16 @@ public class JukeboxPlayRecordMessage implements IMessage
         World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
             
+            
+            
+            LogHelper.info("updateJukeboxAndPlayRecord() - " + this);
+            
+            
+            
             final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
             if (teCandidate instanceof TileEntityRedstoneJukebox) {
                 final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
-                if (this.recordInfoId < 0) {
+                if (this.recordInfoId <= 0) {
                     teJukebox.setCurrentJukeboxPlaySlot((byte)-1);
                 } else {
                     teJukebox.setCurrentJukeboxPlaySlot(this.jukeboxSlot);
@@ -87,6 +94,9 @@ public class JukeboxPlayRecordMessage implements IMessage
                 teJukebox.paramPlayMode = this.playMode;
                 teJukebox.resync();
                 */
+                
+            } else {
+                LogHelper.warn("RedstoneJukebox TileEntity at " + this.x + ", " + this.y + ", " + this.z + " not found, can't sync client. Found this instead: " + teCandidate);
             }
 
             if (this.recordInfoId < 0) {

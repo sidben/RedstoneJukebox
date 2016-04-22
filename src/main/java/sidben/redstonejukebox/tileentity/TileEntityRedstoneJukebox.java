@@ -595,15 +595,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
             // Check if it has a valid item id and a valid song time
-            if (recordInfo != null && recordInfo.recordDurationSeconds > 0) {
+            if (recordInfo != null && recordInfo.getRecordDurationSeconds() > 0) {
                 // --- Debug ---
                 if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
                     LogHelper.info("    Record info id: " + recordInfoId);
-                    LogHelper.info("    Song time:      " + recordInfo.recordDurationSeconds + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
+                    LogHelper.info("    Song time:      " + recordInfo.getRecordDurationSeconds() + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
                 }
 
                 // Record found
-                this.songTimer = recordInfo.recordDurationSeconds + TileEntityRedstoneJukebox.songInterval;
+                this.songTimer = recordInfo.getRecordDurationSeconds() + TileEntityRedstoneJukebox.songInterval;
 
                 // Send update to clients
                 NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.currentJukeboxPlaySlot, this.getExtraVolume());
@@ -803,6 +803,10 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     public byte getCurrentJukeboxPlaySlot()
     {
+        if (System.currentTimeMillis() % 50 == 0) {
+            LogHelper.info("GET {Slot} = " + this.currentJukeboxPlaySlot);
+        }
+        
         return this.currentJukeboxPlaySlot;
     }
 
@@ -813,6 +817,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void setCurrentJukeboxPlaySlot(byte slot)
     {
         this.currentJukeboxPlaySlot = slot;
+
+        LogHelper.info("SET {Slot} = " + this.currentJukeboxPlaySlot);
     }
 
 

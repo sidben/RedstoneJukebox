@@ -11,7 +11,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -79,7 +78,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int p_149915_2_)
+    public TileEntity createNewTileEntity(World world, int damage)
     {
         return new TileEntityRedstoneJukebox();
     }
@@ -339,6 +338,7 @@ public class BlockRedstoneJukebox extends BlockContainer
             // Schedule the [updateTick] event, that ticks the TileEntity
             world.scheduleBlockUpdate(x, y, z, this, 0);
         }
+        
     }
     
     
@@ -348,8 +348,6 @@ public class BlockRedstoneJukebox extends BlockContainer
     @Override
     public void updateTick(World world, int x, int y, int z, Random rand)
     {
-        // LogHelper.info("BlockJukebox.updateTick() @ " + x + ", " + y + ", " + z + " - Active: " + this.isActive);
-
         if (!world.isRemote)
         {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
@@ -380,6 +378,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         // get the TileEntity so it won't be reset
         final TileEntity teJukebox = world.getTileEntity(x, y, z);
+        
 
         // change the block type (without keepMyInventory, Tile Entity would be reset)
         BlockRedstoneJukebox.keepMyInventory = true;
@@ -391,7 +390,7 @@ public class BlockRedstoneJukebox extends BlockContainer
         BlockRedstoneJukebox.keepMyInventory = false;
 
 
-        // Don't know what this does for sure. I think the flag "2" sends update to client
+        // Don't know what this does for sure. I think the flag "2" sends update to client. On my tests, I could not detect any difference.
         // int metadata = active ? 1 : 0;
         // world.setBlockMetadataWithNotify(x, y, z, metadata, 2);
 

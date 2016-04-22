@@ -47,7 +47,7 @@ public class NetworkHelper
     {
         final int defaultJukeboxRange = 64;
         final int extraRangeForNearbyPlayers = 32;
-        int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;          
+        int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;
         
         final JukeboxPlayRecordMessage message = new JukeboxPlayRecordMessage(teJukebox, recordInfoId, slot, volumeExtender);
         final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);      

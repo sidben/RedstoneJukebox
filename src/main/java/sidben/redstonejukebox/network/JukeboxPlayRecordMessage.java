@@ -31,7 +31,7 @@ public class JukeboxPlayRecordMessage implements IMessage
     public JukeboxPlayRecordMessage() {
     }
 
-    public JukeboxPlayRecordMessage(TileEntityRedstoneJukebox teJukebox, int recordInfoId, byte selectedSlot , int extraRange) {
+    public JukeboxPlayRecordMessage(TileEntityRedstoneJukebox teJukebox, int recordInfoId, byte selectedSlot, int extraRange) {
         this.recordInfoId = recordInfoId;
         this.jukeboxSlot = selectedSlot;
         this.x = teJukebox.xCoord;
@@ -74,7 +74,8 @@ public class JukeboxPlayRecordMessage implements IMessage
     public void updateJukeboxAndPlayRecord() {
         World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-            
+
+ 
             
             
             LogHelper.info("updateJukeboxAndPlayRecord() - " + this);
@@ -84,7 +85,7 @@ public class JukeboxPlayRecordMessage implements IMessage
             final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
             if (teCandidate instanceof TileEntityRedstoneJukebox) {
                 final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
-                if (this.recordInfoId <= 0) {
+                if (this.recordInfoId < 0) {
                     teJukebox.setCurrentJukeboxPlaySlot((byte)-1);
                 } else {
                     teJukebox.setCurrentJukeboxPlaySlot(this.jukeboxSlot);
@@ -98,7 +99,8 @@ public class JukeboxPlayRecordMessage implements IMessage
             } else {
                 LogHelper.warn("RedstoneJukebox TileEntity at " + this.x + ", " + this.y + ", " + this.z + " not found, can't sync client. Found this instead: " + teCandidate);
             }
-
+            
+            
             if (this.recordInfoId < 0) {
                 final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
                 ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);

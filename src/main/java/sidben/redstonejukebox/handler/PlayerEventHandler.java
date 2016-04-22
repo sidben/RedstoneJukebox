@@ -46,6 +46,9 @@ public class PlayerEventHandler
                     }
 
 
+                    
+                    
+                    
                     if (tradesList.size() > 0) {
                         // Sends the shop to the player
                         NetworkHelper.sendRecordTradingFullListMessage(tradesList, event.entityPlayer);
@@ -53,14 +56,13 @@ public class PlayerEventHandler
                         // Have trades, opens the GUI
                         ((EntityVillager) event.target).setCustomer(event.entityPlayer);
                         event.entityPlayer.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.recordTradingGuiID, event.target.worldObj, event.target.getEntityId(), 0, 0);
-                    } /*
-                       * else {
-                       * // Don't have trades, play a sound
-                       * event.target.playSound("mob.villager.no", 1.0F, (event.target.worldObj.rand.nextFloat() - event.target.worldObj.rand.nextFloat()) * 0.2F + 1.0F);
-                       * 
-                       * // TODO: re-enable and test (villager sound)
-                       * }
-                       */
+
+                    } else {
+                      // Don't have trades, play a sound
+                      event.target.playSound("mob.villager.no", 1F, 1F);
+                      
+                    }
+                    
                 }
 
 

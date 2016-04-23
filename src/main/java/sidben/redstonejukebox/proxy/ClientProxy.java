@@ -5,13 +5,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.client.gui.GuiRecordTrading;
 import sidben.redstonejukebox.client.gui.GuiRedstoneJukebox;
+import sidben.redstonejukebox.client.renderer.ItemRendererCustomRecord;
 import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
 import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.helper.MusicHelper;
+import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.client.FMLClientHandler;
@@ -35,6 +38,11 @@ public class ClientProxy extends CommonProxy
     public static String jukeboxSideOffIcon;
 
     public static String blankRecordIcon;
+    
+    public static String customRecord_BaseSimple_Icon;
+    public static String customRecord_OverlayFull_Icon;
+    public static String customRecord_OverlayHalf_Icon;
+    public static String customRecord_OverlayCross_Icon;
 
 
 
@@ -63,15 +71,22 @@ public class ClientProxy extends CommonProxy
 
         ClientProxy.blankRecordIcon = this.getResourceName("blank_record");
 
+        ClientProxy.customRecord_BaseSimple_Icon = this.getResourceName("record_base_simple");
+        ClientProxy.customRecord_OverlayCross_Icon = this.getResourceName("record_overlay_cross");
+        ClientProxy.customRecord_OverlayFull_Icon = this.getResourceName("record_overlay_full");
+        ClientProxy.customRecord_OverlayHalf_Icon = this.getResourceName("record_overlay_half");
 
+        
+
+
+        super.pre_initialize();
+
+    
         // Special renderers
         ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 
         RenderingRegistry.registerBlockHandler(new RenderRedstoneJukebox());
-
-
-
-        super.pre_initialize();
+        MinecraftForgeClient.registerItemRenderer(MyItems.recordCustom, new ItemRendererCustomRecord());
     }
 
 

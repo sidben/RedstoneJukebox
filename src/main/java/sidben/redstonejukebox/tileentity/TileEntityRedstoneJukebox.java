@@ -558,7 +558,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // Find the next valid record
             ItemStack nextRecordStack = null;
 
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < this.getSizeInventory(); i++) {
                 this.currentJukeboxPlaySlot = playOrder[this.currentIndex];
                 nextRecordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
 
@@ -567,8 +567,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                     LogHelper.info("    checking item #" + this.currentIndex + " on slot " + this.currentJukeboxPlaySlot + ": " + nextRecordStack);
                 }
                 
-                if (nextRecordStack == null) {
-                    ++this.currentIndex;      
+                if (nextRecordStack == null && this.currentIndex + 1 < this.getSizeInventory()) {
+                    ++this.currentIndex;
                 } else {
                     break;
                 }

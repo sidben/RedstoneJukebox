@@ -52,9 +52,9 @@ public class PlayerEventHandler
                         LogHelper.info("    Villager ID: " + event.target.getEntityId());
                         LogHelper.info("    Custom record trades: " + tradesList.size());
                     }
-                    
-                    
-                    
+
+
+
                     if (tradesList.size() > 0) {
                         // Sends the shop to the player
                         NetworkHelper.sendRecordTradingFullListMessage(tradesList, event.entityPlayer);
@@ -64,11 +64,11 @@ public class PlayerEventHandler
                         event.entityPlayer.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.recordTradingGuiID, event.target.worldObj, event.target.getEntityId(), 0, 0);
 
                     } else {
-                      // Don't have trades, play a sound
-                      event.target.playSound("mob.villager.no", 1F, 1F);
-                      
+                        // Don't have trades, play a sound
+                        event.target.playSound("mob.villager.no", 1F, 1F);
+
                     }
-                    
+
                 }
 
 

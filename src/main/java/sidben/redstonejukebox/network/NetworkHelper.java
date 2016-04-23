@@ -34,7 +34,7 @@ public class NetworkHelper
         }
 
         final JukeboxGUIUpdatedMessage message = new JukeboxGUIUpdatedMessage(teJukebox);
-        
+
         // --- Debug ---
         if (ConfigurationHandler.debugGuiJukebox) {
             LogHelper.info("Sending JukeboxGUIUpdatedMessage");
@@ -43,8 +43,8 @@ public class NetworkHelper
 
         ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
     }
-    
-    
+
+
     /**
      * Starts playing a record from a Redstone Jukebox.
      * 
@@ -54,11 +54,11 @@ public class NetworkHelper
     {
         final int defaultJukeboxRange = 64;
         final int extraRangeForNearbyPlayers = 32;
-        int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;
-        
+        final int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;
+
         final JukeboxPlayRecordMessage message = new JukeboxPlayRecordMessage(teJukebox, recordInfoId, slot, volumeExtender);
-        final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);      
-        
+        final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);
+
         // --- Debug ---
         if (ConfigurationHandler.debugNetworkJukebox) {
             LogHelper.info("Sending JukeboxPlayRecordMessage");
@@ -66,7 +66,7 @@ public class NetworkHelper
         }
 
         ModRedstoneJukebox.NetworkWrapper.sendToAllAround(message, target);
-    }    
+    }
 
 
     /**
@@ -96,7 +96,7 @@ public class NetworkHelper
     public static void sendRecordTradingFullListMessage(MerchantRecipeList list, EntityPlayer entityPlayer)
     {
         final RecordTradingFullListMessage message = new RecordTradingFullListMessage(list);
-        
+
         // --- Debug ---
         if (ConfigurationHandler.debugNetworkRecordTrading) {
             LogHelper.info("Sending RecordTradingFullListMessage");
@@ -143,7 +143,7 @@ public class NetworkHelper
 
         ModRedstoneJukebox.NetworkWrapper.sendToAll(message);
     }
-    
+
 
     /**
      * Sends to the client a command to stop playing all records and background music.
@@ -161,7 +161,6 @@ public class NetworkHelper
 
         ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
     }
-
 
 
 
@@ -259,7 +258,7 @@ public class NetworkHelper
 
     }
 
-    
+
     public static class CommandPlayRecordAtHandler implements IMessageHandler<CommandPlayRecordAtMessage, IMessage>
     {
 
@@ -279,7 +278,7 @@ public class NetworkHelper
 
     }
 
-    
+
     public static class CommandPlayRecordHandler implements IMessageHandler<CommandPlayRecordMessage, IMessage>
     {
 
@@ -299,7 +298,7 @@ public class NetworkHelper
 
     }
 
-    
+
     public static class CommandStopAllRecordsHandler implements IMessageHandler<CommandStopAllRecordsMessage, IMessage>
     {
 
@@ -317,5 +316,5 @@ public class NetworkHelper
         }
 
     }
-    
+
 }

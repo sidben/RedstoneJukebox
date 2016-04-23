@@ -6,15 +6,14 @@ import sidben.redstonejukebox.handler.ConfigurationHandler;
 public class RecordInfo
 {
 
-    private int _recordDurationSeconds;
-    public String recordUrl;
-    public String recordName;
-    public int recordItemId;
-    public int recordItemDamage;
-    
-    
-    
-    
+    private final int _recordDurationSeconds;
+    public String     recordUrl;
+    public String     recordName;
+    public int        recordItemId;
+    public int        recordItemDamage;
+
+
+
     public RecordInfo(String url, int duration, String name) {
         this(url, duration, name, 0, 0);
     }
@@ -26,16 +25,15 @@ public class RecordInfo
         this.recordItemId = itemId;
         this.recordItemDamage = damage;
     }
-    
-    
-    
-    
-    public int getRecordDurationSeconds() {
+
+
+
+    public int getRecordDurationSeconds()
+    {
         return Math.min((this._recordDurationSeconds > 0 ? this._recordDurationSeconds : ConfigurationHandler.defaultSongTime), ConfigurationHandler.maxSongTimeSeconds);
     }
-    
-    
-    
+
+
 
     @Override
     public String toString()
@@ -57,6 +55,6 @@ public class RecordInfo
 
         return r.toString();
     }
-    
+
 
 }

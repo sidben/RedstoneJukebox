@@ -1,25 +1,24 @@
 package sidben.redstonejukebox.item;
 
 import java.util.List;
-import sidben.redstonejukebox.proxy.ClientProxy;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
+import sidben.redstonejukebox.proxy.ClientProxy;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 
 public class ItemCustomRecord extends ItemRecord
 {
-    
-    public static String NBT_RECORD_INFO_ID = "RecordId"; 
-    
-    
-    
+
+    public static String NBT_RECORD_INFO_ID = "RecordId";
+
+
+
     // --------------------------------------------------------------------
     // Constructors
     // --------------------------------------------------------------------
@@ -33,8 +32,8 @@ public class ItemCustomRecord extends ItemRecord
         this.setHasSubtypes(true);
     }
 
-    
-    
+
+
     // --------------------------------------------------------------------
     // Textures and Rendering
     // --------------------------------------------------------------------
@@ -50,8 +49,8 @@ public class ItemCustomRecord extends ItemRecord
     @SideOnly(Side.CLIENT)
     public IIcon overlay_CrossIcon;
 
-    
-    
+
+
     /*
      * When this method is called, your item should register all the icons it needs with the given IconRegister. This
      * is the only chance you get to register icons.
@@ -64,17 +63,12 @@ public class ItemCustomRecord extends ItemRecord
         this.overlay_FullIcon = iconRegister.registerIcon(ClientProxy.customRecord_OverlayFull_Icon);
         this.overlay_HalfIcon = iconRegister.registerIcon(ClientProxy.customRecord_OverlayHalf_Icon);
         this.overlay_CrossIcon = iconRegister.registerIcon(ClientProxy.customRecord_OverlayCross_Icon);
-        
+
         super.itemIcon = this.base_SimpleIcon;
     }
 
-    
-    // OBS: use ForgeHooksClient.renderEntityItem
-    
-    
-    
 
-    
+
     // ----------------------------------------------------
     // Item name and flavor text
     // ----------------------------------------------------
@@ -88,23 +82,20 @@ public class ItemCustomRecord extends ItemRecord
     {
         par3List.add("NOT IMPLEMENTED");
     }
-    
-    
-    
-    
-    
-    
-    
+
+
+
     // ----------------------------------------------------
     // Custom record info
     // ----------------------------------------------------
-    
-    public int getRecordInfoId(ItemStack stack) {
+
+    public int getRecordInfoId(ItemStack stack)
+    {
         int recordInfoId = -1;
         if (stack.stackTagCompound != null && stack.stackTagCompound.hasKey(NBT_RECORD_INFO_ID)) {
             recordInfoId = stack.stackTagCompound.getInteger(NBT_RECORD_INFO_ID);
         }
         return recordInfoId;
     }
-    
+
 }

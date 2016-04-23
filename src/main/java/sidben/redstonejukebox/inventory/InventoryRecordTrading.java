@@ -241,7 +241,7 @@ public class InventoryRecordTrading implements IInventory
                 if (ConfigurationHandler.debugGuiRecordTrading) {
                     LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from client - index: " + this.currentRecipeIndex);
                 }
-                
+
             } else {
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
 

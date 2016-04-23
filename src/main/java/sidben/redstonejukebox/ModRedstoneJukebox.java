@@ -1,8 +1,8 @@
 package sidben.redstonejukebox;
 
 import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.helper.RecordInfoManager;
 import sidben.redstonejukebox.helper.MusicHelper;
+import sidben.redstonejukebox.helper.RecordInfoManager;
 import sidben.redstonejukebox.helper.RecordStoreHelper;
 import sidben.redstonejukebox.init.MyCommands;
 import sidben.redstonejukebox.proxy.IProxy;
@@ -93,9 +93,6 @@ public class ModRedstoneJukebox
         return recordStoreHelper;
     }
 
-    
-    
-    
 
 
     @Mod.EventHandler

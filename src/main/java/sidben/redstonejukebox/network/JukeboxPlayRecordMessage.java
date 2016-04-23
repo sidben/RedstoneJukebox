@@ -17,10 +17,10 @@ public class JukeboxPlayRecordMessage implements IMessage
     // ---------------------------------------------
     // Fields
     // ---------------------------------------------
-    private int     recordInfoId;
-    private int     x, y, z;
-    private byte    jukeboxSlot;
-    private int     extraRange;
+    private int  recordInfoId;
+    private int  x, y, z;
+    private byte jukeboxSlot;
+    private int  extraRange;
 
 
 
@@ -39,8 +39,6 @@ public class JukeboxPlayRecordMessage implements IMessage
         this.z = teJukebox.zCoord;
         this.extraRange = extraRange;
     }
-
-
 
 
 
@@ -69,38 +67,37 @@ public class JukeboxPlayRecordMessage implements IMessage
     }
 
 
-    
 
-    public void updateJukeboxAndPlayRecord() {
-        World world = ModRedstoneJukebox.proxy.getClientWorld();
+    public void updateJukeboxAndPlayRecord()
+    {
+        final World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-            
+
             final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
             if (teCandidate instanceof TileEntityRedstoneJukebox) {
                 final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
                 if (this.recordInfoId < 0) {
-                    teJukebox.setCurrentJukeboxPlaySlot((byte)-1);
+                    teJukebox.setCurrentJukeboxPlaySlot((byte) -1);
                 } else {
                     teJukebox.setCurrentJukeboxPlaySlot(this.jukeboxSlot);
                 }
-                
+
             } else {
                 LogHelper.warn("RedstoneJukebox TileEntity at " + this.x + ", " + this.y + ", " + this.z + " not found, can't sync client. Found this instead: " + teCandidate);
             }
-            
-            
+
+
             if (this.recordInfoId < 0) {
                 final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
                 ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
             } else {
-                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt((int)this.x, (int)this.y, (int)this.z, this.recordInfoId, true, this.extraRange);
+                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(this.x, this.y, this.z, this.recordInfoId, true, this.extraRange);
             }
         }
     }
 
-    
-    
-    
+
+
     @Override
     public String toString()
     {
@@ -122,6 +119,6 @@ public class JukeboxPlayRecordMessage implements IMessage
         return r.toString();
     }
 
-    
+
 
 }

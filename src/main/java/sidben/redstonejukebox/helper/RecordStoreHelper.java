@@ -323,7 +323,6 @@ public class RecordStoreHelper
 
 
 
-
     public enum EnumRecipeType {
         BUYING_RECORDS,
         SELLING_RECORDS

@@ -38,7 +38,7 @@ public class ClientProxy extends CommonProxy
     public static String jukeboxSideOffIcon;
 
     public static String blankRecordIcon;
-    
+
     public static String customRecord_BaseSimple_Icon;
     public static String customRecord_OverlayFull_Icon;
     public static String customRecord_OverlayHalf_Icon;
@@ -76,12 +76,11 @@ public class ClientProxy extends CommonProxy
         ClientProxy.customRecord_OverlayFull_Icon = this.getResourceName("record_overlay_full");
         ClientProxy.customRecord_OverlayHalf_Icon = this.getResourceName("record_overlay_half");
 
-        
 
 
         super.pre_initialize();
 
-    
+
         // Special renderers
         ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 

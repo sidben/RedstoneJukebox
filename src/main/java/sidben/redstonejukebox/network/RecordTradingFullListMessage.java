@@ -160,14 +160,13 @@ public class RecordTradingFullListMessage implements IMessage
     }
 
 
-    
-    
+
     @Override
     public String toString()
     {
         return LogHelper.recipeListToString(tradeList);
     }
-    
-    
+
+
 
 }

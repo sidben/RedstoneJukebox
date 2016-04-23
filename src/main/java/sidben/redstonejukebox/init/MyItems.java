@@ -12,7 +12,7 @@ public class MyItems
 
 
     // Item instances
-    public static ItemBlankRecord recordBlank;
+    public static ItemBlankRecord  recordBlank;
     public static ItemCustomRecord recordCustom;
 
 
@@ -25,7 +25,7 @@ public class MyItems
 
         GameRegistry.registerItem(recordBlank, "BlankRecordItem");
         GameRegistry.registerItem(recordCustom, "CustomRecordItem");
-        
+
     }
 
 }

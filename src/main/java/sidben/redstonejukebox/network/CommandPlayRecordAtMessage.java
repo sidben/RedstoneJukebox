@@ -9,7 +9,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Parameters from the /playrecordat command.
- *  
+ * 
  */
 public class CommandPlayRecordAtMessage implements IMessage
 {
@@ -42,8 +42,6 @@ public class CommandPlayRecordAtMessage implements IMessage
 
 
 
-
-
     // Reads the packet
     @Override
     public void fromBytes(ByteBuf buf)
@@ -69,18 +67,17 @@ public class CommandPlayRecordAtMessage implements IMessage
     }
 
 
-    
 
-    public void playRecord() {
-        World world = ModRedstoneJukebox.proxy.getClientWorld();
+    public void playRecord()
+    {
+        final World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-            ModRedstoneJukebox.instance.getMusicHelper().playRecordAt((int)this.x, (int)this.y, (int)this.z, this.recordInfoId, this.showName, this.range);
+            ModRedstoneJukebox.instance.getMusicHelper().playRecordAt((int) this.x, (int) this.y, (int) this.z, this.recordInfoId, this.showName, this.range);
         }
     }
 
-    
-    
-    
+
+
     @Override
     public String toString()
     {
@@ -102,6 +99,6 @@ public class CommandPlayRecordAtMessage implements IMessage
         return r.toString();
     }
 
-    
+
 
 }

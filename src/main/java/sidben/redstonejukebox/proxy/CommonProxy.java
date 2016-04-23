@@ -44,7 +44,7 @@ public abstract class CommonProxy implements IProxy
     {
         // Register network messages
         int packetdId = 0;
-        
+
         ModRedstoneJukebox.NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, packetdId++, Side.SERVER);
         ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxPlayRecordHandler.class, JukeboxPlayRecordMessage.class, packetdId++, Side.CLIENT);

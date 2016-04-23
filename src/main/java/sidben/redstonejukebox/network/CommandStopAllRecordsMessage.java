@@ -25,8 +25,6 @@ public class CommandStopAllRecordsMessage implements IMessage
 
 
 
-
-
     // Reads the packet
     @Override
     public void fromBytes(ByteBuf buf)
@@ -40,15 +38,15 @@ public class CommandStopAllRecordsMessage implements IMessage
     }
 
 
-    
 
-    public void stopMusic() {
-        World world = ModRedstoneJukebox.proxy.getClientWorld();
+    public void stopMusic()
+    {
+        final World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
             ModRedstoneJukebox.instance.getMusicHelper().StopAllSounds();
         }
     }
 
-    
+
 
 }

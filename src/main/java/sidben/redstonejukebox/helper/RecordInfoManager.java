@@ -344,7 +344,7 @@ public class RecordInfoManager
         if (recordInfo != null && recordInfo.getRecordDurationSeconds() >= 0) {
             returnValue = recordInfo.getRecordDurationSeconds();
         }
-        
+
 
         // --- Debug ---
         if (ConfigurationHandler.debugRecordInfoManager) {
@@ -384,8 +384,8 @@ public class RecordInfoManager
             }
 
             return new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
-            
-        } catch (ArrayIndexOutOfBoundsException e) {
+
+        } catch (final ArrayIndexOutOfBoundsException e) {
             LogHelper.error("Error getting random record: " + e);
 
         }

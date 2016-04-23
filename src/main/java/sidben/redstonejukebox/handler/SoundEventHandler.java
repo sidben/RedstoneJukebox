@@ -38,8 +38,10 @@ public class SoundEventHandler
 
 
             // When a record starts playing, stops all background music
-            // OBS: Note blocks also have the "Records" sound category, so another condition is needed.
-            if (soundCat == SoundCategory.RECORDS && soundName.startsWith("records.")) {
+            // OBS: Note blocks also have the "Records". According to sounds.json, it's the only thing 
+            // that shares the category with music discs, so I can filter it out and remain compatible with
+            // records from other mods (as long as they use the correct SoundCategory).
+            if (soundCat == SoundCategory.RECORDS && !soundName.startsWith("note.")) {
                 ModRedstoneJukebox.instance.getMusicHelper().StopAllBackgroundMusic();
             }
 

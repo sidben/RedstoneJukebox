@@ -58,6 +58,7 @@ public class ModGuiConfig extends GuiConfig
         final ConfigCategory generalCat = ConfigurationHandler.config.getCategory(Configuration.CATEGORY_GENERAL);
 
         generalConfigs.add(new ConfigElement(generalCat.get("song_time")));
+        generalConfigs.add(new ConfigElement(generalCat.get("max_song_time")));
 
         list.addAll(generalConfigs);
 

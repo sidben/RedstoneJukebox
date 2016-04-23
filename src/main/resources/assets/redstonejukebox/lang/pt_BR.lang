@@ -47,4 +47,6 @@ sidben.redstonejukebox.config.record_sell_price_min.tooltip=Preço mínimo em es
 sidben.redstonejukebox.config.record_sell_price_max=Preço de venda (max)
 sidben.redstonejukebox.config.record_sell_price_max.tooltip=Preço máximo em esmeraldas que um aldeão vai cobrar por discos.
 sidben.redstonejukebox.config.song_time=Duração padrão dos discos
-sidben.redstonejukebox.config.song_time.tooltip=Valor em segundos que será usado como duração dos discos, quando o mod não achar os valores corretos.
+sidben.redstonejukebox.config.song_time.tooltip=Valor em segundos que será usado como duração dos discos, quando o mod não achar os valores corretos. Válido para a Jukebox de Redstone e os comandos deste mod.
+sidben.redstonejukebox.config.max_song_time=Duração máxima dos discos
+sidben.redstonejukebox.config.max_song_time.tooltip=Duração máxima em segundos para todos os discos. Válido para a Jukebox de Redstone e os comandos deste mod.

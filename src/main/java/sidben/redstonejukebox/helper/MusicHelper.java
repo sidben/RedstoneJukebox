@@ -129,7 +129,7 @@ public class MusicHelper
         final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+        if (ConfigurationHandler.debugMusicHelper) {
             LogHelper.info("MusicHelper.playRecordAt()");
             LogHelper.info("    Coords:         " + x + ", " + y + ", " + z);
             LogHelper.info("    Show name:      " + showName);
@@ -191,7 +191,7 @@ public class MusicHelper
         final ISound isound = this.mapJukeboxesPositions.get(chunkcoordinates);
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+        if (ConfigurationHandler.debugMusicHelper) {
             LogHelper.info("MusicHelper.stopPlayingAt()");
             LogHelper.info("    Coords:  " + chunkcoordinates.posX + ", " + chunkcoordinates.posY + ", " + chunkcoordinates.posZ);
             LogHelper.info("    iSound:  " + isound);
@@ -215,7 +215,7 @@ public class MusicHelper
         final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+        if (ConfigurationHandler.debugMusicHelper) {
             LogHelper.info("MusicHelper.playRecord()");
             LogHelper.info("    Show name:      " + showName);
             LogHelper.info("    Record info id: " + recordInfoId);
@@ -250,7 +250,7 @@ public class MusicHelper
     public void StopAllBackgroundMusic()
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+        if (ConfigurationHandler.debugMusicHelper) {
             LogHelper.info("MusicHelper.StopAllBackgroundMusic()");
             LogHelper.info("    Custom BGMusic: " + this.IsCustomBackgroundMusicPlaying());
         }
@@ -278,7 +278,7 @@ public class MusicHelper
             if (soundObj.getPositionedSoundLocation().getResourcePath().startsWith("music.") || soundObj.getAttenuationType() == ISound.AttenuationType.NONE
                     || (soundObj.getXPosF() == 0F && soundObj.getYPosF() == 0F && soundObj.getZPosF() == 0F)) {
 
-                if (ConfigurationHandler.DEBUG_MUSICHELPER) {
+                if (ConfigurationHandler.debugMusicHelper) {
                     LogHelper.info("    Stopping sound [" + soundId + "] - " + soundObj.getPositionedSoundLocation());
                 }
 

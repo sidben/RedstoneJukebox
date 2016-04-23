@@ -47,4 +47,6 @@ sidben.redstonejukebox.config.record_sell_price_min.tooltip=Minimum price a vill
 sidben.redstonejukebox.config.record_sell_price_max=Record selling prince (max)
 sidben.redstonejukebox.config.record_sell_price_max.tooltip=Maximum price a villager will charge when selling records.
 sidben.redstonejukebox.config.song_time=Default record duration
-sidben.redstonejukebox.config.song_time.tooltip=Value in seconds that will be used as the record song length, when the mod can't detect the correct value.
+sidben.redstonejukebox.config.song_time.tooltip=Value in seconds that will be used as the record song length, when the mod can't detect the correct value. Valid for the Redstone Jukebox and this mod commands.
+sidben.redstonejukebox.config.max_song_time=Maximum record duration
+sidben.redstonejukebox.config.max_song_time.tooltip=Maximum duration in seconds for all records. Valid for the Redstone Jukebox and this mod commands.

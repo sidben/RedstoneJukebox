@@ -367,7 +367,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.currentJukeboxPlaySlot = tag.getByte("InvSlot");
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+        if (ConfigurationHandler.debugNetworkJukebox) {
             LogHelper.info("TileEntityRedstoneJukebox.onDataPacket()");
             LogHelper.info("    PlayMode: " + this.paramPlayMode);
             LogHelper.info("    Loop:     " + this.paramLoop);
@@ -385,7 +385,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public Packet getDescriptionPacket()
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+        if (ConfigurationHandler.debugNetworkJukebox) {
             LogHelper.info("TileEntityRedstoneJukebox.getDescriptionPacket()");
             LogHelper.info("    PlayMode: " + this.paramPlayMode);
             LogHelper.info("    Loop:     " + this.paramLoop);
@@ -421,7 +421,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         if (!this.worldObj.isRemote) {
 
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_JUKEBOX_TICK) {
+            if (ConfigurationHandler.debugJukeboxTick) {
                 LogHelper.info("Jukebox.tickJukebox() @ " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + 
                         " - isBlockPowered: " + this.isBlockPowered +
                         " - schdPlayNext: " + this.schedulePlayNextRecord +
@@ -492,7 +492,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     public void startPlaying()
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+        if (ConfigurationHandler.debugJukeboxRecordPlay) {
             LogHelper.info("Jukebox.startPlaying() @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - Empty: " + this.isEmpty());
         }
 
@@ -519,7 +519,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.scheduleStopPlaying = false;
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+        if (ConfigurationHandler.debugJukeboxRecordPlay) {
             LogHelper.info("Jukebox.stopPlaying() @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ")");
         }
 
@@ -539,7 +539,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private void playNextRecord()
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+        if (ConfigurationHandler.debugJukeboxRecordPlay) {
             LogHelper.info("Jukebox.playNextRecord() @ (" + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + ") - playlist index: " + this.currentIndex + " - current slot: " + this.currentJukeboxPlaySlot + " - Empty: " + this.isEmpty());
         }
         
@@ -563,8 +563,8 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
                 nextRecordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
 
                 // --- Debug ---
-                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
-                    LogHelper.info("    checking item #" + this.currentIndex + " on slot " + this.currentJukeboxPlaySlot + ": " + nextRecordStack);
+                if (ConfigurationHandler.debugJukeboxRecordPlay) {
+                    LogHelper.info("    checking item #" + this.currentIndex + " on slot " + this.currentJukeboxPlaySlot + ": " + LogHelper.itemStackToString(nextRecordStack));
                 }
                 
                 if (nextRecordStack == null && this.currentIndex + 1 < this.getSizeInventory()) {
@@ -582,7 +582,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
 
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+            if (ConfigurationHandler.debugJukeboxRecordPlay) {
 
                 if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(nextRecordStack)) {
                     final ItemRecord debugRecord = (ItemRecord) (nextRecordStack.getItem());
@@ -607,7 +607,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
             // Check if it has a valid item id and a valid song time
             if (recordInfo != null && recordInfo.getRecordDurationSeconds() > 0) {
                 // --- Debug ---
-                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                if (ConfigurationHandler.debugJukeboxRecordPlay) {
                     LogHelper.info("    Record info id: " + recordInfoId);
                     LogHelper.info("    Song time:      " + recordInfo.getRecordDurationSeconds() + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
                 }
@@ -623,7 +623,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             } else {
                 // --- Debug ---
-                if (ConfigurationHandler.DEBUG_JUKEBOX_RECORDPLAY) {
+                if (ConfigurationHandler.debugJukeboxRecordPlay) {
                     LogHelper.info("    Invalid record, skipping to next slot");
                 }
 

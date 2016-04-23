@@ -238,7 +238,7 @@ public class InventoryRecordTrading implements IInventory
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
 
                 // --- Debug ---
-                if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+                if (ConfigurationHandler.debugGuiRecordTrading) {
                     LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from client - index: " + this.currentRecipeIndex);
                 }
                 
@@ -246,7 +246,7 @@ public class InventoryRecordTrading implements IInventory
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
 
                 // --- Debug ---
-                if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+                if (ConfigurationHandler.debugGuiRecordTrading) {
                     LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from server - index: " + this.currentRecipeIndex);
                 }
 

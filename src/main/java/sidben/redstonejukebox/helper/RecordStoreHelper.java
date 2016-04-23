@@ -20,7 +20,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 
 
@@ -135,7 +134,7 @@ public class RecordStoreHelper
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+        if (ConfigurationHandler.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.getStore(" + villagerId + ")");
         }
 
@@ -148,10 +147,10 @@ public class RecordStoreHelper
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+        if (ConfigurationHandler.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.getStore() <-- [" + list + "]");
 
-            CacheStats cacheStats = this.storeCache.stats();
+            final CacheStats cacheStats = this.storeCache.stats();
             LogHelper.info("* RecordStoreHelper - " + cacheStats.toString());
         }
 
@@ -166,8 +165,8 @@ public class RecordStoreHelper
     public void useRecipe(MerchantRecipe recipe, EntityPlayer player)
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
-            LogHelper.info("RecordStoreHelper.useRecipe(" + recipe + ", " + player + ")");
+        if (ConfigurationHandler.debugRecordStoreHelper) {
+            LogHelper.info("RecordStoreHelper.useRecipe(" + LogHelper.recipeToString(recipe) + ", " + player + ")");
         }
 
         recipe.incrementToolUses();
@@ -182,7 +181,7 @@ public class RecordStoreHelper
     MerchantRecipeList createRandomStore()
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+        if (ConfigurationHandler.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.createRandomStore()");
         }
 
@@ -196,7 +195,9 @@ public class RecordStoreHelper
 
         // Decides how many offers will be added. The minimum is 3 trades.
         int offersSize = rand.nextInt(ConfigurationHandler.maxOffers);
-        if (offersSize < 3) { offersSize = 3; }
+        if (offersSize < 3) {
+            offersSize = 3;
+        }
 
         // Adds one buying offers and one selling offer, by default (extra if for extra randomness)
         if (rand.nextInt(10) < 5) {
@@ -320,53 +321,6 @@ public class RecordStoreHelper
         return recipe;
     }
 
-
-
-    /**
-     * Prints in the debug console all info about the given MerchantRecipeList
-     */
-    public void debugMerchantList(MerchantRecipeList list)
-    {
-        LogHelper.info("=========================================");
-        LogHelper.info("MerchantRecipeList Debug");
-        LogHelper.info("-----------------------------------------");
-        LogHelper.info("List size: " + (list == null ? "NULL" : list.size()));
-        LogHelper.info("");
-
-        if (list != null) {
-            int cont = 0;
-            for (final Object obj : list) {
-                final MerchantRecipe recipe = (MerchantRecipe) obj;
-                final Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
-                final Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
-                final int recipeMaxUses = hiddenMax == null ? -1 : (int) hiddenMax;
-                final int recipeUses = hiddenUses == null ? -1 : (int) hiddenUses;
-
-                cont++;
-
-                LogHelper.info(String.format("Trade #%d - %s - used %d of %d times", cont, (recipe.isRecipeDisabled() ? "Disabled" : "Enabled"), recipeUses, recipeMaxUses));
-                LogHelper.info("    Buy item 1: " + debugRecipeItem(recipe.getItemToBuy()));
-                LogHelper.info("    Buy item 2: " + debugRecipeItem(recipe.getSecondItemToBuy()));
-                LogHelper.info("    Sell item:  " + debugRecipeItem(recipe.getItemToSell()));
-            }
-        }
-
-        LogHelper.info("=========================================");
-    }
-
-
-    private String debugRecipeItem(ItemStack stack)
-    {
-        if (stack == null) {
-            return "NULL";
-        }
-        if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(stack)) {
-            final ItemRecord record = (ItemRecord) stack.getItem();
-            return stack.stackSize + "x " + stack.getDisplayName() + " (" + record.recordName + ")";
-        } else {
-            return stack.stackSize + "x " + stack.getDisplayName();
-        }
-    }
 
 
 

@@ -31,7 +31,7 @@ public class SoundEventHandler
         else if (isWorldRunning && soundName != null) {
 
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_SOUNDEVENTS) {
+            if (ConfigurationHandler.debugSoundEvents) {
                 if (soundCat == SoundCategory.RECORDS || soundCat == SoundCategory.MUSIC) {
                     LogHelper.info("SoundEventHandler.onPlaySound() - " + soundCat + " - " + soundName);
                 }
@@ -51,7 +51,7 @@ public class SoundEventHandler
                 final boolean isCustomBgPlaying = ModRedstoneJukebox.instance.getMusicHelper().IsCustomBackgroundMusicPlaying();
 
                 // --- Debug ---
-                if (ConfigurationHandler.DEBUG_SOUNDEVENTS) {
+                if (ConfigurationHandler.debugSoundEvents) {
                     LogHelper.info("    Any jukebox playing:    " + isJukeboxPlaying);
                     LogHelper.info("    Custom BgMusic playing: " + isCustomBgPlaying);
                     LogHelper.info("    Should deny:            " + (isJukeboxPlaying || isCustomBgPlaying));

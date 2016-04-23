@@ -176,7 +176,7 @@ public class RecordInfoManager
     public String getRecordResourceUrl(ItemRecord record, int damageValue)
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getRecordResourceUrl(" + record + ", " + damageValue + ")");
         }
 
@@ -190,7 +190,6 @@ public class RecordInfoManager
                 // https://github.com/chylex/Hardcore-Ender-Expansion/blob/master/src/main/java/chylex/hee/item/ItemMusicDisk.java
 
                 try {
-                    // TODO: check if ObfuscationReflectionHelper can be useful here
                     final Class<?> modClass = Class.forName(RECORD_CLASS_FROM_MOD_HARDCOREEXNDEREXPANSION);
                     final Method modMethod = modClass.getMethod(RECORD_RESOURCEMETHOD_FROM_MOD_HARDCOREEXNDEREXPANSION, int.class);
                     final String[] modReturnValue = (String[]) modMethod.invoke(null, damageValue);
@@ -230,7 +229,7 @@ public class RecordInfoManager
 
 
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+            if (ConfigurationHandler.debugRecordInfoManager) {
                 LogHelper.info("RecordInfoManager.getRecordResourceUrl()    <-- [" + resourceName + "]");
             }
 
@@ -248,8 +247,8 @@ public class RecordInfoManager
     public int getRecordInfoIdFromItemStack(ItemStack s)
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
-            LogHelper.info("RecordInfoManager.getRecordInfoIdFromItemStack(" + s + ")");
+        if (ConfigurationHandler.debugRecordInfoManager) {
+            LogHelper.info("RecordInfoManager.getRecordInfoIdFromItemStack(" + LogHelper.itemStackToString(s) + ")");
         }
 
         int returnValue = -1;
@@ -261,7 +260,7 @@ public class RecordInfoManager
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getRecordInfoIdFromItemStack()    <-- [" + returnValue + "]");
         }
 
@@ -276,7 +275,7 @@ public class RecordInfoManager
     public int getRecordInfoIdFromUrl(String resourceName)
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getRecordInfoIdFromUrl('" + resourceName + "')");
         }
 
@@ -292,7 +291,7 @@ public class RecordInfoManager
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getRecordInfoIdFromUrl()    <-- [" + returnValue + "]");
         }
 
@@ -304,7 +303,7 @@ public class RecordInfoManager
     public RecordInfo getRecordInfoFromId(int recordInfoId)
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getRecordInfoFromId(" + recordInfoId + ")");
         }
 
@@ -315,7 +314,7 @@ public class RecordInfoManager
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getRecordInfoFromId()    <-- [" + returnValue + "]");
         }
 
@@ -331,8 +330,8 @@ public class RecordInfoManager
     public int getSongTime(ItemStack s)
     {
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
-            LogHelper.info("RecordInfoManager.getSongTime(" + s + ")");
+        if (ConfigurationHandler.debugRecordInfoManager) {
+            LogHelper.info("RecordInfoManager.getSongTime(" + LogHelper.itemStackToString(s) + ")");
         }
 
         int infoId;
@@ -348,7 +347,7 @@ public class RecordInfoManager
         
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+        if (ConfigurationHandler.debugRecordInfoManager) {
             LogHelper.info("RecordInfoManager.getSongTime()    <-- [" + returnValue + "]");
         }
 
@@ -378,7 +377,7 @@ public class RecordInfoManager
             final Item recordItem = Item.getItemById(recordInfo.recordItemId);
 
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+            if (ConfigurationHandler.debugRecordInfoManager) {
                 LogHelper.info("RecordInfoManager.getRandomRecord()");
                 LogHelper.info("    Record info: " + recordInfo);
                 LogHelper.info("    Item: " + recordItem);

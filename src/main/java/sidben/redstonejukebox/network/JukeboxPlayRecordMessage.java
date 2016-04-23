@@ -74,13 +74,6 @@ public class JukeboxPlayRecordMessage implements IMessage
     public void updateJukeboxAndPlayRecord() {
         World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-
- 
-            
-            
-            LogHelper.info("updateJukeboxAndPlayRecord() - " + this);
-            
-            
             
             final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
             if (teCandidate instanceof TileEntityRedstoneJukebox) {
@@ -90,11 +83,6 @@ public class JukeboxPlayRecordMessage implements IMessage
                 } else {
                     teJukebox.setCurrentJukeboxPlaySlot(this.jukeboxSlot);
                 }
-                /*
-                teJukebox.paramLoop = this.isLoop;
-                teJukebox.paramPlayMode = this.playMode;
-                teJukebox.resync();
-                */
                 
             } else {
                 LogHelper.warn("RedstoneJukebox TileEntity at " + this.x + ", " + this.y + ", " + this.z + " not found, can't sync client. Found this instead: " + teCandidate);

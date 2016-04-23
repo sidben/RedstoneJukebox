@@ -47,7 +47,7 @@ public class PlayerEventHandler
 
 
                     // --- Debug ---
-                    if (ConfigurationHandler.DEBUG_NETWORK_RECORDTRADE) {
+                    if (ConfigurationHandler.debugNetworkRecordTrading) {
                         LogHelper.info("PlayerEventHandler.onEntityInteractEvent()");
                         LogHelper.info("    Villager ID: " + event.target.getEntityId());
                         LogHelper.info("    Custom record trades: " + tradesList.size());

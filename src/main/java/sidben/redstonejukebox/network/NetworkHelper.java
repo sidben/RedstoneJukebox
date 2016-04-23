@@ -36,7 +36,7 @@ public class NetworkHelper
         final JukeboxGUIUpdatedMessage message = new JukeboxGUIUpdatedMessage(teJukebox);
         
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_GUI_JUKEBOX) {
+        if (ConfigurationHandler.debugGuiJukebox) {
             LogHelper.info("Sending JukeboxGUIUpdatedMessage");
             LogHelper.info("    " + message);
         }
@@ -60,7 +60,7 @@ public class NetworkHelper
         final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);      
         
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+        if (ConfigurationHandler.debugNetworkJukebox) {
             LogHelper.info("Sending JukeboxPlayRecordMessage");
             LogHelper.info("    " + message);
         }
@@ -79,7 +79,7 @@ public class NetworkHelper
         final RecordTradingGUIUpdatedMessage message = new RecordTradingGUIUpdatedMessage(recipeIndex);
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+        if (ConfigurationHandler.debugGuiRecordTrading) {
             LogHelper.info("Sending RecordTradingGUIUpdatedMessage");
             LogHelper.info("    " + message);
         }
@@ -98,7 +98,7 @@ public class NetworkHelper
         final RecordTradingFullListMessage message = new RecordTradingFullListMessage(list);
         
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_RECORDTRADE) {
+        if (ConfigurationHandler.debugNetworkRecordTrading) {
             LogHelper.info("Sending RecordTradingFullListMessage");
             LogHelper.info("    " + message);
         }
@@ -117,7 +117,7 @@ public class NetworkHelper
         final CommandPlayRecordAtMessage message = new CommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, range);
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+        if (ConfigurationHandler.debugNetworkCommands) {
             LogHelper.info("Sending CommandPlayRecordAtMessage");
             LogHelper.info("    " + message);
         }
@@ -136,7 +136,7 @@ public class NetworkHelper
         final CommandPlayRecordMessage message = new CommandPlayRecordMessage(recordInfoId, showName);
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+        if (ConfigurationHandler.debugNetworkCommands) {
             LogHelper.info("Sending CommandPlayRecordMessage");
             LogHelper.info("    " + message);
         }
@@ -155,7 +155,7 @@ public class NetworkHelper
         final CommandStopAllRecordsMessage message = new CommandStopAllRecordsMessage();
 
         // --- Debug ---
-        if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+        if (ConfigurationHandler.debugNetworkCommands) {
             LogHelper.info("Sending CommandStopAllRecordsMessage");
         }
 
@@ -176,7 +176,7 @@ public class NetworkHelper
         public IMessage onMessage(JukeboxGUIUpdatedMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_GUI_JUKEBOX) {
+            if (ConfigurationHandler.debugGuiJukebox) {
                 LogHelper.info("Handling JukeboxGUIUpdatedMessage");
                 LogHelper.info("    " + message);
             }
@@ -200,7 +200,7 @@ public class NetworkHelper
         public IMessage onMessage(JukeboxPlayRecordMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+            if (ConfigurationHandler.debugNetworkJukebox) {
                 LogHelper.info("Handling JukeboxPlayRecordMessage");
                 LogHelper.info("    " + message);
             }
@@ -220,7 +220,7 @@ public class NetworkHelper
         public IMessage onMessage(RecordTradingGUIUpdatedMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+            if (ConfigurationHandler.debugGuiRecordTrading) {
                 LogHelper.info("Handling RecordTradingGUIUpdatedMessage");
                 LogHelper.info("    " + message);
             }
@@ -246,7 +246,7 @@ public class NetworkHelper
         public IMessage onMessage(RecordTradingFullListMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_NETWORK_RECORDTRADE) {
+            if (ConfigurationHandler.debugNetworkRecordTrading) {
                 LogHelper.info("Handling RecordTradingFullListMessage");
                 LogHelper.info("    " + message);
             }
@@ -267,7 +267,7 @@ public class NetworkHelper
         public IMessage onMessage(CommandPlayRecordAtMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+            if (ConfigurationHandler.debugNetworkCommands) {
                 LogHelper.info("Handling CommandPlayRecordAtMessage");
                 LogHelper.info("    " + message);
             }
@@ -287,7 +287,7 @@ public class NetworkHelper
         public IMessage onMessage(CommandPlayRecordMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+            if (ConfigurationHandler.debugNetworkCommands) {
                 LogHelper.info("Handling CommandPlayRecordMessage");
                 LogHelper.info("    " + message);
             }
@@ -307,7 +307,7 @@ public class NetworkHelper
         public IMessage onMessage(CommandStopAllRecordsMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+            if (ConfigurationHandler.debugNetworkCommands) {
                 LogHelper.info("Handling CommandStopAllRecordsMessage");
             }
 

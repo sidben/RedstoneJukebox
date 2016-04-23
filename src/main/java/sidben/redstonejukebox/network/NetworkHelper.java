@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
@@ -33,8 +34,14 @@ public class NetworkHelper
         }
 
         final JukeboxGUIUpdatedMessage message = new JukeboxGUIUpdatedMessage(teJukebox);
-        ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
+        
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_GUI_JUKEBOX) {
+            LogHelper.info("Sending JukeboxGUIUpdatedMessage");
+            LogHelper.info("    " + message);
+        }
 
+        ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
     }
     
     
@@ -51,6 +58,13 @@ public class NetworkHelper
         
         final JukeboxPlayRecordMessage message = new JukeboxPlayRecordMessage(teJukebox, recordInfoId, slot, volumeExtender);
         final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);      
+        
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+            LogHelper.info("Sending JukeboxPlayRecordMessage");
+            LogHelper.info("    " + message);
+        }
+
         ModRedstoneJukebox.NetworkWrapper.sendToAllAround(message, target);
     }    
 
@@ -63,6 +77,13 @@ public class NetworkHelper
     public static void sendRecordTradingGUIUpdatedMessage(int recipeIndex)
     {
         final RecordTradingGUIUpdatedMessage message = new RecordTradingGUIUpdatedMessage(recipeIndex);
+
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+            LogHelper.info("Sending RecordTradingGUIUpdatedMessage");
+            LogHelper.info("    " + message);
+        }
+
         ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
     }
 
@@ -75,6 +96,13 @@ public class NetworkHelper
     public static void sendRecordTradingFullListMessage(MerchantRecipeList list, EntityPlayer entityPlayer)
     {
         final RecordTradingFullListMessage message = new RecordTradingFullListMessage(list);
+        
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_RECORDTRADE) {
+            LogHelper.info("Sending RecordTradingFullListMessage");
+            LogHelper.info("    " + message);
+        }
+
         ModRedstoneJukebox.NetworkWrapper.sendTo(message, (EntityPlayerMP) entityPlayer);
     }
 
@@ -87,6 +115,13 @@ public class NetworkHelper
     public static void sendCommandPlayRecordAtMessage(int recordInfoId, boolean showName, double x, double y, double z, int range, EntityPlayerMP entityPlayer)
     {
         final CommandPlayRecordAtMessage message = new CommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, range);
+
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+            LogHelper.info("Sending CommandPlayRecordAtMessage");
+            LogHelper.info("    " + message);
+        }
+
         ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
     }
 
@@ -99,6 +134,13 @@ public class NetworkHelper
     public static void sendCommandPlayRecordMessage(int recordInfoId, boolean showName)
     {
         final CommandPlayRecordMessage message = new CommandPlayRecordMessage(recordInfoId, showName);
+
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+            LogHelper.info("Sending CommandPlayRecordMessage");
+            LogHelper.info("    " + message);
+        }
+
         ModRedstoneJukebox.NetworkWrapper.sendToAll(message);
     }
     
@@ -111,6 +153,12 @@ public class NetworkHelper
     public static void sendCommandStopAllRecordsMessage(EntityPlayerMP entityPlayer)
     {
         final CommandStopAllRecordsMessage message = new CommandStopAllRecordsMessage();
+
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+            LogHelper.info("Sending CommandStopAllRecordsMessage");
+        }
+
         ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
     }
 
@@ -127,11 +175,11 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(JukeboxGUIUpdatedMessage message, MessageContext ctx)
         {
-            /*
-            // DEBUG
-            LogHelper.info("Receiving Jukebox GUI message");
-            LogHelper.info("    " + message);
-            */
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_GUI_JUKEBOX) {
+                LogHelper.info("Handling JukeboxGUIUpdatedMessage");
+                LogHelper.info("    " + message);
+            }
 
             final World world = ctx.getServerHandler().playerEntity.worldObj;
             if (world == null) {
@@ -151,9 +199,11 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(JukeboxPlayRecordMessage message, MessageContext ctx)
         {
-            // DEBUG
-            LogHelper.info("Receiving Jukebox PlayRecord message");
-            LogHelper.info("    " + message);
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+                LogHelper.info("Handling JukeboxPlayRecordMessage");
+                LogHelper.info("    " + message);
+            }
 
             message.updateJukeboxAndPlayRecord();
 
@@ -169,12 +219,11 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(RecordTradingGUIUpdatedMessage message, MessageContext ctx)
         {
-            /*
-            // DEBUG
-            LogHelper.info("Receiving Record GUI message");
-            LogHelper.info("    " + message);
-            */
-
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+                LogHelper.info("Handling RecordTradingGUIUpdatedMessage");
+                LogHelper.info("    " + message);
+            }
 
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
             if (player == null) {
@@ -196,11 +245,11 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(RecordTradingFullListMessage message, MessageContext ctx)
         {
-            /*
-            // DEBUG
-            LogHelper.info("Receiving Record trade list message");
-            LogHelper.info("    " + message);
-            */
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_NETWORK_RECORDTRADE) {
+                LogHelper.info("Handling RecordTradingFullListMessage");
+                LogHelper.info("    " + message);
+            }
 
             ctx.getClientHandler();
             message.updateClientSideRecordStore();
@@ -217,9 +266,11 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(CommandPlayRecordAtMessage message, MessageContext ctx)
         {
-            // DEBUG
-            LogHelper.info("Receiving CommandPlayRecordAt message");
-            LogHelper.info("    " + message);
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+                LogHelper.info("Handling CommandPlayRecordAtMessage");
+                LogHelper.info("    " + message);
+            }
 
             message.playRecord();
 
@@ -235,9 +286,11 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(CommandPlayRecordMessage message, MessageContext ctx)
         {
-            // DEBUG
-            LogHelper.info("Receiving CommandPlayRecord message");
-            LogHelper.info("    " + message);
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+                LogHelper.info("Handling CommandPlayRecordMessage");
+                LogHelper.info("    " + message);
+            }
 
             message.playRecord();
 
@@ -253,8 +306,10 @@ public class NetworkHelper
         @Override
         public IMessage onMessage(CommandStopAllRecordsMessage message, MessageContext ctx)
         {
-            // DEBUG
-            LogHelper.info("Receiving CommandStopAllRecords message");
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_NETWORK_COMMANDS) {
+                LogHelper.info("Handling CommandStopAllRecordsMessage");
+            }
 
             message.stopMusic();
 

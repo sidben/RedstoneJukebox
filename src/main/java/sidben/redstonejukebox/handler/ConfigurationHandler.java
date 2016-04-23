@@ -25,9 +25,15 @@ public class ConfigurationHandler
     
     public static final boolean DEBUG_SOUNDEVENTS           = true;
     public static final boolean DEBUG_MUSICHELPER           = false;
+    public static final boolean DEBUG_RECORDSTOREHELPER     = true;
     public static final boolean DEBUG_RECORDINFOMANAGER     = false;
     public static final boolean DEBUG_JUKEBOX_TICK          = false;
     public static final boolean DEBUG_JUKEBOX_RECORDPLAY    = true;
+    public static final boolean DEBUG_GUI_RECORDTRADE       = true;
+    public static final boolean DEBUG_GUI_JUKEBOX           = false;
+    public static final boolean DEBUG_NETWORK_JUKEBOX       = false;
+    public static final boolean DEBUG_NETWORK_RECORDTRADE   = true;
+    public static final boolean DEBUG_NETWORK_COMMANDS      = true;
 
     
     public static final int MAX_SONG_TIME_SECONDS           = 1800;         // TODO: make this a GUI config

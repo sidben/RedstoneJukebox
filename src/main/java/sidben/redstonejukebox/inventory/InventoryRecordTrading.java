@@ -8,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
+import sidben.redstonejukebox.handler.ConfigurationHandler;
+import sidben.redstonejukebox.helper.LogHelper;
 
 
 
@@ -234,16 +236,20 @@ public class InventoryRecordTrading implements IInventory
             MerchantRecipeList merchantrecipelist;
             if (this.thePlayer.worldObj.isRemote) {
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
-                /*
-                 * // DEBUG
-                 * sidben.redstonejukebox.helper.LogHelper.info(" - getting recipe from client");
-                 */
+
+                // --- Debug ---
+                if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+                    LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from client - index: " + this.currentRecipeIndex);
+                }
+                
             } else {
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
-                /*
-                 * // DEBUG
-                 * sidben.redstonejukebox.helper.LogHelper.info(" - getting recipe from server");
-                 */
+
+                // --- Debug ---
+                if (ConfigurationHandler.DEBUG_GUI_RECORDTRADE) {
+                    LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from server - index: " + this.currentRecipeIndex);
+                }
+
             }
 
 

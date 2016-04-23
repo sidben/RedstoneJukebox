@@ -370,21 +370,28 @@ public class RecordInfoManager
      */
     public ItemStack getRandomRecord(Random rand)
     {
-        // NOTE: Only consider vanilla or custom records from this mod.
-        final int randomPosition = rand.nextInt(this.recordsInfoIdRandomCandidates.length);
-        final int randomInfoId = this.recordsInfoIdRandomCandidates[randomPosition];
-        final RecordInfo recordInfo = this.recordsInfoCollection.get(randomInfoId);
-        final Item recordItem = Item.getItemById(recordInfo.recordItemId);
+        try {
+            // NOTE: Only consider vanilla or custom records from this mod.
+            final int randomPosition = rand.nextInt(this.recordsInfoIdRandomCandidates.length);
+            final int randomInfoId = this.recordsInfoIdRandomCandidates[randomPosition];
+            final RecordInfo recordInfo = this.recordsInfoCollection.get(randomInfoId);
+            final Item recordItem = Item.getItemById(recordInfo.recordItemId);
 
-        // TODO - debug rule (if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {)
-        LogHelper.info("getRandomRecord");
-        LogHelper.info("    position: " + randomPosition);
-        LogHelper.info("    info id: " + randomInfoId);
-        LogHelper.info("    info: " + recordInfo);
-        LogHelper.info("    item id: " + recordInfo.recordItemId);
-        LogHelper.info("    item: " + recordItem);
+            // --- Debug ---
+            if (ConfigurationHandler.DEBUG_RECORDINFOMANAGER) {
+                LogHelper.info("RecordInfoManager.getRandomRecord()");
+                LogHelper.info("    Record info: " + recordInfo);
+                LogHelper.info("    Item: " + recordItem);
+            }
 
-        return new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
+            return new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
+            
+        } catch (ArrayIndexOutOfBoundsException e) {
+            LogHelper.error("Error getting random record: " + e);
+
+        }
+
+        return null;
     }
 
 

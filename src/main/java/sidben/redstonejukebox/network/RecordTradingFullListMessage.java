@@ -159,4 +159,54 @@ public class RecordTradingFullListMessage implements IMessage
     }
 
 
+    
+    
+    @Override
+    public String toString()
+    {
+        // TODO: integrate with RecordStoreHelper.debugMerchantList   1) itemStackToString()   2) merchantRecipeToString   3) MerchantListToString()
+        final StringBuilder r = new StringBuilder();
+
+        if (this.tradeList != null && this.tradeList.size() > 0) {
+            r.append("List size: ");
+            r.append(this.tradeList.size());
+            
+            MerchantRecipe recipe;
+            int cont = 0;
+            for (final Object obj : this.tradeList) {
+                recipe = (MerchantRecipe) obj;
+                
+                r.append("\n    #" + cont + ": [");
+                r.append(this.itemStackToString(recipe.getItemToBuy()));
+                r.append("] + [");
+                r.append(this.itemStackToString(recipe.getSecondItemToBuy()));
+                r.append("] = [");
+                r.append(this.itemStackToString(recipe.getItemToSell()));
+                r.append("]");
+                
+                cont++;
+            }
+
+        } else {
+            r.append("List size: NULL");
+            
+        }
+        
+
+        return r.toString();
+    }
+    
+    
+    private String itemStackToString(ItemStack stack) {
+        String value = "";
+
+        if (stack != null) {
+            Item auxItem = stack.getItem();
+            value = stack.stackSize + "x " + auxItem.getClass().getSimpleName() + " " + Item.getIdFromItem(auxItem) + ":" + stack.getItemDamage();
+        }
+        
+        return value;
+    }
+    
+
 }

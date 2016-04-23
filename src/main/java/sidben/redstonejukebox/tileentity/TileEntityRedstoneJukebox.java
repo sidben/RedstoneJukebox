@@ -366,15 +366,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
         this.paramLoop = tag.getBoolean("Loop");
         this.currentJukeboxPlaySlot = tag.getByte("InvSlot");
 
-        // DEBUG
-        /*
-        LogHelper.info("onDataPacket()");
-        LogHelper.info("    PlayMode: " + this.paramPlayMode);
-        LogHelper.info("    Loop:     " + this.paramLoop);
-        LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
-        LogHelper.info("    Index:    " + this.currentIndex);
-        LogHelper.info("    Coords:   " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
-        */
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+            LogHelper.info("TileEntityRedstoneJukebox.onDataPacket()");
+            LogHelper.info("    PlayMode: " + this.paramPlayMode);
+            LogHelper.info("    Loop:     " + this.paramLoop);
+            LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
+            LogHelper.info("    Index:    " + this.currentIndex);
+            LogHelper.info("    Coords:   " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        }
     }
 
 
@@ -384,15 +384,15 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     @Override
     public Packet getDescriptionPacket()
     {
-        // Debug
-        /*
-        LogHelper.info("getDescriptionPacket()");
-        LogHelper.info("    PlayMode: " + this.paramPlayMode);
-        LogHelper.info("    Loop:     " + this.paramLoop);
-        LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
-        LogHelper.info("    Index:    " + this.currentIndex);
-        LogHelper.info("    Coords:   " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
-        */
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_NETWORK_JUKEBOX) {
+            LogHelper.info("TileEntityRedstoneJukebox.getDescriptionPacket()");
+            LogHelper.info("    PlayMode: " + this.paramPlayMode);
+            LogHelper.info("    Loop:     " + this.paramLoop);
+            LogHelper.info("    Slot:     " + this.currentJukeboxPlaySlot);
+            LogHelper.info("    Index:    " + this.currentIndex);
+            LogHelper.info("    Coords:   " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord);
+        }
 
         // Send the NBT Packet to client
         final NBTTagCompound tag = new NBTTagCompound();

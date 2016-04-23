@@ -18,6 +18,7 @@ import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.init.MyItems;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.CacheStats;
 import com.google.common.cache.LoadingCache;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
@@ -133,16 +134,28 @@ public class RecordStoreHelper
             return null;
         }
 
-        // CacheStats cacheStats = this.storeCache.getCacheStats();
-        // System.out.println(cacheStats.toString());
-
-        try {
-            final MerchantRecipeList list = this.storeCache.get(villagerId);
-            return list;
-        } catch (final ExecutionException e) {
-            LogHelper.error(e.getMessage());
-            return null;
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+            LogHelper.info("RecordStoreHelper.getStore(" + villagerId + ")");
         }
+
+        MerchantRecipeList list;
+        try {
+            list = this.storeCache.get(villagerId);
+        } catch (final ExecutionException e) {
+            LogHelper.error(e);
+            list = null;
+        }
+
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+            LogHelper.info("RecordStoreHelper.getStore() <-- [" + list + "]");
+
+            CacheStats cacheStats = this.storeCache.stats();
+            LogHelper.info("* RecordStoreHelper - " + cacheStats.toString());
+        }
+
+        return list;
     }
 
 
@@ -152,6 +165,11 @@ public class RecordStoreHelper
      */
     public void useRecipe(MerchantRecipe recipe, EntityPlayer player)
     {
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+            LogHelper.info("RecordStoreHelper.useRecipe(" + recipe + ", " + player + ")");
+        }
+
         recipe.incrementToolUses();
     }
 
@@ -163,6 +181,11 @@ public class RecordStoreHelper
     @SuppressWarnings("unchecked")
     MerchantRecipeList createRandomStore()
     {
+        // --- Debug ---
+        if (ConfigurationHandler.DEBUG_RECORDSTOREHELPER) {
+            LogHelper.info("RecordStoreHelper.createRandomStore()");
+        }
+
         final MerchantRecipeList store = new MerchantRecipeList();
         MerchantRecipe recipe;
         final Queue<EnumRecipeType> offers = new LinkedList<EnumRecipeType>();

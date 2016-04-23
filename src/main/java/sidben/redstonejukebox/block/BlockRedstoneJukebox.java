@@ -16,7 +16,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
@@ -413,7 +412,6 @@ public class BlockRedstoneJukebox extends BlockContainer
     public static int getAmplifierPower(World world, int x, int y, int z)
     {
         int amp = 0;
-
 
         // check an area of 5x5x3 around the block looking for note blocks
         for (int i = x - 2; i <= x + 2; ++i) {

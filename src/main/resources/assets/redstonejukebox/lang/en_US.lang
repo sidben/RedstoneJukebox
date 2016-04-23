@@ -3,20 +3,30 @@ tile.redstonejukebox:redstone_jukebox.name=Redstone Jukebox
 
 # Items
 item.redstonejukebox:blank_record.name=Blank Record
+item.redstonejukebox:blank_record.hint=Trade with a villager
 
 # Commands
-commands.playrecord.usage=/playrecord <record name> [showname true|false]
+commands.playrecord.usage=/playrecord <record name> [showName true|false]
 commands.playrecord.success=Playing record '%s'
 commands.playrecord.record_not_found=Record '%s' not found
-commands.playrecordat.usage=/playrecordat <record name> <player> [showname true|false] [x] [y] [z] [range]
+commands.playrecordat.usage=/playrecordat <record name> <player> [showName true|false] [x] [y] [z] [range]
 commands.playrecordat.success=Playing record '%s' to %s
 commands.playrecordat.record_not_found=Record '%s' not found
 commands.stopallrecords.usage=/stopallrecords <player>
 commands.stopallrecords.success=Stopping all records and background music
 
+# Jukebox GUI
+sidben.redstonejukebox.gui.tooltip_play_once=Play records only once
+sidben.redstonejukebox.gui.tooltip_play_loop=Play records in loop
+sidben.redstonejukebox.gui.tooltip_inorder=Play mode: In order
+sidben.redstonejukebox.gui.tooltip_shuffed=Play mode: Shuffle
+sidben.redstonejukebox.gui.tooltip_range=Jukebox range: %s blocks
+
 # Config GUI
 sidben.redstonejukebox.config.category.record_trading=Record Trading
+sidben.redstonejukebox.config.category.record_trading.tooltip=
 sidben.redstonejukebox.config.category.custom_records=Custom Records
+sidben.redstonejukebox.config.category.custom_records.tooltip=
 
 sidben.redstonejukebox.config.max_stores=Maximum record 'stores'
 sidben.redstonejukebox.config.max_stores.tooltip=Maximum amount of record trading lists (store) the server will keep in memory.

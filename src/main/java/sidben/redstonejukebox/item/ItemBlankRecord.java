@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
 import cpw.mods.fml.relauncher.Side;
@@ -72,7 +73,9 @@ public class ItemBlankRecord extends Item
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
     {
-        par3List.add("Trade with a villager!");
+        if (debugActive) {
+            par3List.add(StatCollector.translateToLocal(this.getUnlocalizedName() + ".hint"));
+        }
     }
 
 

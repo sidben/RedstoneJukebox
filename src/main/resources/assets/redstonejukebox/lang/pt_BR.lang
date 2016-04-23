@@ -1,0 +1,50 @@
+﻿# Blocks
+tile.redstonejukebox:redstone_jukebox.name=Jukebox de Redstone
+
+# Items
+item.redstonejukebox:blank_record.name=Disco Vazio
+item.redstonejukebox:blank_record.hint=Troque com um aldeão
+
+# Commands
+commands.playrecord.usage=/playrecord <nome do disco> [mostrarNome true|false]
+commands.playrecord.success=Tocando disco '%s'
+commands.playrecord.record_not_found=Disco '%s' não encontrado
+commands.playrecordat.usage=/playrecordat <nome do disco> <jogador> [mostrarNome true|false] [x] [y] [z] [alcance]
+commands.playrecordat.success=Tocando disco '%s' para %s
+commands.playrecordat.record_not_found=Disco '%s' não encontrado
+commands.stopallrecords.usage=/stopallrecords <jogador>
+commands.stopallrecords.success=Parando todos os discos e música de fundo
+
+# Jukebox GUI
+sidben.redstonejukebox.gui.tooltip_play_once=Tocar discos uma vez
+sidben.redstonejukebox.gui.tooltip_play_loop=Tocar discos em repetição
+sidben.redstonejukebox.gui.tooltip_inorder=Modo: Tocar em ordem
+sidben.redstonejukebox.gui.tooltip_shuffed=Modo: Aleatório
+sidben.redstonejukebox.gui.tooltip_range=Alcance da jukebox: %s blocos
+
+# Config GUI
+sidben.redstonejukebox.config.category.record_trading=Troca de Discos
+sidben.redstonejukebox.config.category.record_trading.tooltip=
+sidben.redstonejukebox.config.category.custom_records=Discos Personalizados
+sidben.redstonejukebox.config.category.custom_records.tooltip=
+
+sidben.redstonejukebox.config.max_stores=Máximo de 'lojas' de discos
+sidben.redstonejukebox.config.max_stores.tooltip=Quantidade máxima de listas de trocas de discos que o servidor pode manter na memória.
+sidben.redstonejukebox.config.expiration_store=Cachê de lojas (minutos)
+sidben.redstonejukebox.config.expiration_store.tooltip=Tempo em minutos que a lista de trocas (loja) será mantida na memória do servidor.
+sidben.redstonejukebox.config.store_chance=Chance de trocar discos
+sidben.redstonejukebox.config.store_chance.tooltip=Percentual dos aldeões que podem trocar discos.
+sidben.redstonejukebox.config.max_trades=Máximo de opções de troca
+sidben.redstonejukebox.config.max_trades.tooltip=Quantidade máxima de discos que um aldeão pode trocar.
+sidben.redstonejukebox.config.record_trade_count=Limite de trocas
+sidben.redstonejukebox.config.record_trade_count.tooltip=Quantidade máxima que uma troca de discos pode ser usada.
+sidben.redstonejukebox.config.record_buy_price_min=Preço de compra (min)
+sidben.redstonejukebox.config.record_buy_price_min.tooltip=Preço mínimo em esmeraldas que um aldeão pagará por discos.
+sidben.redstonejukebox.config.record_buy_price_max=Preço de compra (max)
+sidben.redstonejukebox.config.record_buy_price_max.tooltip=Preço máximo em esmeraldas que um aldeão pagará por discos.
+sidben.redstonejukebox.config.record_sell_price_min=Preço de venda (min)
+sidben.redstonejukebox.config.record_sell_price_min.tooltip=Preço mínimo em esmeraldas que um aldeão vai cobrar por discos.
+sidben.redstonejukebox.config.record_sell_price_max=Preço de venda (max)
+sidben.redstonejukebox.config.record_sell_price_max.tooltip=Preço máximo em esmeraldas que um aldeão vai cobrar por discos.
+sidben.redstonejukebox.config.song_time=Duração padrão dos discos
+sidben.redstonejukebox.config.song_time.tooltip=Valor em segundos que será usado como duração dos discos, quando o mod não achar os valores corretos.

@@ -141,21 +141,21 @@ public class GuiRedstoneJukebox extends GuiContainer
         final GuiButton btPlaymode = (GuiButton) this.buttonList.get(2);
 
         if (btPlayOnce.func_146115_a()) {
-            this.drawCreativeTabHoveringText("Play records only once", x - this.guiLeft, y - this.guiTop + 21);
+            this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_play_once"), x - this.guiLeft, y - this.guiTop + 21);
         } else if (btPlayLoop.func_146115_a()) {
-            this.drawCreativeTabHoveringText("Play records in loop", x - this.guiLeft, y - this.guiTop + 21);
+            this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_play_loop"), x - this.guiLeft, y - this.guiTop + 21);
         } else if (btPlaymode.func_146115_a()) {
             switch (this.jukeboxInventory.paramPlayMode) {
                 case 0:
-                    this.drawCreativeTabHoveringText("Play mode: In order", x - this.guiLeft, y - this.guiTop + 21);
+                    this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_inorder"), x - this.guiLeft, y - this.guiTop + 21);
                     break;
                 case 1:
-                    this.drawCreativeTabHoveringText("Play mode: Shuffle", x - this.guiLeft, y - this.guiTop + 21);
+                    this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_shuffed"), x - this.guiLeft, y - this.guiTop + 21);
                     break;
             }
         } else if (x >= this.guiLeft + 8 && x <= this.guiLeft + 20 && y >= this.guiTop + 27 && y <= this.guiTop + 35) {
             int jukeboxExtraVolumeRange = 64 + this.jukeboxInventory.getExtraVolume(false);
-            this.drawCreativeTabHoveringText("Jukebox range: " + jukeboxExtraVolumeRange + " blocks", x - this.guiLeft, y - this.guiTop + 21);
+            this.drawCreativeTabHoveringText(StatCollector.translateToLocalFormatted("sidben.redstonejukebox.gui.tooltip_range", jukeboxExtraVolumeRange), x - this.guiLeft, y - this.guiTop + 21);
             
         }
 
@@ -210,7 +210,7 @@ public class GuiRedstoneJukebox extends GuiContainer
         }
 
 
-        // -- Volume range indicator
+        // -- Volume range indicator (the slice have around 9px width and 8px height)
         int jukeboxExtraVolumeRange = this.jukeboxInventory.getExtraVolume(false);
         int volumeFactor = (int) Math.floor(((float)jukeboxExtraVolumeRange / (float)ModRedstoneJukebox.maxExtraVolume) * 8);
         this.drawTexturedModalRect(j + 10, k + 27, 176, 42, 1 + volumeFactor, 8);

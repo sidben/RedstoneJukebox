@@ -72,7 +72,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
     private byte        currentJukeboxPlaySlot    = -1;
 
     /** Amount of seconds that will be added to the song timer before playing the next record. Should help compensate latency on multiplayer */
-    private static int  songInterval              = 2;
+    private static int  songInterval              = 0;
 
     /** Timer of the song being played */
     public int          songTimer                 = 0;
@@ -422,7 +422,7 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
 
             // --- Debug ---
             if (ConfigurationHandler.debugJukeboxTick) {
-                LogHelper.info("Jukebox.tickJukebox() @ " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + " - isBlockPowered: " + this.isBlockPowered + " - schdPlayNext: "
+                LogHelper.info("Jukebox.tickJukebox() @ " + this.xCoord + ", " + this.yCoord + ", " + this.zCoord + " isPlaying: " + this.isPlaying() + " - isBlockPowered: " + this.isBlockPowered + " - schdPlayNext: "
                         + this.schedulePlayNextRecord + " - schdStart: " + this.scheduleStartPlaying + " - schdStop: " + this.scheduleStopPlaying + " - playlistFinish: " + this.isPlaylistFinished
                         + " - songTimer: " + this.songTimer + " - gameTick: " + MinecraftServer.getServer().getTickCounter());
             }
@@ -793,7 +793,17 @@ public class TileEntityRedstoneJukebox extends TileEntity implements IInventory
      */
     public boolean isPlaying()
     {
-        return this.isPlaylistStarted && (!this.isPlaylistFinished || this.paramLoop);
+        return this.isPlaylistStarted && !this.isPlaylistFinished();
+    }
+
+
+    /**
+     * Returns if this Jukebox reached the end of the playlist.
+     * 
+     */
+    public boolean isPlaylistFinished()
+    {
+        return this.isPlaylistFinished && !this.paramLoop;
     }
 
 

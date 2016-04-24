@@ -320,24 +320,14 @@ public class BlockRedstoneJukebox extends BlockContainer
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
     {
         if (!world.isRemote) {
-            final boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
-            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
-
             
-            if (this.isActive && !haveEnergy) {
-                // Turns the jukebox off
-                BlockRedstoneJukebox.updateJukeboxBlockState(false, world, x, y, z);
-                teJukebox.updateJukeboxTileState(haveEnergy);
-            } else if (!this.isActive && haveEnergy) {
-                // Turns the jukebox on
-                BlockRedstoneJukebox.updateJukeboxBlockState(true, world, x, y, z);
-                teJukebox.updateJukeboxTileState(haveEnergy);
+            final boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
+            if ((this.isActive && !haveEnergy) || (!this.isActive && haveEnergy)) {
+                world.scheduleBlockUpdate(x, y, z, this, 0);
+                // world.scheduleBlockUpdateWithPriority(x, y, z, this, 0, -1);
             }
 
-            // Schedule the [updateTick] event, that ticks the TileEntity
-            world.scheduleBlockUpdate(x, y, z, this, 0);
         }
-        
     }
     
     
@@ -349,11 +339,22 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         if (!world.isRemote)
         {
+            final boolean haveEnergy = world.isBlockIndirectlyGettingPowered(x, y, z);
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+
+            
+            if ((this.isActive && !haveEnergy) || (!this.isActive && haveEnergy)) {
+                BlockRedstoneJukebox.updateJukeboxBlockState(haveEnergy, world, x, y, z);
+                teJukebox.updateJukeboxTileState(haveEnergy);
+            }
+            
             teJukebox.tickJukebox();
             
-            // Schedule the next tick only when powered
-            if (this.isActive) world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+
+            // Schedule the next tick only when powered  
+            if (haveEnergy) world.scheduleBlockUpdate(x, y, z, MyBlocks.redstoneJukeboxActive, this.tickRate(world));
+            
+            // TODO: test a way to avoid ticking when the playlist ended.
         }
     }
     

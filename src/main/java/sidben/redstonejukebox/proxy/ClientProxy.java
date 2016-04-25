@@ -4,21 +4,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.client.gui.GuiRecordTrading;
 import sidben.redstonejukebox.client.gui.GuiRedstoneJukebox;
-import sidben.redstonejukebox.client.renderer.ItemRendererCustomRecord;
-import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
+//import sidben.redstonejukebox.client.renderer.ItemRendererCustomRecord;
+//import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
 import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.helper.MusicHelper;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 
 
@@ -30,19 +31,6 @@ public class ClientProxy extends CommonProxy
     public static String guiTextureJukebox;
     public static String guiTextureTrade;
 
-    // Icons
-    public static String jukeboxDiscIcon;
-    public static String jukeboxTopIcon;
-    public static String jukeboxBottomIcon;
-    public static String jukeboxSideOnIcon;
-    public static String jukeboxSideOffIcon;
-
-    public static String blankRecordIcon;
-
-    public static String customRecord_BaseSimple_Icon;
-    public static String customRecord_OverlayFull_Icon;
-    public static String customRecord_OverlayHalf_Icon;
-    public static String customRecord_OverlayCross_Icon;
 
 
 
@@ -62,30 +50,16 @@ public class ClientProxy extends CommonProxy
         ClientProxy.guiTextureTrade = this.getResourceName("textures/gui/recordtrading-gui.png");
 
 
-        // Block and item textures
-        ClientProxy.jukeboxDiscIcon = this.getResourceName("redstone_jukebox_disc");
-        ClientProxy.jukeboxTopIcon = this.getResourceName("redstone_jukebox_top");
-        ClientProxy.jukeboxBottomIcon = this.getResourceName("redstone_jukebox_bottom");
-        ClientProxy.jukeboxSideOnIcon = this.getResourceName("redstone_jukebox_on");
-        ClientProxy.jukeboxSideOffIcon = this.getResourceName("redstone_jukebox_off");
-
-        ClientProxy.blankRecordIcon = this.getResourceName("blank_record");
-
-        ClientProxy.customRecord_BaseSimple_Icon = this.getResourceName("record_base_simple");
-        ClientProxy.customRecord_OverlayCross_Icon = this.getResourceName("record_overlay_cross");
-        ClientProxy.customRecord_OverlayFull_Icon = this.getResourceName("record_overlay_full");
-        ClientProxy.customRecord_OverlayHalf_Icon = this.getResourceName("record_overlay_half");
-
-
-
         super.pre_initialize();
 
 
         // Special renderers
+        /*
         ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 
         RenderingRegistry.registerBlockHandler(new RenderRedstoneJukebox());
         MinecraftForgeClient.registerItemRenderer(MyItems.recordCustom, new ItemRendererCustomRecord());
+        */
     }
 
 
@@ -107,8 +81,8 @@ public class ClientProxy extends CommonProxy
     @Override
     public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
-        if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
-            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+    	if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
+            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(new BlockPos(x, y, z));
             return new GuiRedstoneJukebox(player.inventory, teJukebox);
         }
 
@@ -125,7 +99,7 @@ public class ClientProxy extends CommonProxy
 
 
 
-    private String getResourceName(String name)
+    public static String getResourceName(String name)		// TODO: find a better place for this
     {
         return Reference.ResourcesNamespace + ":" + name;
     }

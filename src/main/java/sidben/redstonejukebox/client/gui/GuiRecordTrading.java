@@ -4,12 +4,14 @@ import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
@@ -20,8 +22,8 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 @SideOnly(Side.CLIENT)
@@ -163,58 +165,69 @@ public class GuiRecordTrading extends GuiContainer
      * Draws the screen and all the components in it.
      */
     @Override
-    public void drawScreen(int par1, int par2, float par3)
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
 
-        super.drawScreen(par1, par2, par3);
-        final MerchantRecipeList var4 = tradesList;
+    	super.drawScreen(mouseX, mouseY, partialTicks);
+        final MerchantRecipeList merchantrecipelist = tradesList;
 
-        if (var4 != null && !var4.isEmpty()) {
-            final int var5 = (this.width - this.xSize) / 2;
-            final int var6 = (this.height - this.ySize) / 2;
-            final int var7 = this.currentRecipeIndex;
-            final MerchantRecipe var8 = (MerchantRecipe) var4.get(var7);
-            GL11.glPushMatrix();
-            final ItemStack var9 = var8.getItemToBuy();
-            final ItemStack var10 = var8.getSecondItemToBuy();
-            final ItemStack var11 = var8.getItemToSell();
+        if (merchantrecipelist != null && !merchantrecipelist.isEmpty()) {
+            int i = (this.width - this.xSize) / 2;
+            int j = (this.height - this.ySize) / 2;
+            int k = this.currentRecipeIndex;
+            MerchantRecipe merchantrecipe = (MerchantRecipe)merchantrecipelist.get(k);
+            ItemStack stackToBuy1 = merchantrecipe.getItemToBuy();
+            ItemStack stackToBuy2 = merchantrecipe.getSecondItemToBuy();
+            ItemStack stackToSell = merchantrecipe.getItemToSell();
+            
+            GlStateManager.pushMatrix();
             RenderHelper.enableGUIStandardItemLighting();
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-            GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-            GL11.glEnable(GL11.GL_LIGHTING);
-            itemRender.zLevel = 100.0F;
-            
-            if (var9 != null) {
-                itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var9, var5 + 36, var6 + 24);
-                itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var9, var5 + 36, var6 + 24);
-            }
-            
-            if (var10 != null) {
-                itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var10, var5 + 62, var6 + 24);
-                itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var10, var5 + 62, var6 + 24);
-            }
+            GlStateManager.disableLighting();
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.enableColorMaterial();
+            GlStateManager.enableLighting();
 
-            if (var11 != null) {
-                itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, var11, var5 + 120, var6 + 24);
-                itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, this.mc.renderEngine, var11, var5 + 120, var6 + 24);
+            this.itemRender.zLevel = 100.0F;
+
+            if (stackToBuy1 != null)
+            {
+	            this.itemRender.renderItemAndEffectIntoGUI(stackToBuy1, i + 36, j + 24);
+	            this.itemRender.renderItemOverlays(this.fontRendererObj, stackToBuy1, i + 36, j + 24);
+            }
+            if (stackToBuy2 != null)
+            {
+                this.itemRender.renderItemAndEffectIntoGUI(stackToBuy2, i + 62, j + 24);
+                this.itemRender.renderItemOverlays(this.fontRendererObj, stackToBuy2, i + 62, j + 24);
+            }
+            if (stackToSell != null)
+            {
+	            this.itemRender.renderItemAndEffectIntoGUI(stackToSell, i + 120, j + 24);
+	            this.itemRender.renderItemOverlays(this.fontRendererObj, stackToSell, i + 120, j + 24);
             }
             
             itemRender.zLevel = 0.0F;
-            GL11.glDisable(GL11.GL_LIGHTING);
+            GlStateManager.disableLighting();
 
-            // OBS: func_146978_c() == isPointInRegion()
-            if (var9 != null && this.func_146978_c(36, 24, 16, 16, par1, par2)) {
-                this.renderToolTip(var9, par1, par2);
-            } else if (var10 != null && this.func_146978_c(62, 24, 16, 16, par1, par2)) {
-                this.renderToolTip(var10, par1, par2);
-            } else if (var11 != null && this.func_146978_c(120, 24, 16, 16, par1, par2)) {
-                this.renderToolTip(var11, par1, par2);
+            if (this.isPointInRegion(36, 24, 16, 16, mouseX, mouseY) && stackToBuy1 != null)
+            {
+                this.renderToolTip(stackToBuy1, mouseX, mouseY);
+            }
+            else if (stackToBuy2 != null && this.isPointInRegion(62, 24, 16, 16, mouseX, mouseY) && stackToBuy2 != null)
+            {
+                this.renderToolTip(stackToBuy2, mouseX, mouseY);
+            }
+            else if (stackToSell != null && this.isPointInRegion(120, 24, 16, 16, mouseX, mouseY) && stackToSell != null)
+            {
+                this.renderToolTip(stackToSell, mouseX, mouseY);
+            }
+            else if (merchantrecipe.isRecipeDisabled() && (this.isPointInRegion(83, 21, 28, 21, mouseX, mouseY) || this.isPointInRegion(83, 51, 28, 21, mouseX, mouseY)))
+            {
+                this.drawCreativeTabHoveringText(I18n.format("merchant.deprecated", new Object[0]), mouseX, mouseY);
             }
 
-            GL11.glPopMatrix();
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GlStateManager.popMatrix();
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
             RenderHelper.enableStandardItemLighting();
         }
     }
@@ -252,7 +265,6 @@ public class GuiRecordTrading extends GuiContainer
         // Spawns particles if a trade was made.
         if (this.mc.thePlayer != null && madeTrade) {
             final Entity auxVillager = (Entity) this.theIMerchant;
-            final String s = "note";
 
             if (auxVillager != null) {
                 for (int i = 0; i < 3; ++i) {
@@ -263,7 +275,7 @@ public class GuiRecordTrading extends GuiContainer
                     final double velY = this.rand.nextGaussian();
                     final double velZ = this.rand.nextGaussian();
 
-                    auxVillager.worldObj.spawnParticle(s, pX, pY, pZ, velX, velY, velZ);
+                    auxVillager.worldObj.spawnParticle(EnumParticleTypes.NOTE, pX, pY, pZ, velX, velY, velZ, new int[0]);
                 }
             }
         }

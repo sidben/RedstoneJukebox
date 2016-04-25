@@ -9,8 +9,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 
@@ -27,23 +27,25 @@ public class ContainerRecordTrading extends Container
 
 
 
-    public ContainerRecordTrading(InventoryPlayer par1InventoryPlayer, IMerchant par2IMerchant, World par3World) {
-        this.theMerchant = par2IMerchant;
-        this.theWorld = par3World;
-        this.merchantInventory = new InventoryRecordTrading(par1InventoryPlayer.player, par2IMerchant);
+    public ContainerRecordTrading(InventoryPlayer playerInventory, IMerchant merchant, World worldIn) {
+        this.theMerchant = merchant;
+        this.theWorld = worldIn;
+        this.merchantInventory = new InventoryRecordTrading(playerInventory.player, merchant);
         this.addSlotToContainer(new Slot(this.merchantInventory, 0, 36, 53));
         this.addSlotToContainer(new Slot(this.merchantInventory, 1, 62, 53));
-        this.addSlotToContainer(new SlotRecordTradingResult(par1InventoryPlayer.player, this.merchantInventory, 2, 120, 53));
-        int var4;
+        this.addSlotToContainer(new SlotRecordTradingResult(playerInventory.player, this.merchantInventory, 2, 120, 53));
 
-        for (var4 = 0; var4 < 3; ++var4) {
-            for (int var5 = 0; var5 < 9; ++var5) {
-                this.addSlotToContainer(new Slot(par1InventoryPlayer, var5 + var4 * 9 + 9, 8 + var5 * 18, 84 + var4 * 18));
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 9; ++j)
+            {
+                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
-        for (var4 = 0; var4 < 9; ++var4) {
-            this.addSlotToContainer(new Slot(par1InventoryPlayer, var4, 8 + var4 * 18, 142));
+        for (int k = 0; k < 9; ++k)
+        {
+            this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 142));
         }
     }
 
@@ -53,11 +55,10 @@ public class ContainerRecordTrading extends Container
     {
         return this.merchantInventory;
     }
-
-    @Override
-    public void addCraftingToCrafters(ICrafting par1ICrafting)
+    
+    public void onCraftGuiOpened(ICrafting listener)
     {
-        super.addCraftingToCrafters(par1ICrafting);
+        super.onCraftGuiOpened(listener);
     }
 
     /**
@@ -73,15 +74,15 @@ public class ContainerRecordTrading extends Container
      * Callback for when the crafting matrix is changed.
      */
     @Override
-    public void onCraftMatrixChanged(IInventory par1IInventory)
+    public void onCraftMatrixChanged(IInventory inventoryIn)
     {
         this.merchantInventory.resetRecipeAndSlots();
-        super.onCraftMatrixChanged(par1IInventory);
+        super.onCraftMatrixChanged(inventoryIn);
     }
 
-    public void setCurrentRecipeIndex(int par1)
+    public void setCurrentRecipeIndex(int index)
     {
-        this.merchantInventory.setCurrentRecipeIndex(par1);
+        this.merchantInventory.setCurrentRecipeIndex(index);
     }
 
     @Override
@@ -101,27 +102,27 @@ public class ContainerRecordTrading extends Container
      * Called when a player shift-clicks on a slot. You must override this or you will crash when someone does that.
      */
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
-        ItemStack var3 = null;
-        final Slot var4 = (Slot) this.inventorySlots.get(par2);
+        ItemStack stack = null;
+        final Slot slot = (Slot) this.inventorySlots.get(index);
 
-        if (var4 != null && var4.getHasStack()) {
-            final ItemStack var5 = var4.getStack();
-            var3 = var5.copy();
+        if (slot != null && slot.getHasStack()) {
+            final ItemStack var5 = slot.getStack();
+            stack = var5.copy();
 
-            if (par2 == 2) {
+            if (index == 2) {
                 if (!this.mergeItemStack(var5, 3, 39, true)) {
                     return null;
                 }
 
-                var4.onSlotChange(var5, var3);
-            } else if (par2 != 0 && par2 != 1) {
-                if (par2 >= 3 && par2 < 30) {
+                slot.onSlotChange(var5, stack);
+            } else if (index != 0 && index != 1) {
+                if (index >= 3 && index < 30) {
                     if (!this.mergeItemStack(var5, 30, 39, false)) {
                         return null;
                     }
-                } else if (par2 >= 30 && par2 < 39 && !this.mergeItemStack(var5, 3, 30, false)) {
+                } else if (index >= 30 && index < 39 && !this.mergeItemStack(var5, 3, 30, false)) {
                     return null;
                 }
             } else if (!this.mergeItemStack(var5, 3, 39, false)) {
@@ -129,42 +130,42 @@ public class ContainerRecordTrading extends Container
             }
 
             if (var5.stackSize == 0) {
-                var4.putStack((ItemStack) null);
+                slot.putStack((ItemStack) null);
             } else {
-                var4.onSlotChanged();
+                slot.onSlotChanged();
             }
 
-            if (var5.stackSize == var3.stackSize) {
+            if (var5.stackSize == stack.stackSize) {
                 return null;
             }
 
-            var4.onPickupFromSlot(par1EntityPlayer, var5);
+            slot.onPickupFromSlot(playerIn, var5);
         }
 
-        return var3;
+        return stack;
     }
 
     /**
      * Callback for when the crafting gui is closed.
      */
     @Override
-    public void onContainerClosed(EntityPlayer par1EntityPlayer)
+    public void onContainerClosed(EntityPlayer playerIn)
     {
-        super.onContainerClosed(par1EntityPlayer);
+        super.onContainerClosed(playerIn);
         this.theMerchant.setCustomer((EntityPlayer) null);
-        super.onContainerClosed(par1EntityPlayer);
+        super.onContainerClosed(playerIn);
 
         if (!this.theWorld.isRemote) {
-            ItemStack var2 = this.merchantInventory.getStackInSlotOnClosing(0);
+            ItemStack var2 = this.merchantInventory.removeStackFromSlot(0);
 
             if (var2 != null) {
-                par1EntityPlayer.dropPlayerItemWithRandomChoice(var2, false);
+                playerIn.dropPlayerItemWithRandomChoice(var2, false);
             }
 
-            var2 = this.merchantInventory.getStackInSlotOnClosing(1);
+            var2 = this.merchantInventory.removeStackFromSlot(1);
 
             if (var2 != null) {
-                par1EntityPlayer.dropPlayerItemWithRandomChoice(var2, false);
+                playerIn.dropPlayerItemWithRandomChoice(var2, false);
             }
 
         }

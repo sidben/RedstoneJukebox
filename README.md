@@ -25,6 +25,12 @@ Features
 Planned features for future releases
 --------------
 
-- [ ] Compatibility with records / music discs from other mods;
+- [x] Compatibility with records / music discs from other mods;
 - [ ] Custom Records;
 - [ ] Commands;
+
+
+Contact
+--------------
+
+If you need to send me a message, [contact me on reddit](https://www.reddit.com/u/sidben).

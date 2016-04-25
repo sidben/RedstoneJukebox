@@ -1,15 +1,15 @@
 package sidben.redstonejukebox.item;
 
 import java.util.List;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 public class ItemBlankRecord extends Item
@@ -22,6 +22,7 @@ public class ItemBlankRecord extends Item
     public ItemBlankRecord() {
         this.setMaxStackSize(16);
         this.setUnlocalizedName("blank_record");
+        this.setCreativeTab(CreativeTabs.tabMisc);
     }
 
 
@@ -30,16 +31,6 @@ public class ItemBlankRecord extends Item
     // Textures and Rendering
     // --------------------------------------------------------------------
 
-    /*
-     * When this method is called, your item should register all the icons it needs with the given IconRegister. This
-     * is the only chance you get to register icons.
-     */
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister iconRegister)
-    {
-        super.itemIcon = iconRegister.registerIcon(ClientProxy.blankRecordIcon);
-    }
 
 
 
@@ -70,11 +61,10 @@ public class ItemBlankRecord extends Item
      * Allows items to add custom lines of information to the mouse-over description
      */
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void addInformation(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, List par3List, boolean debugActive)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
-        if (debugActive) {
-            par3List.add(StatCollector.translateToLocal(this.getUnlocalizedName() + ".hint"));
+        if (advanced) {
+            tooltip.add(StatCollector.translateToLocal(this.getUnlocalizedName() + ".hint"));
         }
     }
 

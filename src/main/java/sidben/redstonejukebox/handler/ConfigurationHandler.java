@@ -3,8 +3,8 @@ package sidben.redstonejukebox.handler;
 import java.io.File;
 import net.minecraftforge.common.config.Configuration;
 import sidben.redstonejukebox.reference.Reference;
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
 public class ConfigurationHandler

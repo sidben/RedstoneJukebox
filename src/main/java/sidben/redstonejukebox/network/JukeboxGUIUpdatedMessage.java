@@ -2,9 +2,10 @@ package sidben.redstonejukebox.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 
 
@@ -34,9 +35,9 @@ public class JukeboxGUIUpdatedMessage implements IMessage
     public JukeboxGUIUpdatedMessage(TileEntityRedstoneJukebox teJukebox) {
         this.isLoop = teJukebox.paramLoop;
         this.playMode = teJukebox.paramPlayMode;
-        this.x = teJukebox.xCoord;
-        this.y = teJukebox.yCoord;
-        this.z = teJukebox.zCoord;
+        this.x = teJukebox.getPos().getX();
+        this.y = teJukebox.getPos().getY();
+        this.z = teJukebox.getPos().getZ();
     }
 
 
@@ -50,7 +51,7 @@ public class JukeboxGUIUpdatedMessage implements IMessage
             return;
         }
 
-        final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
+        final TileEntity teCandidate = world.getTileEntity(new BlockPos(this.x, this.y, this.z));
         if (teCandidate instanceof TileEntityRedstoneJukebox) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
             teJukebox.paramLoop = this.isLoop;

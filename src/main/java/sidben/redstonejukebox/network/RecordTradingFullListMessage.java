@@ -10,8 +10,8 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.helper.RecordInfo;
 import sidben.redstonejukebox.init.MyItems;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 
 /**
@@ -82,7 +82,7 @@ public class RecordTradingFullListMessage implements IMessage
                 // Since the tradeUses variable is hard-coded on 7, manually reduces the amount of
                 // times this trade can be used.
                 if (recipeMaxUses != 7) {
-                    recipe.func_82783_a(recipeMaxUses - 7);
+                    recipe.increaseMaxTradeUses(recipeMaxUses - 7);
                 }
 
                 // Adds the trade uses

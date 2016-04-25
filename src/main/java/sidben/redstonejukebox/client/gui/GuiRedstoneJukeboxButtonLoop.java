@@ -5,8 +5,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 
@@ -34,10 +34,9 @@ public class GuiRedstoneJukeboxButtonLoop extends GuiButton
     public void drawButton(Minecraft par1Minecraft, int mouseX, int mouseY)
     {
         if (this.visible) {
-            final boolean isMouseOver = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-            this.field_146123_n = isMouseOver;
+        	this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
-            if (isMouseOver) {
+            if (this.hovered) {			// TODO: use GlStateManager
                 par1Minecraft.getTextureManager().bindTexture(this.guiMainTexture);
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 GL11.glEnable(GL11.GL_BLEND);                       // need those lines for alpha, wasn't needed before (1.6.2)

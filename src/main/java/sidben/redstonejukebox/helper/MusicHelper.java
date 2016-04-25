@@ -9,16 +9,16 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.audio.SoundManager;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 
@@ -56,12 +56,12 @@ public class MusicHelper
     // --------------------------------------------
 
     /** Currently playing Redstone Jukeboxes. Type: HashMap<ChunkCoordinates, ISound> */
-    private final Map<ChunkCoordinates, ISound> mapJukeboxesPositions = Maps.newHashMap();
+    private final Map<BlockPos, ISound> mapJukeboxesPositions = Maps.newHashMap();
 
     /**
      * Holds a reference to the private field [mapSoundPositions] from the RenderGlobal.
      */
-    private final Map<ChunkCoordinates, ISound> vanillaSoundPositions;
+    private final Map<BlockPos, ISound> vanillaSoundPositions;
 
     /** Access to the [playingSounds] private map in SoundManager */
     private final HashBiMap<String, ISound>     vanillaPlayingSounds;
@@ -121,17 +121,15 @@ public class MusicHelper
      * Starts playing a record on the given coordinates
      * 
      */
-    public void playRecordAt(int x, int y, int z, int recordInfoId, boolean showName, float volumeExtender)
+    public void playRecordAt(BlockPos pos, int recordInfoId, boolean showName, float volumeExtender)
     {
-        final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-
         // Find the record
         final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
 
         // --- Debug ---
         if (ConfigurationHandler.debugMusicHelper) {
             LogHelper.info("MusicHelper.playRecordAt()");
-            LogHelper.info("    Coords:         " + x + ", " + y + ", " + z);
+            LogHelper.info("    Coords:         " + pos);
             LogHelper.info("    Show name:      " + showName);
             LogHelper.info("    Extra volume:   " + volumeExtender);
             LogHelper.info("    Record info id: " + recordInfoId);
@@ -154,7 +152,7 @@ public class MusicHelper
 
             // Stops any record that may be playing at the given coordinate
             // before starting a new one.
-            this.stopPlayingAt(chunkcoordinates);
+            this.stopPlayingAt(pos);
 
 
             if (recordResource != null) {
@@ -168,14 +166,14 @@ public class MusicHelper
                 // Override of the playRecord method on RenderGlobal, since I need to set extra volume range.
 
                 // Plays the record
-                final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, x, y, z);
-                this.mapJukeboxesPositions.put(chunkcoordinates, sound);
+                final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, pos.getX(), pos.getY(), pos.getZ());
+                this.mapJukeboxesPositions.put(pos, sound);
                 mc.getSoundHandler().playSound(sound);
             }
 
         } else {
             // Not a valid record, stops the music
-            this.stopPlayingAt(chunkcoordinates);
+            this.stopPlayingAt(pos);
 
         }
     }
@@ -186,20 +184,20 @@ public class MusicHelper
      * Stops the record being played at the given coordinates.
      * 
      */
-    public void stopPlayingAt(ChunkCoordinates chunkcoordinates)
+    public void stopPlayingAt(BlockPos pos)
     {
-        final ISound isound = this.mapJukeboxesPositions.get(chunkcoordinates);
+        final ISound isound = this.mapJukeboxesPositions.get(pos);
 
         // --- Debug ---
         if (ConfigurationHandler.debugMusicHelper) {
             LogHelper.info("MusicHelper.stopPlayingAt()");
-            LogHelper.info("    Coords:  " + chunkcoordinates.posX + ", " + chunkcoordinates.posY + ", " + chunkcoordinates.posZ);
+            LogHelper.info("    Coords:  " + pos);
             LogHelper.info("    iSound:  " + isound);
         }
 
         if (isound != null) {
             mc.getSoundHandler().stopSound(isound);
-            this.mapJukeboxesPositions.remove(chunkcoordinates);
+            this.mapJukeboxesPositions.remove(pos);
         }
     }
 
@@ -238,7 +236,7 @@ public class MusicHelper
 
                 // Plays the record as background music
                 // OBS: The volume that controls this sound is the Noteblock/Jukebox one.
-                this.customBackgroundMusic = PositionedSoundRecord.func_147673_a(recordResource);
+                this.customBackgroundMusic = PositionedSoundRecord.create(recordResource);
                 mc.getSoundHandler().playSound(this.customBackgroundMusic);
             }
 
@@ -275,11 +273,11 @@ public class MusicHelper
             final String soundId = entry.getKey();
             final ISound soundObj = entry.getValue();
 
-            if (soundObj.getPositionedSoundLocation().getResourcePath().startsWith("music.") || soundObj.getAttenuationType() == ISound.AttenuationType.NONE
+            if (soundObj.getSoundLocation().getResourcePath().startsWith("music.") || soundObj.getAttenuationType() == ISound.AttenuationType.NONE
                     || (soundObj.getXPosF() == 0F && soundObj.getYPosF() == 0F && soundObj.getZPosF() == 0F)) {
 
                 if (ConfigurationHandler.debugMusicHelper) {
-                    LogHelper.info("    Stopping sound [" + soundId + "] - " + soundObj.getPositionedSoundLocation());
+                    LogHelper.info("    Stopping sound [" + soundId + "] - " + soundObj.getSoundLocation());
                 }
 
                 mc.getSoundHandler().stopSound(soundObj);

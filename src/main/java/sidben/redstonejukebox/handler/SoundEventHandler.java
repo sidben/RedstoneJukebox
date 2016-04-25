@@ -1,11 +1,11 @@
 package sidben.redstonejukebox.handler;
 
 import net.minecraft.client.audio.SoundCategory;
-import net.minecraftforge.client.event.sound.PlaySoundEvent17;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.client.event.sound.PlaySoundEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
 
@@ -13,7 +13,7 @@ public class SoundEventHandler
 {
 
     @SubscribeEvent
-    public void onPlaySound(PlaySoundEvent17 event)
+    public void onPlaySound(PlaySoundEvent event)
     {
         final String soundName = event.name;
         final SoundCategory soundCat = event.category;
@@ -66,5 +66,6 @@ public class SoundEventHandler
         }
 
     }
+
 
 }

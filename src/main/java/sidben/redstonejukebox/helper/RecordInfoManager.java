@@ -11,7 +11,7 @@ import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.Maps;
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.Loader;
 
 
 /**
@@ -217,7 +217,7 @@ public class RecordInfoManager
                 } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
                     LogHelper.error("Error coverting the return value of the record resource method HardcoreEnderExpansion mod.");
                     LogHelper.error("    exception:     " + e);
-
+                    
                 }
 
             } else {

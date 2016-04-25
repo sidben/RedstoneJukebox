@@ -8,7 +8,7 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.network.NetworkHelper;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
 public class PlayerEventHandler

@@ -15,8 +15,8 @@ import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 
@@ -140,11 +140,11 @@ public class GuiRedstoneJukebox extends GuiContainer
         final GuiButton btPlayLoop = (GuiButton) this.buttonList.get(1);
         final GuiButton btPlaymode = (GuiButton) this.buttonList.get(2);
 
-        if (btPlayOnce.func_146115_a()) {
+        if (btPlayOnce.isMouseOver()) {
             this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_play_once"), x - this.guiLeft, y - this.guiTop + 21);
-        } else if (btPlayLoop.func_146115_a()) {
+        } else if (btPlayLoop.isMouseOver()) {
             this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_play_loop"), x - this.guiLeft, y - this.guiTop + 21);
-        } else if (btPlaymode.func_146115_a()) {
+        } else if (btPlaymode.isMouseOver()) {
             switch (this.jukeboxInventory.paramPlayMode) {
                 case 0:
                     this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_inorder"), x - this.guiLeft, y - this.guiTop + 21);
@@ -221,33 +221,32 @@ public class GuiRedstoneJukebox extends GuiContainer
         final int spacer = 18;
         final int pStartX = 78;
         final int pStartY = 45;
-        final RenderItem iRender = GuiScreen.itemRender;
-        iRender.zLevel = 100.0F;
+        this.itemRender.zLevel = 100.0F;
 
 
         switch (this.jukeboxInventory.paramPlayMode) {
             case 0:
                 // normal
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 0, k + pStartY);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.stone_pickaxe), j + pStartX + spacer * 1, k + pStartY);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.iron_pickaxe), j + pStartX + spacer * 2, k + pStartY);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.golden_pickaxe), j + pStartX + spacer * 3, k + pStartY);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.diamond_pickaxe), j + pStartX + spacer * 4, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 0, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.stone_pickaxe), j + pStartX + spacer * 1, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.iron_pickaxe), j + pStartX + spacer * 2, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.golden_pickaxe), j + pStartX + spacer * 3, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.diamond_pickaxe), j + pStartX + spacer * 4, k + pStartY);
                 break;
 
             case 1:
                 // shuffle
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.iron_shovel), j + pStartX + spacer * 0, k + pStartY - 1);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.diamond_pickaxe), j + pStartX + spacer * 1, k + pStartY + 4);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.golden_axe), j + pStartX + spacer * 2, k + pStartY - 3);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 3, k + pStartY + 1);
-                iRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.renderEngine, new ItemStack(Items.stone_pickaxe), j + pStartX + spacer * 4, k + pStartY - 2);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.iron_shovel), j + pStartX + spacer * 0, k + pStartY - 1);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.diamond_pickaxe), j + pStartX + spacer * 1, k + pStartY + 4);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.golden_axe), j + pStartX + spacer * 2, k + pStartY - 3);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 3, k + pStartY + 1);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.stone_pickaxe), j + pStartX + spacer * 4, k + pStartY - 2);
                 break;
 
         }
 
 
-        GuiScreen.itemRender.zLevel = 0.0F;
+        this.itemRender.zLevel = 0.0F;
 
     }
 

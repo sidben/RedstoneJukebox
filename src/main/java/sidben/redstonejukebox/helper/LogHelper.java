@@ -6,8 +6,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import org.apache.logging.log4j.Level;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import sidben.redstonejukebox.reference.Reference;
 
 
@@ -71,8 +71,8 @@ public class LogHelper
         final StringBuilder r = new StringBuilder();
         final Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
         final Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
-        final int recipeMaxUses = hiddenMax == null ? -1 : (int) hiddenMax;
-        final int recipeUses = hiddenUses == null ? -1 : (int) hiddenUses;
+        final int recipeMaxUses = hiddenMax == null ? -1 : (Integer) hiddenMax;
+        final int recipeUses = hiddenUses == null ? -1 : (Integer) hiddenUses;
 
 
         r.append(LogHelper.itemStackToString(recipe.getItemToBuy()));

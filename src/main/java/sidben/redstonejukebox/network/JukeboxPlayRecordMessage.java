@@ -2,12 +2,12 @@ package sidben.redstonejukebox.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 
 
@@ -34,9 +34,9 @@ public class JukeboxPlayRecordMessage implements IMessage
     public JukeboxPlayRecordMessage(TileEntityRedstoneJukebox teJukebox, int recordInfoId, byte selectedSlot, int extraRange) {
         this.recordInfoId = recordInfoId;
         this.jukeboxSlot = selectedSlot;
-        this.x = teJukebox.xCoord;
-        this.y = teJukebox.yCoord;
-        this.z = teJukebox.zCoord;
+        this.x = teJukebox.getPos().getX();
+        this.y = teJukebox.getPos().getY();
+        this.z = teJukebox.getPos().getZ();
         this.extraRange = extraRange;
     }
 
@@ -73,7 +73,8 @@ public class JukeboxPlayRecordMessage implements IMessage
         final World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
 
-            final TileEntity teCandidate = world.getTileEntity(this.x, this.y, this.z);
+        	BlockPos pos = new BlockPos(this.x, this.y, this.z);
+            final TileEntity teCandidate = world.getTileEntity(pos);
             if (teCandidate instanceof TileEntityRedstoneJukebox) {
                 final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
                 if (this.recordInfoId < 0) {
@@ -88,10 +89,9 @@ public class JukeboxPlayRecordMessage implements IMessage
 
 
             if (this.recordInfoId < 0) {
-                final ChunkCoordinates chunkcoordinates = new ChunkCoordinates(x, y, z);
-                ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(chunkcoordinates);
+                ModRedstoneJukebox.instance.getMusicHelper().stopPlayingAt(pos);
             } else {
-                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(this.x, this.y, this.z, this.recordInfoId, true, this.extraRange);
+                ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(new BlockPos(this.x, this.y, this.z), this.recordInfoId, true, this.extraRange);
             }
         }
     }

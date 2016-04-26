@@ -11,11 +11,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityLockable;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
@@ -263,9 +263,9 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     /**
      * Marks the block and the chuck as "dirty", forcing an update between Server/Client.
      */
-    public void resync()
+    public void resync()		// TODO: check if this is needed, it think it only server to update rendering
     {
-        this.worldObj.markBlockForUpdate(this.pos);
+    	// this.worldObj.notifyBlockUpdate(pos, state, state, 3);		// Disabled by now
         this.markDirty();
     }
 
@@ -362,7 +362,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
      *            The data packet
      */
     @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet)
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet)
     {
         // Read NBT packet from the server
         final NBTTagCompound tag = packet.getNbtCompound();
@@ -408,7 +408,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
         tag.setBoolean("Loop", this.paramLoop);
         tag.setByte("InvSlot", this.currentJukeboxPlaySlot);
 
-        return new S35PacketUpdateTileEntity(this.pos, 0, tag);
+        return new SPacketUpdateTileEntity(this.pos, 0, tag);
     }
 
 
@@ -430,7 +430,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
             if (ConfigurationHandler.debugJukeboxTick) {
                 LogHelper.info("Jukebox.tickJukebox() @ " + this.pos + " isPlaying: " + this.isPlaying() + " - isBlockPowered: " + this.isBlockPowered + " - schdPlayNext: "
                         + this.schedulePlayNextRecord + " - schdStart: " + this.scheduleStartPlaying + " - schdStop: " + this.scheduleStopPlaying + " - playlistFinish: " + this.isPlaylistFinished
-                        + " - songTimer: " + this.songTimer + " - gameTick: " + MinecraftServer.getServer().getTickCounter());
+                        + " - songTimer: " + this.songTimer + " - gameTick: " + this.worldObj.getMinecraftServer().getTickCounter());
             }
 
 
@@ -588,8 +588,13 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
 
                 if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(nextRecordStack)) {
                     final ItemRecord debugRecord = (ItemRecord) (nextRecordStack.getItem());
-                    LogHelper.info("    * recordName:       " + debugRecord.recordName);
-                    LogHelper.info("    * record resource:  " + debugRecord.getRecordResource(debugRecord.recordName));
+                    if (debugRecord.getSound() == null) {
+                        LogHelper.info("    * recordName:       NULL");
+                        LogHelper.info("    * record resource:  NULL");
+                    } else {
+                        LogHelper.info("    * recordName:       " + debugRecord.getSound().getSoundName().getResourcePath());
+                        LogHelper.info("    * record resource:  " + debugRecord.getSound().getSoundName());
+                    }
                     if (this.worldObj.isRemote) {
                         LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
                     }

@@ -3,12 +3,11 @@ package sidben.redstonejukebox.client.gui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
@@ -133,7 +132,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y)
     {
-        this.fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(I18n.format("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
 
         // Tooltips
         final GuiButton btPlayOnce = (GuiButton) this.buttonList.get(0);
@@ -141,21 +140,21 @@ public class GuiRedstoneJukebox extends GuiContainer
         final GuiButton btPlaymode = (GuiButton) this.buttonList.get(2);
 
         if (btPlayOnce.isMouseOver()) {
-            this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_play_once"), x - this.guiLeft, y - this.guiTop + 21);
+            this.drawCreativeTabHoveringText(I18n.format("sidben.redstonejukebox.gui.tooltip_play_once"), x - this.guiLeft, y - this.guiTop + 21);
         } else if (btPlayLoop.isMouseOver()) {
-            this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_play_loop"), x - this.guiLeft, y - this.guiTop + 21);
+            this.drawCreativeTabHoveringText(I18n.format("sidben.redstonejukebox.gui.tooltip_play_loop"), x - this.guiLeft, y - this.guiTop + 21);
         } else if (btPlaymode.isMouseOver()) {
             switch (this.jukeboxInventory.paramPlayMode) {
                 case 0:
-                    this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_inorder"), x - this.guiLeft, y - this.guiTop + 21);
+                    this.drawCreativeTabHoveringText(I18n.format("sidben.redstonejukebox.gui.tooltip_inorder"), x - this.guiLeft, y - this.guiTop + 21);
                     break;
                 case 1:
-                    this.drawCreativeTabHoveringText(StatCollector.translateToLocal("sidben.redstonejukebox.gui.tooltip_shuffed"), x - this.guiLeft, y - this.guiTop + 21);
+                    this.drawCreativeTabHoveringText(I18n.format("sidben.redstonejukebox.gui.tooltip_shuffed"), x - this.guiLeft, y - this.guiTop + 21);
                     break;
             }
         } else if (x >= this.guiLeft + 8 && x <= this.guiLeft + 20 && y >= this.guiTop + 27 && y <= this.guiTop + 35) {
             final int jukeboxExtraVolumeRange = 64 + this.jukeboxInventory.getExtraVolume(false);
-            this.drawCreativeTabHoveringText(StatCollector.translateToLocalFormatted("sidben.redstonejukebox.gui.tooltip_range", jukeboxExtraVolumeRange), x - this.guiLeft, y - this.guiTop + 21);
+            this.drawCreativeTabHoveringText(I18n.format("sidben.redstonejukebox.gui.tooltip_range", jukeboxExtraVolumeRange), x - this.guiLeft, y - this.guiTop + 21);
 
         }
 

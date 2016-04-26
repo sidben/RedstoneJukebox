@@ -5,7 +5,8 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.BlockPos;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import sidben.redstonejukebox.network.NetworkHelper;
 
 
@@ -35,7 +36,7 @@ public class CommandStopAllRecords extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1) {
             throw new CommandException(this.getCommandUsage(sender), new Object[0]);
@@ -45,7 +46,7 @@ public class CommandStopAllRecords extends CommandBase
              * stopallrecords <player>
              */
 
-            final EntityPlayerMP player = getPlayer(sender, args[0]);
+            final EntityPlayerMP player = getPlayer(server, sender, args[0]);
 
 
             // Send packet requesting record play
@@ -63,7 +64,7 @@ public class CommandStopAllRecords extends CommandBase
      * Adds the strings available in this command to the given list of tab completion options.
      */
     @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         return null;
     }

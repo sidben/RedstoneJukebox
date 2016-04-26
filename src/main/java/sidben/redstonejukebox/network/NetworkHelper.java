@@ -60,7 +60,7 @@ public class NetworkHelper
         final int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;
 
         final JukeboxPlayRecordMessage message = new JukeboxPlayRecordMessage(teJukebox, recordInfoId, slot, volumeExtender);
-        final TargetPoint target = new TargetPoint(teJukebox.getWorld().provider.getDimensionId(), teJukebox.getPos().getX(), teJukebox.getPos().getY(), teJukebox.getPos().getZ(), targetRange);
+        final TargetPoint target = new TargetPoint(teJukebox.getWorld().provider.getDimension(), teJukebox.getPos().getX(), teJukebox.getPos().getY(), teJukebox.getPos().getZ(), targetRange);
 
         // --- Debug ---
         if (ConfigurationHandler.debugNetworkJukebox) {

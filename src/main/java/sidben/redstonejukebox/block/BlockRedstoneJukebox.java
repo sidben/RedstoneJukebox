@@ -3,6 +3,7 @@ package sidben.redstonejukebox.block;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,10 +13,12 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
@@ -73,7 +76,7 @@ public class BlockRedstoneJukebox extends BlockContainer
         this.setHardness(2.0F);
         this.setResistance(10.0F);
         this.setUnlocalizedName("redstone_jukebox");
-        this.setStepSound(Block.soundTypePiston);
+        this.setStepSound(SoundType.STONE);
         
         if (active) {
             this.setLightLevel(0.75F);
@@ -96,11 +99,8 @@ public class BlockRedstoneJukebox extends BlockContainer
     // Parameters
     // --------------------------------------------------------------------
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     @Override
-    public boolean isOpaqueCube()
+    public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
@@ -110,7 +110,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      * Checks if the block is a solid face on the given side, used by placement logic.
      */
     @Override
-    public boolean isSideSolid(IBlockAccess world, BlockPos pos, EnumFacing side)
+    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
     {
         return true;
     }
@@ -129,11 +129,13 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Gets an item for the block being called on.
      */
+    @Deprecated // Forge: Use more sensitive version below: getPickBlock
     @Override
     @SideOnly(Side.CLIENT)
-    public Item getItem(World worldIn, BlockPos pos)
+    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
     {
-        return Item.getItemFromBlock(MyBlocks.redstoneJukebox);
+        Item item = Item.getItemFromBlock(MyBlocks.redstoneJukebox);
+        return item == null ? null : new ItemStack(item, 1, 0);
     }
     
     
@@ -161,26 +163,25 @@ public class BlockRedstoneJukebox extends BlockContainer
      * Returns true if the given side of this block type should be rendered, if the adjacent block is at the given
      * coordinates.
      */
-    public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess worldIn, BlockPos pos, EnumFacing side)
     {
         return true;		// TODO: return false for bottom
     }
 
     
     @SideOnly(Side.CLIENT)
-    public EnumWorldBlockLayer getBlockLayer()
+    public BlockRenderLayer getBlockLayer()
     {
-        return EnumWorldBlockLayer.CUTOUT;
+        return BlockRenderLayer.CUTOUT;
     }
 
 
     /**
      * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
      */
-    @Override
-    public int getRenderType()
+    public EnumBlockRenderType getRenderType(IBlockState state)
     {
-    	return 3;
+        return EnumBlockRenderType.MODEL;
     }
 
 
@@ -188,7 +189,6 @@ public class BlockRedstoneJukebox extends BlockContainer
     // ----------------------------------------------------
     // Block name
     // ----------------------------------------------------
-    /*
     @Override
     public String getUnlocalizedName()
     {
@@ -199,7 +199,6 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
     }
-    */
 
 
 
@@ -211,7 +210,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      * Called upon block activation (right click on the block.)
      */
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         final TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity == null || playerIn.isSneaking()) {
@@ -387,7 +386,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      */
     @Override
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
+    public void randomDisplayTick(IBlockState state, World worldIn, BlockPos pos, Random rand)
     {
 
         if (this.isActive) {
@@ -422,19 +421,19 @@ public class BlockRedstoneJukebox extends BlockContainer
             double particleZ = (double)((float)pos.getZ() + rand.nextFloat());
 
 
-            if (i == 2 && !worldIn.getBlockState(pos.south()).getBlock().isOpaqueCube()) {
+            if (i == 2 && !worldIn.getBlockState(pos.south()).isOpaqueCube()) {
                 particleZ = (double)pos.getZ() + 1 + distance;
             }
 
-            if (i == 3 && !worldIn.getBlockState(pos.north()).getBlock().isOpaqueCube()) {
+            if (i == 3 && !worldIn.getBlockState(pos.north()).isOpaqueCube()) {
                 particleZ = (double)pos.getZ() + 0 - distance;
             }
 
-            if (i == 4 && !worldIn.getBlockState(pos.east()).getBlock().isOpaqueCube()) {
+            if (i == 4 && !worldIn.getBlockState(pos.east()).isOpaqueCube()) {
                 particleX = (double)pos.getX() + 1 + distance;
             }
 
-            if (i == 5 && !worldIn.getBlockState(pos.west()).getBlock().isOpaqueCube()) {
+            if (i == 5 && !worldIn.getBlockState(pos.west()).isOpaqueCube()) {
                 particleX = (double)pos.getX() + 0 - distance;
             }
 
@@ -468,7 +467,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      * Can this block provide power. Only wire currently seems to have this change based on its state.
      */
     @Override
-    public boolean canProvidePower()
+    public boolean canProvidePower(IBlockState state)
     {
         return false;
     }
@@ -479,7 +478,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      * getComparatorInputOverride instead of the actual redstone signal strength.
      */
     @Override
-    public boolean hasComparatorInputOverride()
+    public boolean hasComparatorInputOverride(IBlockState state)
     {
         return true;
     }
@@ -490,7 +489,7 @@ public class BlockRedstoneJukebox extends BlockContainer
      * strength when this block inputs to a comparator.
      */
     @Override
-    public int getComparatorInputOverride(World worldIn, BlockPos pos)
+    public int getComparatorInputOverride(IBlockState state, World worldIn, BlockPos pos)
     {
         final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
         return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;

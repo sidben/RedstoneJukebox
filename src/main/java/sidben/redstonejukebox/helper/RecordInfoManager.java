@@ -13,6 +13,7 @@ import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.Maps;
 import net.minecraftforge.fml.common.Loader;
 
+// TODO: refactor to integrate with SoundEvents
 
 /**
  * Class to provide info about records, from vanilla and mods.
@@ -51,18 +52,18 @@ public class RecordInfoManager
 
 
         // Adds the vanilla records
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.13", 178, "item.record.13.desc", Item.getIdFromItem(Items.record_13), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.cat", 184, "item.record.cat.desc", Item.getIdFromItem(Items.record_cat), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.blocks", 345, "item.record.blocks.desc", Item.getIdFromItem(Items.record_blocks), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.chirp", 185, "item.record.chirp.desc", Item.getIdFromItem(Items.record_chirp), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.far", 174, "item.record.far.desc", Item.getIdFromItem(Items.record_far), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mall", 197, "item.record.mall.desc", Item.getIdFromItem(Items.record_mall), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.mellohi", 96, "item.record.mellohi.desc", Item.getIdFromItem(Items.record_mellohi), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.stal", 150, "item.record.stal.desc", Item.getIdFromItem(Items.record_stal), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.strad", 188, "item.record.strad.desc", Item.getIdFromItem(Items.record_strad), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.ward", 251, "item.record.ward.desc", Item.getIdFromItem(Items.record_ward), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.11", 71, "item.record.11.desc", Item.getIdFromItem(Items.record_11), 0));
-        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:records.wait", 237, "item.record.wait.desc", Item.getIdFromItem(Items.record_wait), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.13", 178, "item.record.13.desc", Item.getIdFromItem(Items.record_13), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.cat", 184, "item.record.cat.desc", Item.getIdFromItem(Items.record_cat), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.blocks", 345, "item.record.blocks.desc", Item.getIdFromItem(Items.record_blocks), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.chirp", 185, "item.record.chirp.desc", Item.getIdFromItem(Items.record_chirp), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.far", 174, "item.record.far.desc", Item.getIdFromItem(Items.record_far), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.mall", 197, "item.record.mall.desc", Item.getIdFromItem(Items.record_mall), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.mellohi", 96, "item.record.mellohi.desc", Item.getIdFromItem(Items.record_mellohi), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.stal", 150, "item.record.stal.desc", Item.getIdFromItem(Items.record_stal), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.strad", 188, "item.record.strad.desc", Item.getIdFromItem(Items.record_strad), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.ward", 251, "item.record.ward.desc", Item.getIdFromItem(Items.record_ward), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.11", 71, "item.record.11.desc", Item.getIdFromItem(Items.record_11), 0));
+        recordsInfoCollection.put(idCount++, new RecordInfo("minecraft:record.wait", 237, "item.record.wait.desc", Item.getIdFromItem(Items.record_wait), 0));
 
         // --- Debug ---
         LogHelper.info("Found 12 vanilla records");
@@ -241,7 +242,9 @@ public class RecordInfoManager
 
             } else {
                 // Vanilla-compatible records
-                resourceName = record.getRecordResource("records." + record.recordName).toString();
+            	if (record.getSound() != null) {
+                    resourceName = record.getSound().getSoundName().toString();
+            	}
 
             }
 

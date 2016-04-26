@@ -5,7 +5,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 import sidben.redstonejukebox.proxy.ClientProxy;
 import sidben.redstonejukebox.reference.Reference;
 import net.minecraftforge.fml.relauncher.Side;
@@ -64,7 +64,7 @@ public class ItemBlankRecord extends Item
     public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
         if (advanced) {
-            tooltip.add(StatCollector.translateToLocal(this.getUnlocalizedName() + ".hint"));
+            tooltip.add(I18n.translateToLocal(this.getUnlocalizedName() + ".hint"));
         }
     }
 

@@ -1,13 +1,14 @@
 package sidben.redstonejukebox.handler;
 
 import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipeList;
-import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.network.NetworkHelper;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 
@@ -16,7 +17,7 @@ public class PlayerEventHandler
 
 
     @SubscribeEvent
-    public void onEntityInteractEvent(EntityInteractEvent event)
+    public void onEntityInteractEvent(EntityInteract event)
     {
 
         /*
@@ -24,21 +25,21 @@ public class PlayerEventHandler
          */
 
         // check if the player right-clicked a villager
-        if (event.target instanceof EntityVillager) {
+        if (event.getTarget() instanceof EntityVillager) {
 
             // if the player is holding a blank record, cancels the regular trade...
-            final ItemStack item = event.entityPlayer.inventory.getCurrentItem();
+            final ItemStack item = event.getEntityPlayer().inventory.getCurrentItem();
             if (item != null && item.getItem() == MyItems.recordBlank) {
                 // ...and opens a custom trade screen
                 event.setCanceled(true);
 
-                if (!event.target.worldObj.isRemote) {
+                if (!event.getTarget().worldObj.isRemote) {
                     // Check if the villager have valid trades
                     MerchantRecipeList tradesList = null;
                     try {
-                        tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(event.target.getEntityId());
+                        tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(event.getTarget().getEntityId());
                     } catch (final Throwable ex) {
-                        LogHelper.error("Error loading the custom trades lists for villager ID " + event.target.getEntityId());
+                        LogHelper.error("Error loading the custom trades lists for villager ID " + event.getTarget().getEntityId());
                         LogHelper.error(ex);
                     }
                     if (tradesList == null) {
@@ -49,7 +50,7 @@ public class PlayerEventHandler
                     // --- Debug ---
                     if (ConfigurationHandler.debugNetworkRecordTrading) {
                         LogHelper.info("PlayerEventHandler.onEntityInteractEvent()");
-                        LogHelper.info("    Villager ID: " + event.target.getEntityId());
+                        LogHelper.info("    Villager ID: " + event.getTarget().getEntityId());
                         LogHelper.info("    Custom record trades: " + tradesList.size());
                     }
 
@@ -57,15 +58,15 @@ public class PlayerEventHandler
 
                     if (tradesList.size() > 0) {
                         // Sends the shop to the player
-                        NetworkHelper.sendRecordTradingFullListMessage(tradesList, event.entityPlayer);
+                        NetworkHelper.sendRecordTradingFullListMessage(tradesList, event.getEntityPlayer());
 
                         // Have trades, opens the GUI
-                        ((EntityVillager) event.target).setCustomer(event.entityPlayer);
-                        event.entityPlayer.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.recordTradingGuiID, event.target.worldObj, event.target.getEntityId(), 0, 0);
+                        ((EntityVillager) event.getTarget()).setCustomer(event.getEntityPlayer());
+                        event.getEntityPlayer().openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.recordTradingGuiID, event.getTarget().worldObj, event.getTarget().getEntityId(), 0, 0);
 
                     } else {
                         // Don't have trades, play a sound
-                        event.target.playSound("mob.villager.no", 1F, 1F);
+                        event.getTarget().playSound(SoundEvents.entity_villager_no, 1F, 1F);
 
                     }
 

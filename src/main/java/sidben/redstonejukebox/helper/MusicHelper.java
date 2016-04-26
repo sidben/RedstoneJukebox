@@ -9,9 +9,11 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.audio.SoundManager;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.util.BlockPos;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.HashBiMap;
@@ -159,14 +161,14 @@ public class MusicHelper
 
                 // Displays the song name
                 if (showName && !recordInfo.recordName.isEmpty()) {
-                    final String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                    final String recordTitle = I18n.format(recordInfo.recordName);
                     mc.ingameGUI.setRecordPlayingMessage(recordTitle);
                 }
 
                 // Override of the playRecord method on RenderGlobal, since I need to set extra volume range.
 
                 // Plays the record
-                final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, volumeRange, 1.0F, pos.getX(), pos.getY(), pos.getZ());
+                final PositionedSoundRecord sound = new PositionedSoundRecord(recordResource, SoundCategory.RECORDS, volumeRange, 1.0F, false, 0, ISound.AttenuationType.LINEAR, pos.getX(), pos.getY(), pos.getZ()); 
                 this.mapJukeboxesPositions.put(pos, sound);
                 mc.getSoundHandler().playSound(sound);
             }
@@ -223,12 +225,13 @@ public class MusicHelper
 
         if (recordInfo != null) {
             final ResourceLocation recordResource = new ResourceLocation(recordInfo.recordUrl);
+            final SoundEvent recordSoundEvent = new SoundEvent(recordResource);
 
             if (recordResource != null) {
 
                 // Displays the song name
                 if (showName && !recordInfo.recordName.isEmpty()) {
-                    final String recordTitle = StatCollector.translateToLocal(recordInfo.recordName);
+                    final String recordTitle = I18n.format(recordInfo.recordName);
                     mc.ingameGUI.setRecordPlayingMessage(recordTitle);
                 }
 
@@ -236,7 +239,7 @@ public class MusicHelper
 
                 // Plays the record as background music
                 // OBS: The volume that controls this sound is the Noteblock/Jukebox one.
-                this.customBackgroundMusic = PositionedSoundRecord.create(recordResource);
+                this.customBackgroundMusic = PositionedSoundRecord.getMusicRecord(recordSoundEvent);
                 mc.getSoundHandler().playSound(this.customBackgroundMusic);
             }
 

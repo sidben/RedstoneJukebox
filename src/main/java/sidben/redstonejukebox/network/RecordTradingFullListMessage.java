@@ -142,8 +142,8 @@ public class RecordTradingFullListMessage implements IMessage
                 // Adds the trade uses
                 final Object hiddenMax = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "maxTradeUses", "field_82786_e");
                 final Object hiddenUses = ObfuscationReflectionHelper.getPrivateValue(MerchantRecipe.class, recipe, "toolUses", "field_77400_d");
-                final int recipeMaxUses = hiddenMax == null ? -1 : (int) hiddenMax;
-                final int recipeUses = hiddenUses == null ? -1 : (int) hiddenUses;
+                final int recipeMaxUses = hiddenMax == null ? -1 : (Integer) hiddenMax;
+                final int recipeUses = hiddenUses == null ? -1 : (Integer) hiddenUses;
 
                 buf.writeInt(recipeUses);
                 buf.writeInt(recipeMaxUses);

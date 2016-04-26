@@ -69,12 +69,6 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void initialize()
     {
-		// Item renderers
-		MyItems.registerRender();
-
-		// Block renderes
-		MyBlocks.registerRender();
-		
 		// Recipes
         MyRecipes.register();
 
@@ -84,7 +78,6 @@ public abstract class CommonProxy implements IProxy
 
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
-        MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
 
     }
 

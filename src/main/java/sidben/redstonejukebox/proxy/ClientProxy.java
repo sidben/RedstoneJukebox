@@ -11,10 +11,12 @@ import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.client.gui.GuiRecordTrading;
 import sidben.redstonejukebox.client.gui.GuiRedstoneJukebox;
+import sidben.redstonejukebox.handler.PlayerEventHandler;
 //import sidben.redstonejukebox.client.renderer.ItemRendererCustomRecord;
 //import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
 import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.helper.MusicHelper;
+import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
@@ -50,14 +52,13 @@ public class ClientProxy extends CommonProxy
         ClientProxy.guiTextureTrade = this.getResourceName("textures/gui/recordtrading-gui.png");
 
 
-        super.pre_initialize();
+		super.pre_initialize();
 
 
-        // Special renderers
+		// Special renderers
         /*
         ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
 
-        RenderingRegistry.registerBlockHandler(new RenderRedstoneJukebox());
         MinecraftForgeClient.registerItemRenderer(MyItems.recordCustom, new ItemRendererCustomRecord());
         */
     }
@@ -69,11 +70,18 @@ public class ClientProxy extends CommonProxy
     {
         super.initialize();
 
-        // Helper classes single instances
+		// Item renderers
+		MyItems.registerRender();
+
+		// Block renderes
+		MyBlocks.registerRender();
+
+		// Helper classes single instances
         ModRedstoneJukebox.instance.setMusicHelper(new MusicHelper(Minecraft.getMinecraft()));
 
         // Event Handlers
         MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
+
     }
 
 

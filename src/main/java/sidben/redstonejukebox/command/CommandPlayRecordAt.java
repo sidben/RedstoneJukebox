@@ -9,7 +9,7 @@ import net.minecraft.util.BlockPos;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 
-
+// TODO: support for ~ on xyz coords, autocomplete of player name
 public class CommandPlayRecordAt extends CommandBase
 {
 

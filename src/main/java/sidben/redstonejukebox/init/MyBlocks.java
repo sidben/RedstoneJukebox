@@ -51,8 +51,6 @@ public class MyBlocks
         
         itemMesher.register(Item.getItemFromBlock(redstoneJukebox), 0, new ModelResourceLocation("redstonejukebox:redstone_jukebox", "inventory"));
         itemMesher.register(Item.getItemFromBlock(redstoneJukeboxActive), 1, new ModelResourceLocation("redstonejukebox:redstone_jukebox_active", "inventory"));
-        
-        // ClientRegistry.bindTileEntitySpecialRenderer(TileEntityPrismarineChest.class, new TileEntityPrismarineChestRenderer());
     }
 
 }

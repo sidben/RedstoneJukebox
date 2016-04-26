@@ -14,6 +14,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 
+
+// TODO: remove this class and add the send/handle logic to each message, as static methods. with that I'll only need to change one file per message. 
+
 public class NetworkHelper
 {
 

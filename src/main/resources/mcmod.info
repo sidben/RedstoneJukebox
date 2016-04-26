@@ -1,6 +1,6 @@
 [
 {
-"modid": "SidbenRedstoneJukebox",
+"modid": "redstonejukebox",
 "name": "Redstone Jukebox",
 "description": "Adds a new and improved Jukebox to the game. Configurable interface, holds up to 8 records and activated by redstone.",
 "version": "${version}",

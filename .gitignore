@@ -6,6 +6,7 @@ eclipse/
 bin/
 repo/
 .settings/
+*.launch
 
 *.class
 

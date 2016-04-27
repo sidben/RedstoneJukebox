@@ -3,6 +3,7 @@ package sidben.redstonejukebox.handler;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.helper.LogHelper;
@@ -24,8 +25,11 @@ public class PlayerEventHandler
          * OBS: This method is called whenever a player interacts with something (right-click)
          */
 
+    	// 1.9 OBS - this event is called twice, for main and off hand. Trying to open the GUI
+    	// twice don't work, so to make it easy I only check the main hand.
+    	
         // check if the player right-clicked a villager
-        if (event.getTarget() instanceof EntityVillager) {
+        if (event.getTarget() instanceof EntityVillager && event.getHand().equals(EnumHand.MAIN_HAND)) {
 
             // if the player is holding a blank record, cancels the regular trade...
             final ItemStack item = event.getEntityPlayer().inventory.getCurrentItem();
@@ -59,7 +63,7 @@ public class PlayerEventHandler
                     if (tradesList.size() > 0) {
                         // Sends the shop to the player
                         NetworkHelper.sendRecordTradingFullListMessage(tradesList, event.getEntityPlayer());
-
+                        
                         // Have trades, opens the GUI
                         ((EntityVillager) event.getTarget()).setCustomer(event.getEntityPlayer());
                         event.getEntityPlayer().openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.recordTradingGuiID, event.getTarget().worldObj, event.getTarget().getEntityId(), 0, 0);

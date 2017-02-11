@@ -1,14 +1,18 @@
-build/
+# eclipse
+bin
+*.launch
+.settings
+.metadata
 .classpath
 .project
-.gradle/
-eclipse/
-bin/
-repo/
-.settings/
-*.launch
 
-*.class
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
 
 # Package Files #
 *.jar

@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
@@ -98,7 +98,7 @@ public class ClientProxy extends CommonProxy
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
             final Entity villager = world.getEntityByID(x);
             if (villager instanceof EntityVillager) {
-                return new GuiRecordTrading(player.inventory, (EntityVillager) villager, world, ((EntityVillager) villager).getCustomNameTag());
+                return new GuiRecordTrading(player.inventory, (EntityVillager) villager, world);
             }
         }
 

@@ -241,7 +241,7 @@ public class RecordStoreHelper
 
             // Gets the name of the song / record
             if (record != null) {
-                recordName = ((ItemRecord) record.getItem()).recordName;
+                recordName = ((ItemRecord) record.getItem()).getRecordNameLocal();		// TODO: test, may not work
             }
 
 
@@ -295,9 +295,9 @@ public class RecordStoreHelper
         }
 
         if (auxPriceMin == auxPriceMax) {
-            emeralds = new ItemStack(Items.emerald, auxPriceMin);
+            emeralds = new ItemStack(Items.EMERALD, auxPriceMin);
         } else {
-            emeralds = new ItemStack(Items.emerald, rand.nextInt(auxPriceMax - auxPriceMin + 1) + auxPriceMin);
+            emeralds = new ItemStack(Items.EMERALD, rand.nextInt(auxPriceMax - auxPriceMin + 1) + auxPriceMin);
         }
 
 

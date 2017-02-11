@@ -26,7 +26,8 @@ public class RecordInfo
         this.recordItemDamage = damage;
     }
 
-
+    // TODO: constructor from ItemRecord
+    
 
     public int getRecordDurationSeconds()
     {

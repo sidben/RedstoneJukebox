@@ -13,6 +13,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
@@ -38,17 +39,17 @@ public class GuiRecordTrading extends GuiContainer
     private final IMerchant                 theIMerchant;
     private GuiRecordTrading.MerchantButton nextRecipeButtonIndex;
     private GuiRecordTrading.MerchantButton previousRecipeButtonIndex;
-    private final String                    merchantName;
     private int                             currentRecipeIndex = 0;
+    private ITextComponent 					chatComponent;
 
     private final MerchantRecipeList        tradesList;                                                            // Record trading uses a special trades list, shared by some merchants
 
 
 
-    public GuiRecordTrading(InventoryPlayer player, IMerchant merchant, World world, String customName) {
+    public GuiRecordTrading(InventoryPlayer player, IMerchant merchant, World world) {
         super(new ContainerRecordTrading(player, merchant, world));
         this.theIMerchant = merchant;
-        this.merchantName = customName != null && customName.length() > 1 ? customName : I18n.format("entity.Villager.name", new Object[0]);
+        this.chatComponent = merchant.getDisplayName();
 
         tradesList = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
     }
@@ -79,8 +80,10 @@ public class GuiRecordTrading extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int par1, int par2)
     {
+        String name = this.chatComponent.getUnformattedText();		// TODO: fix career - Client-side villager don't replicate career
+
         // Shows the name "Villager" and "Inventory"
-        this.fontRendererObj.drawString(this.merchantName, this.xSize / 2 - this.fontRendererObj.getStringWidth(this.merchantName) / 2, 6, 4210752);
+        this.fontRendererObj.drawString(name, this.xSize / 2 - this.fontRendererObj.getStringWidth(name) / 2, 6, 4210752);
         this.fontRendererObj.drawString(I18n.format("container.inventory", new Object[0]), 8, this.ySize - 96 + 2, 4210752);
     }
 

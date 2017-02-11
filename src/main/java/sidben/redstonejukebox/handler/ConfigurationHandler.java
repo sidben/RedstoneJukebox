@@ -153,7 +153,7 @@ public class ConfigurationHandler
     @SubscribeEvent
     public void onConfigurationChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event)
     {
-        if (event.modID.equalsIgnoreCase(Reference.ModID)) {
+        if (event.getModID().equalsIgnoreCase(Reference.ModID)) {
             // Resync config
             loadConfig();
         }

@@ -22,10 +22,10 @@ public class ItemCustomRecord extends ItemRecord
     // Constructors
     // --------------------------------------------------------------------
     public ItemCustomRecord(String name) {
-        super(name);
+        super(name, null);
         this.setMaxStackSize(1);
         this.setUnlocalizedName(name);
-        this.setCreativeTab(CreativeTabs.tabMisc);
+        this.setCreativeTab(CreativeTabs.MISC);
 
         this.setMaxDamage(0);
         this.setHasSubtypes(true);

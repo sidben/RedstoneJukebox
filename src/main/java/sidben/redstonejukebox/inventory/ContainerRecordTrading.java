@@ -4,7 +4,6 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -56,10 +55,6 @@ public class ContainerRecordTrading extends Container
         return this.merchantInventory;
     }
     
-    public void onCraftGuiOpened(ICrafting listener)
-    {
-        super.onCraftGuiOpened(listener);
-    }
 
     /**
      * Looks for changes made in the container, sends them to every listener.
@@ -159,13 +154,13 @@ public class ContainerRecordTrading extends Container
             ItemStack var2 = this.merchantInventory.removeStackFromSlot(0);
 
             if (var2 != null) {
-                playerIn.dropPlayerItemWithRandomChoice(var2, false);
+                playerIn.dropItem(var2, false);
             }
 
             var2 = this.merchantInventory.removeStackFromSlot(1);
 
             if (var2 != null) {
-                playerIn.dropPlayerItemWithRandomChoice(var2, false);
+                playerIn.dropItem(var2, false);
             }
 
         }

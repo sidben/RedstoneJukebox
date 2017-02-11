@@ -188,7 +188,6 @@ public class BlockRedstoneJukebox extends BlockContainer
     // ----------------------------------------------------
     // Block name
     // ----------------------------------------------------
-    /*
     @Override
     public String getUnlocalizedName()
     {
@@ -199,8 +198,8 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
     }
-    */
 
+    
 
 
     // --------------------------------------------------------------------

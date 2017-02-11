@@ -1,9 +1,10 @@
 package sidben.redstonejukebox.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 
 
@@ -72,7 +73,7 @@ public class CommandPlayRecordAtMessage implements IMessage
     {
         final World world = ModRedstoneJukebox.proxy.getClientWorld();
         if (world != null) {
-            ModRedstoneJukebox.instance.getMusicHelper().playRecordAt((int) this.x, (int) this.y, (int) this.z, this.recordInfoId, this.showName, this.range);
+            ModRedstoneJukebox.instance.getMusicHelper().playRecordAt(new BlockPos(this.x, this.y, this.z), this.recordInfoId, this.showName, this.range);
         }
     }
 

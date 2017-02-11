@@ -3,7 +3,7 @@ package sidben.redstonejukebox.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 
 

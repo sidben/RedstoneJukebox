@@ -5,6 +5,9 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
@@ -29,9 +32,9 @@ public class InventoryRecordTrading implements IInventory
     // Original code from InventoryMerchant
     // --------------------------------------------------
 
-    public InventoryRecordTrading(EntityPlayer par1EntityPlayer, IMerchant merchant) {
-        this.thePlayer = par1EntityPlayer;
-        this.theMerchant = merchant;
+    public InventoryRecordTrading(EntityPlayer thePlayerIn, IMerchant theMerchantIn) {
+        this.thePlayer = thePlayerIn;
+        this.theMerchant = theMerchantIn;
         this.villagerId = ((Entity) this.theMerchant).getEntityId();
     }
 
@@ -107,11 +110,11 @@ public class InventoryRecordTrading implements IInventory
      * like when you close a workbench GUI.
      */
     @Override
-    public ItemStack getStackInSlotOnClosing(int par1)
+    public ItemStack removeStackFromSlot(int index)
     {
-        if (this.theInventory[par1] != null) {
-            final ItemStack var2 = this.theInventory[par1];
-            this.theInventory[par1] = null;
+        if (this.theInventory[index] != null) {
+            final ItemStack var2 = this.theInventory[index];
+            this.theInventory[index] = null;
             return var2;
         } else {
             return null;
@@ -122,15 +125,15 @@ public class InventoryRecordTrading implements IInventory
      * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
      */
     @Override
-    public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
+    public void setInventorySlotContents(int index, ItemStack stack)
     {
-        this.theInventory[par1] = par2ItemStack;
+        this.theInventory[index] = stack;
 
-        if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit()) {
-            par2ItemStack.stackSize = this.getInventoryStackLimit();
+        if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
+            stack.stackSize = this.getInventoryStackLimit();
         }
 
-        if (this.inventoryResetNeededOnSlotChange(par1)) {
+        if (this.inventoryResetNeededOnSlotChange(index)) {
             this.resetRecipeAndSlots();
         }
     }
@@ -139,7 +142,7 @@ public class InventoryRecordTrading implements IInventory
      * Returns the name of the inventory.
      */
     @Override
-    public String getInventoryName()
+    public String getName()
     {
         return "mob.villager";
     }
@@ -148,7 +151,7 @@ public class InventoryRecordTrading implements IInventory
      * Returns if the inventory is named
      */
     @Override
-    public boolean hasCustomInventoryName()
+    public boolean hasCustomName()
     {
         return false;
     }
@@ -173,12 +176,12 @@ public class InventoryRecordTrading implements IInventory
     }
 
     @Override
-    public void openInventory()
+    public void openInventory(EntityPlayer player)
     {
     }
 
     @Override
-    public void closeInventory()
+    public void closeInventory(EntityPlayer player)
     {
     }
 
@@ -186,7 +189,7 @@ public class InventoryRecordTrading implements IInventory
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
      */
     @Override
-    public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_)
+    public boolean isItemValidForSlot(int index, ItemStack stack)
     {
         return true;
     }
@@ -206,9 +209,9 @@ public class InventoryRecordTrading implements IInventory
         return this.currentRecipe;
     }
 
-    public void setCurrentRecipeIndex(int par1)
+    public void setCurrentRecipeIndex(int index)
     {
-        this.currentRecipeIndex = par1;
+        this.currentRecipeIndex = index;
         this.resetRecipeAndSlots();
     }
 
@@ -278,7 +281,40 @@ public class InventoryRecordTrading implements IInventory
 
 
         // Villager sounds (yes or no)
-        this.theMerchant.func_110297_a_(this.getStackInSlot(2));
+        this.theMerchant.verifySellingItem(this.getStackInSlot(2));
+    }
+
+    
+    
+    
+    // TODO: better placement
+    
+    
+	@Override
+	public IChatComponent getDisplayName() {
+		return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
+	}
+
+	@Override
+	public int getField(int id) {
+		return 0;
+	}
+
+	@Override
+	public void setField(int id, int value) {
+	}
+
+	@Override
+	public int getFieldCount() {
+		return 0;
+	}
+
+	@Override
+	public void clear() {
+        for (int i = 0; i < this.theInventory.length; ++i)
+        {
+            this.theInventory[i] = null;
+        }
     }
 
 

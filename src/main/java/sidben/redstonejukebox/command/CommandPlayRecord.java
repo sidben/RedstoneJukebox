@@ -4,6 +4,7 @@ import java.util.List;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 
@@ -34,7 +35,7 @@ public class CommandPlayRecord extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args)
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1) {
             throw new CommandException(this.getCommandUsage(sender), new Object[0]);
@@ -57,7 +58,7 @@ public class CommandPlayRecord extends CommandBase
 
 
             if (args.length > 1) {
-                showName = parseBoolean(sender, args[1]);
+                showName = parseBoolean(args[1]);
             }
 
 
@@ -67,7 +68,7 @@ public class CommandPlayRecord extends CommandBase
 
 
             // Writes text on the chat
-            func_152373_a(sender, this, "commands.playrecord.success", new Object[] { recordName });
+            notifyOperators(sender, this, "commands.playrecord.success", new Object[] { recordName });
         }
 
     }
@@ -78,8 +79,7 @@ public class CommandPlayRecord extends CommandBase
      * Adds the strings available in this command to the given list of tab completion options.
      */
     @Override
-    @SuppressWarnings("rawtypes")
-    public List addTabCompletionOptions(ICommandSender sender, String[] args)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1) {
             return CommandBase.getListOfStringsMatchingLastWord(args, ModRedstoneJukebox.instance.getRecordInfoManager().getRecordNames());

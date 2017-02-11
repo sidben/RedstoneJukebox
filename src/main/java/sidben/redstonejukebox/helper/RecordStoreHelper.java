@@ -314,7 +314,7 @@ public class RecordStoreHelper
         // Since the tradeUses variable is hard-coded on 7, manually reduces the amount of
         // times this trade can be used.
         recipeStock = rand.nextInt(ConfigurationHandler.tradeUses) + 1;
-        recipe.func_82783_a(recipeStock - 7);
+        recipe.increaseMaxTradeUses(recipeStock - 7);
 
 
         // returns the recipe

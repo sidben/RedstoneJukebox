@@ -5,6 +5,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.BlockPos;
 import sidben.redstonejukebox.network.NetworkHelper;
 
 
@@ -34,7 +35,7 @@ public class CommandStopAllRecords extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args)
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1) {
             throw new CommandException(this.getCommandUsage(sender), new Object[0]);
@@ -52,7 +53,7 @@ public class CommandStopAllRecords extends CommandBase
 
 
             // Writes text on the chat
-            func_152373_a(sender, this, "commands.stopallrecords.success", new Object[0]);
+            notifyOperators(sender, this, "commands.stopallrecords.success", new Object[0]);
         }
 
     }
@@ -62,8 +63,7 @@ public class CommandStopAllRecords extends CommandBase
      * Adds the strings available in this command to the given list of tab completion options.
      */
     @Override
-    @SuppressWarnings("rawtypes")
-    public List addTabCompletionOptions(ICommandSender sender, String[] args)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return null;
     }

@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "normal": { "model": "redstonejukebox:redstone_jukebox_inactive" }
+    }
+}

@@ -5,10 +5,11 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.BlockPos;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.network.NetworkHelper;
 
-
+// TODO: support for ~ on xyz coords, autocomplete of player name
 public class CommandPlayRecordAt extends CommandBase
 {
 
@@ -34,7 +35,7 @@ public class CommandPlayRecordAt extends CommandBase
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args)
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2) {
             throw new CommandException(this.getCommandUsage(sender), new Object[0]);
@@ -64,23 +65,23 @@ public class CommandPlayRecordAt extends CommandBase
 
 
             if (args.length > 2) {
-                showName = parseBoolean(sender, args[2]);
+                showName = parseBoolean(args[2]);
             }
 
             if (args.length > 3) {
-                x = parseDouble(sender, args[3]);
+                x = parseDouble(args[3]);
             }
 
             if (args.length > 4) {
-                y = parseDoubleWithMin(sender, args[4], 0);
+                y = parseDouble(args[4], 0);
             }
 
             if (args.length > 5) {
-                z = parseDouble(sender, args[5]);
+                z = parseDouble(args[5]);
             }
 
             if (args.length > 6) {
-                extraVolumeRange = parseInt(sender, args[6]);
+                extraVolumeRange = parseInt(args[6]);
             }
 
 
@@ -89,7 +90,7 @@ public class CommandPlayRecordAt extends CommandBase
 
 
             // Writes text on the chat
-            func_152373_a(sender, this, "commands.playrecordat.success", new Object[] { recordName, player.getCommandSenderName() });
+            notifyOperators(sender, this, "commands.playrecordat.success", new Object[] { recordName, player.getName() });
         }
 
     }
@@ -99,8 +100,7 @@ public class CommandPlayRecordAt extends CommandBase
      * Adds the strings available in this command to the given list of tab completion options.
      */
     @Override
-    @SuppressWarnings("rawtypes")
-    public List addTabCompletionOptions(ICommandSender sender, String[] args)
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1) {
             return CommandBase.getListOfStringsMatchingLastWord(args, ModRedstoneJukebox.instance.getRecordInfoManager().getRecordNames());

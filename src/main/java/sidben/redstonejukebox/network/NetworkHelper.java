@@ -8,11 +8,14 @@ import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+
+
+// TODO: remove this class and add the send/handle logic to each message, as static methods. with that I'll only need to change one file per message. 
 
 public class NetworkHelper
 {
@@ -57,7 +60,7 @@ public class NetworkHelper
         final int targetRange = defaultJukeboxRange + extraRangeForNearbyPlayers + volumeExtender;
 
         final JukeboxPlayRecordMessage message = new JukeboxPlayRecordMessage(teJukebox, recordInfoId, slot, volumeExtender);
-        final TargetPoint target = new TargetPoint(teJukebox.getWorldObj().provider.dimensionId, teJukebox.xCoord, teJukebox.yCoord, teJukebox.zCoord, targetRange);
+        final TargetPoint target = new TargetPoint(teJukebox.getWorld().provider.getDimensionId(), teJukebox.getPos().getX(), teJukebox.getPos().getY(), teJukebox.getPos().getZ(), targetRange);
 
         // --- Debug ---
         if (ConfigurationHandler.debugNetworkJukebox) {

@@ -11,7 +11,7 @@ import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import sidben.redstonejukebox.handler.ConfigurationHandler;
 import com.google.common.collect.Maps;
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.Loader;
 
 
 /**
@@ -204,20 +204,39 @@ public class RecordInfoManager
                     LogHelper.error("    class name:    " + RECORD_CLASS_FROM_MOD_HARDCOREEXNDEREXPANSION);
                     LogHelper.error("    exception:     " + e);
 
-                } catch (NoSuchMethodException | SecurityException e) {
+                } catch (NoSuchMethodException e) {
                     LogHelper.error("Error reading record resource method from HardcoreEnderExpansion mod.");
                     LogHelper.error("    method name:   " + RECORD_RESOURCEMETHOD_FROM_MOD_HARDCOREEXNDEREXPANSION);
                     LogHelper.error("    exception:     " + e);
 
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                } catch (SecurityException e) {
+                    LogHelper.error("Error reading record resource method from HardcoreEnderExpansion mod.");
+                    LogHelper.error("    method name:   " + RECORD_RESOURCEMETHOD_FROM_MOD_HARDCOREEXNDEREXPANSION);
+                    LogHelper.error("    exception:     " + e);
+
+                } catch (IllegalAccessException e) {
                     LogHelper.error("Error invoking record resource method from HardcoreEnderExpansion mod.");
                     LogHelper.error("    method name:   " + RECORD_RESOURCEMETHOD_FROM_MOD_HARDCOREEXNDEREXPANSION);
                     LogHelper.error("    exception:     " + e);
 
-                } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
-                    LogHelper.error("Error coverting the return value of the record resource method HardcoreEnderExpansion mod.");
+                } catch (IllegalArgumentException e) {
+                    LogHelper.error("Error invoking record resource method from HardcoreEnderExpansion mod.");
+                    LogHelper.error("    method name:   " + RECORD_RESOURCEMETHOD_FROM_MOD_HARDCOREEXNDEREXPANSION);
                     LogHelper.error("    exception:     " + e);
 
+                } catch (InvocationTargetException e) {
+                    LogHelper.error("Error invoking record resource method from HardcoreEnderExpansion mod.");
+                    LogHelper.error("    method name:   " + RECORD_RESOURCEMETHOD_FROM_MOD_HARDCOREEXNDEREXPANSION);
+                    LogHelper.error("    exception:     " + e);
+
+                } catch (ClassCastException e) {
+                    LogHelper.error("Error coverting the return value of the record resource method HardcoreEnderExpansion mod.");
+                    LogHelper.error("    exception:     " + e);
+                    
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    LogHelper.error("Error coverting the return value of the record resource method HardcoreEnderExpansion mod.");
+                    LogHelper.error("    exception:     " + e);
+                    
                 }
 
             } else {

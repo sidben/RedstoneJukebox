@@ -1,7 +1,7 @@
 package sidben.redstonejukebox.proxy;
 
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.common.network.IGuiHandler;
 
 
 public interface IProxy extends IGuiHandler

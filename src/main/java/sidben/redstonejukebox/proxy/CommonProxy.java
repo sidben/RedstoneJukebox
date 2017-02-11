@@ -3,10 +3,12 @@ package sidben.redstonejukebox.proxy;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.PlayerEventHandler;
+import sidben.redstonejukebox.handler.SoundEventHandler;
 import sidben.redstonejukebox.init.MyBlocks;
 import sidben.redstonejukebox.init.MyItems;
 import sidben.redstonejukebox.init.MyRecipes;
@@ -22,8 +24,8 @@ import sidben.redstonejukebox.network.RecordTradingFullListMessage;
 import sidben.redstonejukebox.network.RecordTradingGUIUpdatedMessage;
 import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 
 /*
@@ -67,7 +69,7 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void initialize()
     {
-        // Recipes
+		// Recipes
         MyRecipes.register();
 
 
@@ -100,7 +102,7 @@ public abstract class CommonProxy implements IProxy
     public Object getServerGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
         if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
-            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(x, y, z);
+            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(new BlockPos(x, y, z));
             return new ContainerRedstoneJukebox(player.inventory, teJukebox);
         }
 
@@ -119,7 +121,7 @@ public abstract class CommonProxy implements IProxy
     @Override
     public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
-        return null;
+    	return null;
     }
 
 

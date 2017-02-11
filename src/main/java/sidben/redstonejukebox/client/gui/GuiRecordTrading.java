@@ -21,8 +21,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
-import sidben.redstonejukebox.network.NetworkHelper;
-import sidben.redstonejukebox.proxy.ClientProxy;
+import sidben.redstonejukebox.network.NetworkManager;
+import sidben.redstonejukebox.proxy.ProxyClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,7 +33,7 @@ public class GuiRecordTrading extends GuiContainer
 
     protected Random                        rand               = new Random();
 
-    private static final ResourceLocation   guiMainTexture     = new ResourceLocation(ClientProxy.guiTextureTrade);
+    private static final ResourceLocation   guiMainTexture     = new ResourceLocation(ProxyClient.guiTextureTrade);
 
     /** Instance of IMerchant interface. */
     private final IMerchant                 theIMerchant;
@@ -129,7 +129,7 @@ public class GuiRecordTrading extends GuiContainer
 
         if (updateServer) {
             ((ContainerRecordTrading) this.inventorySlots).setCurrentRecipeIndex(this.currentRecipeIndex);
-            NetworkHelper.sendRecordTradingGUIUpdatedMessage(this.currentRecipeIndex);
+            NetworkManager.sendRecordTradingGUIUpdatedMessage(this.currentRecipeIndex);
         }
     }
 
@@ -266,7 +266,7 @@ public class GuiRecordTrading extends GuiContainer
 
 
         // Spawns particles if a trade was made.
-        if (this.mc.thePlayer != null && madeTrade) {
+        if (this.mc.player != null && madeTrade) {
             final Entity auxVillager = (Entity) this.theIMerchant;
 
             if (auxVillager != null) {
@@ -278,7 +278,7 @@ public class GuiRecordTrading extends GuiContainer
                     final double velY = this.rand.nextGaussian();
                     final double velZ = this.rand.nextGaussian();
 
-                    auxVillager.worldObj.spawnParticle(EnumParticleTypes.NOTE, pX, pY, pZ, velX, velY, velZ, new int[0]);
+                    auxVillager.world.spawnParticle(EnumParticleTypes.NOTE, pX, pY, pZ, velX, velY, velZ, new int[0]);
                 }
             }
         }

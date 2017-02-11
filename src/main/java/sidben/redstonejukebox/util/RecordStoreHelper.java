@@ -1,4 +1,4 @@
-package sidben.redstonejukebox.helper;
+package sidben.redstonejukebox.util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,8 +14,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.init.MyItems;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.main.ModConfig;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
@@ -94,8 +95,8 @@ public class RecordStoreHelper
      * not cause a crash (yay).
      */
 
-    private final LoadingCache<Integer, MerchantRecipeList> storeCache             = CacheBuilder.newBuilder().maximumSize(ConfigurationHandler.maxStores)
-                                                                                           .expireAfterAccess(ConfigurationHandler.expirationTime, TimeUnit.MINUTES).recordStats()
+    private final LoadingCache<Integer, MerchantRecipeList> storeCache             = CacheBuilder.newBuilder().maximumSize(ModConfig.maxStores)
+                                                                                           .expireAfterAccess(ModConfig.expirationTime, TimeUnit.MINUTES).recordStats()
                                                                                            .build(new CacheLoader<Integer, MerchantRecipeList>()
                                                                                            {
                                                                                                @Override
@@ -105,7 +106,7 @@ public class RecordStoreHelper
                                                                                                    MerchantRecipeList store;
 
                                                                                                    final int luck = rand.nextInt(100) + 1;
-                                                                                                   if (luck <= ConfigurationHandler.shopChance) {
+                                                                                                   if (luck <= ModConfig.shopChance) {
                                                                                                        store = createRandomStore();
                                                                                                    } else {
                                                                                                        store = new MerchantRecipeList();       // Empty store
@@ -134,7 +135,7 @@ public class RecordStoreHelper
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.debugRecordStoreHelper) {
+        if (ModConfig.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.getStore(" + villagerId + ")");
         }
 
@@ -147,7 +148,7 @@ public class RecordStoreHelper
         }
 
         // --- Debug ---
-        if (ConfigurationHandler.debugRecordStoreHelper) {
+        if (ModConfig.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.getStore() <-- [" + list + "]");
 
             final CacheStats cacheStats = this.storeCache.stats();
@@ -165,7 +166,7 @@ public class RecordStoreHelper
     public void useRecipe(MerchantRecipe recipe, EntityPlayer player)
     {
         // --- Debug ---
-        if (ConfigurationHandler.debugRecordStoreHelper) {
+        if (ModConfig.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.useRecipe(" + LogHelper.recipeToString(recipe) + ", " + player + ")");
         }
 
@@ -181,7 +182,7 @@ public class RecordStoreHelper
     MerchantRecipeList createRandomStore()
     {
         // --- Debug ---
-        if (ConfigurationHandler.debugRecordStoreHelper) {
+        if (ModConfig.debugRecordStoreHelper) {
             LogHelper.info("RecordStoreHelper.createRandomStore()");
         }
 
@@ -194,7 +195,7 @@ public class RecordStoreHelper
 
 
         // Decides how many offers will be added. The minimum is 3 trades.
-        int offersSize = rand.nextInt(ConfigurationHandler.maxOffers);
+        int offersSize = rand.nextInt(ModConfig.maxOffers);
         if (offersSize < 3) {
             offersSize = 3;
         }
@@ -213,7 +214,7 @@ public class RecordStoreHelper
         final int spareOffers = 5;
         for (int i = 0; i < (offersSize + spareOffers); i++) {
             luck = rand.nextInt(100) + 1;
-            luckType = luck <= ConfigurationHandler.buyingOffersRatio ? EnumRecipeType.BUYING_RECORDS : EnumRecipeType.SELLING_RECORDS;
+            luckType = luck <= ModConfig.buyingOffersRatio ? EnumRecipeType.BUYING_RECORDS : EnumRecipeType.SELLING_RECORDS;
             offers.add(luckType);
         }
 
@@ -270,7 +271,7 @@ public class RecordStoreHelper
 
     MerchantRecipe getRandomRecipe(EnumRecipeType type)
     {
-        final ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
+        final ItemStack emptyDisc = new ItemStack(Features.Items.BLANK_RECORD, 1);
         ItemStack musicDisc = null;
         ItemStack emeralds = null;
         MerchantRecipe recipe;
@@ -285,11 +286,11 @@ public class RecordStoreHelper
 
         // sets the price
         if (type == EnumRecipeType.BUYING_RECORDS) {
-            auxPriceMin = ConfigurationHandler.recordPriceBuyMin;
-            auxPriceMax = ConfigurationHandler.recordPriceBuyMax;
+            auxPriceMin = ModConfig.recordPriceBuyMin;
+            auxPriceMax = ModConfig.recordPriceBuyMax;
         } else if (type == EnumRecipeType.SELLING_RECORDS) {
-            auxPriceMin = ConfigurationHandler.recordPriceSellMin;
-            auxPriceMax = ConfigurationHandler.recordPriceSellMax;
+            auxPriceMin = ModConfig.recordPriceSellMin;
+            auxPriceMax = ModConfig.recordPriceSellMax;
         } else {
             return null;
         }
@@ -313,7 +314,7 @@ public class RecordStoreHelper
 
         // Since the tradeUses variable is hard-coded on 7, manually reduces the amount of
         // times this trade can be used.
-        recipeStock = rand.nextInt(ConfigurationHandler.tradeUses) + 1;
+        recipeStock = rand.nextInt(ModConfig.tradeUses) + 1;
         recipe.increaseMaxTradeUses(recipeStock - 7);
 
 

@@ -124,17 +124,17 @@ public class ContainerRecordTrading extends Container
                 return null;
             }
 
-            if (var5.stackSize == 0) {
+            if (var5.getCount() == 0) {
                 slot.putStack((ItemStack) null);
             } else {
                 slot.onSlotChanged();
             }
 
-            if (var5.stackSize == stack.stackSize) {
+            if (var5.getCount() == stack.getCount()) {
                 return null;
             }
 
-            slot.onPickupFromSlot(playerIn, var5);
+            slot.onTake(playerIn, var5);
         }
 
         return stack;

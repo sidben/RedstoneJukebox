@@ -11,8 +11,9 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.helper.LogHelper;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.util.LogHelper;
 
 
 
@@ -70,7 +71,7 @@ public class InventoryRecordTrading implements IInventory
                 var3 = this.theInventory[par1];
                 this.theInventory[par1] = null;
                 return var3;
-            } else if (this.theInventory[par1].stackSize <= par2) {
+            } else if (this.theInventory[par1].getCount() <= par2) {
                 var3 = this.theInventory[par1];
                 this.theInventory[par1] = null;
 
@@ -82,7 +83,7 @@ public class InventoryRecordTrading implements IInventory
             } else {
                 var3 = this.theInventory[par1].splitStack(par2);
 
-                if (this.theInventory[par1].stackSize == 0) {
+                if (this.theInventory[par1].getCount() == 0) {
                     this.theInventory[par1] = null;
                 }
 
@@ -129,8 +130,8 @@ public class InventoryRecordTrading implements IInventory
     {
         this.theInventory[index] = stack;
 
-        if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
-            stack.stackSize = this.getInventoryStackLimit();
+        if (stack != null && stack.getCount() > this.getInventoryStackLimit()) {
+            // TODO: update stack.getCount() = this.getInventoryStackLimit();
         }
 
         if (this.inventoryResetNeededOnSlotChange(index)) {
@@ -170,11 +171,12 @@ public class InventoryRecordTrading implements IInventory
      * Do not make give this method the name canInteractWith because it clashes with Container
      */
     @Override
-    public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
+    public boolean isUsableByPlayer(EntityPlayer player)
     {
-        return this.theMerchant.getCustomer() == par1EntityPlayer;
+        return this.theMerchant.getCustomer() == player;
     }
 
+    
     @Override
     public void openInventory(EntityPlayer player)
     {
@@ -237,11 +239,11 @@ public class InventoryRecordTrading implements IInventory
             this.setInventorySlotContents(2, (ItemStack) null);
         } else {
             MerchantRecipeList merchantrecipelist;
-            if (this.thePlayer.worldObj.isRemote) {
+            if (this.thePlayer.world.isRemote) {
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().clientSideCurrentStore;
 
                 // --- Debug ---
-                if (ConfigurationHandler.debugGuiRecordTrading) {
+                if (ModConfig.debugGuiRecordTrading) {
                     LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from client - index: " + this.currentRecipeIndex);
                 }
 
@@ -249,7 +251,7 @@ public class InventoryRecordTrading implements IInventory
                 merchantrecipelist = ModRedstoneJukebox.instance.getRecordStoreHelper().getStore(villagerId);
 
                 // --- Debug ---
-                if (ConfigurationHandler.debugGuiRecordTrading) {
+                if (ModConfig.debugGuiRecordTrading) {
                     LogHelper.info("InventoryRecordTrading.resetRecipeAndSlots() - getting recipe from server - index: " + this.currentRecipeIndex);
                 }
 
@@ -316,6 +318,15 @@ public class InventoryRecordTrading implements IInventory
             this.theInventory[i] = null;
         }
     }
+
+	
+    @Override
+    public boolean isEmpty()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 
 
 }

@@ -4,7 +4,6 @@ import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.opengl.GL11;
-import sidben.redstonejukebox.init.MyItems;
 
 
 /*
@@ -52,16 +51,16 @@ public class ItemRendererCustomRecord implements IItemRenderer
 
 
                 // Base layer
-                auxIcon = MyItems.recordCustom.base_SimpleIcon;
+                auxIcon = Features.Items.recordCustom.base_SimpleIcon;
                 ItemRenderer.renderItemIn2D(tessellator, auxIcon.getMaxU(), auxIcon.getMinV(), auxIcon.getMinU(), auxIcon.getMaxV(), 16, 16, 0.0625F);
 
                 // 1st overlay
-                auxIcon = MyItems.recordCustom.overlay_FullIcon;
+                auxIcon = Features.Items.recordCustom.overlay_FullIcon;
                 GL11.glColor4f(1.0F, 1.0F, 0.0F, 1.0F);
                 ItemRenderer.renderItemIn2D(tessellator, auxIcon.getMaxU(), auxIcon.getMinV(), auxIcon.getMinU(), auxIcon.getMaxV(), 16, 16, 0.0625F);
 
                 // 2nd overlay
-                auxIcon = MyItems.recordCustom.overlay_HalfIcon;
+                auxIcon = Features.Items.recordCustom.overlay_HalfIcon;
                 GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
                 ItemRenderer.renderItemIn2D(tessellator, auxIcon.getMaxU(), auxIcon.getMinV(), auxIcon.getMinU(), auxIcon.getMaxV(), 16, 16, 0.0625F);
 
@@ -78,15 +77,15 @@ public class ItemRendererCustomRecord implements IItemRenderer
 
 
                 // Base layer
-                RenderItem.getInstance().renderIcon(0, 0, MyItems.recordCustom.base_SimpleIcon, 16, 16);
+                RenderItem.getInstance().renderIcon(0, 0, Features.Items.recordCustom.base_SimpleIcon, 16, 16);
 
                 // 1st overlay
                 GL11.glColor4f(1.0F, 1.0F, 0.0F, 1.0F);
-                RenderItem.getInstance().renderIcon(0, 0, MyItems.recordCustom.overlay_FullIcon, 16, 16);
+                RenderItem.getInstance().renderIcon(0, 0, Features.Items.recordCustom.overlay_FullIcon, 16, 16);
 
                 // 2nd overlay
                 GL11.glColor4f(0.0F, 0.0F, 0.0F, 1.0F);
-                RenderItem.getInstance().renderIcon(0, 0, MyItems.recordCustom.overlay_HalfIcon, 16, 16);
+                RenderItem.getInstance().renderIcon(0, 0, Features.Items.recordCustom.overlay_HalfIcon, 16, 16);
 
 
                 GL11.glPopMatrix();

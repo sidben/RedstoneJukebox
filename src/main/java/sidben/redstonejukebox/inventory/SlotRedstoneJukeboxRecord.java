@@ -40,11 +40,13 @@ public class SlotRedstoneJukeboxRecord extends Slot
     /**
      * Called when the player picks up an item from an inventory slot
      */
+    /*
     @Override
-    public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack s)
+    // TODO: update public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack s)
     {
         super.onPickupFromSlot(par1EntityPlayer, s);
     }
+    */
 
 
 }

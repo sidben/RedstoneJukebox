@@ -7,9 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.LogHelper;
-import sidben.redstonejukebox.helper.RecordInfo;
-import sidben.redstonejukebox.init.MyItems;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.util.LogHelper;
+import sidben.redstonejukebox.util.RecordInfo;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -67,7 +67,7 @@ public class RecordTradingFullListMessage implements IMessage
                 final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
                 final Item recordItem = Item.getItemById(recordInfo.recordItemId);
 
-                final ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
+                final ItemStack emptyDisc = new ItemStack(Features.Items.BLANK_RECORD, 1);
                 final ItemStack musicDisc = new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
                 final ItemStack emeralds = new ItemStack(Items.EMERALD, emeraldPrice);
 
@@ -122,7 +122,7 @@ public class RecordTradingFullListMessage implements IMessage
                     // Villager is buying records
                     buf.writeByte(TYPE_BUYING);             // Trade type
                     buf.writeInt(recordInfoId);             // Record the villager is buying
-                    buf.writeShort(slotSell.stackSize);     // Price in emeralds
+                    buf.writeShort(slotSell.getCount());     // Price in emeralds
                 }
 
             } else {
@@ -132,7 +132,7 @@ public class RecordTradingFullListMessage implements IMessage
                     // Villager is selling records
                     buf.writeByte(TYPE_SELLING);            // Trade type
                     buf.writeInt(recordInfoId);             // Record the villager is selling
-                    buf.writeShort(slotBuy2.stackSize);     // Price in emeralds
+                    buf.writeShort(slotBuy2.getCount());     // Price in emeralds
                 }
 
             }

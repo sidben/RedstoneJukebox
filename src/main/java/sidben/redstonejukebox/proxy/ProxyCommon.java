@@ -9,20 +9,19 @@ import net.minecraftforge.common.MinecraftForge;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.handler.PlayerEventHandler;
 import sidben.redstonejukebox.handler.SoundEventHandler;
-import sidben.redstonejukebox.init.MyBlocks;
-import sidben.redstonejukebox.init.MyItems;
-import sidben.redstonejukebox.init.MyRecipes;
 import sidben.redstonejukebox.inventory.ContainerRecordTrading;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.main.Reference;
 import sidben.redstonejukebox.network.CommandPlayRecordAtMessage;
 import sidben.redstonejukebox.network.CommandPlayRecordMessage;
 import sidben.redstonejukebox.network.CommandStopAllRecordsMessage;
 import sidben.redstonejukebox.network.JukeboxGUIUpdatedMessage;
 import sidben.redstonejukebox.network.JukeboxPlayRecordMessage;
-import sidben.redstonejukebox.network.NetworkHelper;
+import sidben.redstonejukebox.network.NetworkManager;
 import sidben.redstonejukebox.network.RecordTradingFullListMessage;
 import sidben.redstonejukebox.network.RecordTradingGUIUpdatedMessage;
-import sidben.redstonejukebox.reference.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,7 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 /*
  * Base proxy class, here I initialize everything that must happen on both, server and client.
  */
-public abstract class CommonProxy implements IProxy
+public abstract class ProxyCommon implements IProxy
 {
 
     @Override
@@ -44,41 +43,19 @@ public abstract class CommonProxy implements IProxy
     @Override
     public void pre_initialize()
     {
-        // Register network messages
-        int packetdId = 0;
-
-        ModRedstoneJukebox.NetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.ModChannel);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, packetdId++, Side.SERVER);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.JukeboxPlayRecordHandler.class, JukeboxPlayRecordMessage.class, packetdId++, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingGUIHandler.class, RecordTradingGUIUpdatedMessage.class, packetdId++, Side.SERVER);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.RecordTradingFullListHandler.class, RecordTradingFullListMessage.class, packetdId++, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordAtHandler.class, CommandPlayRecordAtMessage.class, packetdId++, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandPlayRecordHandler.class, CommandPlayRecordMessage.class, packetdId++, Side.CLIENT);
-        ModRedstoneJukebox.NetworkWrapper.registerMessage(NetworkHelper.CommandStopAllRecordsHandler.class, CommandStopAllRecordsMessage.class, packetdId++, Side.CLIENT);
-
-
-        // Register items
-        MyItems.register();
-
-
-        // Register blocks
-        MyBlocks.register();
+        Features.registerItems();
+        Features.registerBlocks();
+        
+        NetworkManager.registerMessages();
     }
 
 
     @Override
     public void initialize()
     {
-		// Recipes
-        MyRecipes.register();
-
-
-        // Achievements
-
-
-        // Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
 
+        Features.registerRecipes();
     }
 
 
@@ -101,12 +78,12 @@ public abstract class CommonProxy implements IProxy
     @Override
     public Object getServerGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
-        if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
+        if (guiID == ModConfig.redstoneJukeboxGuiID) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(new BlockPos(x, y, z));
             return new ContainerRedstoneJukebox(player.inventory, teJukebox);
         }
 
-        else if (guiID == ModRedstoneJukebox.recordTradingGuiID) {
+        else if (guiID == ModConfig.recordTradingGuiID) {
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
             final Entity villager = world.getEntityByID(x);
             if (villager instanceof EntityVillager) {

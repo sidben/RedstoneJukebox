@@ -6,9 +6,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.village.MerchantRecipeList;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.LogHelper;
-import sidben.redstonejukebox.init.MyItems;
-import sidben.redstonejukebox.network.NetworkHelper;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.network.NetworkManager;
+import sidben.redstonejukebox.util.LogHelper;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -33,11 +34,11 @@ public class PlayerEventHandler
 
             // if the player is holding a blank record, cancels the regular trade...
             final ItemStack item = event.getEntityPlayer().inventory.getCurrentItem();
-            if (item != null && item.getItem() == MyItems.recordBlank) {
+            if (item != null && item.getItem() == Features.Items.BLANK_RECORD) {
                 // ...and opens a custom trade screen
                 event.setCanceled(true);
 
-                if (!event.getTarget().worldObj.isRemote) {
+                if (!event.getTarget().world.isRemote) {
                     // Check if the villager have valid trades
                     MerchantRecipeList tradesList = null;
                     try {
@@ -52,7 +53,7 @@ public class PlayerEventHandler
 
 
                     // --- Debug ---
-                    if (ConfigurationHandler.debugNetworkRecordTrading) {
+                    if (ModConfig.debugNetworkRecordTrading) {
                         LogHelper.info("PlayerEventHandler.onEntityInteractEvent()");
                         LogHelper.info("    Villager ID: " + event.getTarget().getEntityId());
                         LogHelper.info("    Custom record trades: " + tradesList.size());
@@ -62,11 +63,11 @@ public class PlayerEventHandler
 
                     if (tradesList.size() > 0) {
                         // Sends the shop to the player
-                        NetworkHelper.sendRecordTradingFullListMessage(tradesList, event.getEntityPlayer());
+                        NetworkManager.sendRecordTradingFullListMessage(tradesList, event.getEntityPlayer());
                         
                         // Have trades, opens the GUI
                         ((EntityVillager) event.getTarget()).setCustomer(event.getEntityPlayer());
-                        event.getEntityPlayer().openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.recordTradingGuiID, event.getTarget().worldObj, event.getTarget().getEntityId(), 0, 0);
+                        event.getEntityPlayer().openGui(ModRedstoneJukebox.instance, ModConfig.recordTradingGuiID, event.getTarget().world, event.getTarget().getEntityId(), 0, 0);
 
                     } else {
                         // Don't have trades, play a sound
@@ -77,7 +78,7 @@ public class PlayerEventHandler
                 }
 
 
-            } // if (item != null && item.getItem() == MyItems.recordBlank)
+            } // if (item != null && item.getItem() == Features.Items.recordBlank)
 
 
         } // if (event.target instanceof EntityVillager)

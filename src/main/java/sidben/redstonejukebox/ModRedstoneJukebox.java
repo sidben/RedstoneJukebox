@@ -1,17 +1,7 @@
 package sidben.redstonejukebox;
 
-import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.helper.MusicHelper;
-import sidben.redstonejukebox.helper.RecordInfoManager;
-import sidben.redstonejukebox.helper.RecordStoreHelper;
-import sidben.redstonejukebox.init.MyBlocks;
-import sidben.redstonejukebox.init.MyCommands;
-import sidben.redstonejukebox.init.MyItems;
-import sidben.redstonejukebox.proxy.IProxy;
-import sidben.redstonejukebox.reference.Reference;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -21,45 +11,35 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.main.Reference;
+import sidben.redstonejukebox.proxy.IProxy;
+import sidben.redstonejukebox.util.MusicHelper;
+import sidben.redstonejukebox.util.RecordInfoManager;
+import sidben.redstonejukebox.util.RecordStoreHelper;
 
 
 @Mod(modid = Reference.ModID, name = Reference.ModName, version = Reference.ModVersion, guiFactory = Reference.GuiFactoryClass)
 public class ModRedstoneJukebox
 {
 
-
-    // The instance of your mod that Forge uses.
     @Mod.Instance(Reference.ModID)
-    public static ModRedstoneJukebox   instance;
-
+    public static ModRedstoneJukebox instance;
 
     @SidedProxy(clientSide = Reference.ClientProxyClass, serverSide = Reference.ServerProxyClass)
-    public static IProxy               proxy;
-
-
-    // Used to send information between client / server
-    public static SimpleNetworkWrapper NetworkWrapper;
-
-
-    // Global variables
-    public final static int            maxExtraVolume       = 128;        // Maximum amount of extra range for the custom jukebox
+    public static IProxy             proxy;
 
 
     // Helper classes
-    private RecordInfoManager          recordInfoManager;
-    private RecordStoreHelper          recordStoreHelper;
+    private RecordInfoManager        recordInfoManager;
+    private RecordStoreHelper        recordStoreHelper;
     @SideOnly(Side.CLIENT)
-    private MusicHelper                musicHelper;
-
-
-
-    // GUI IDs
-    public static int                  redstoneJukeboxGuiID = 0;
-    public static int                  recordTradingGuiID   = 1;
+    private MusicHelper              musicHelper;
 
 
 
@@ -103,8 +83,8 @@ public class ModRedstoneJukebox
     public void preInit(FMLPreInitializationEvent event)
     {
         // Loads config
-        ConfigurationHandler.init(event.getSuggestedConfigurationFile());
-        MinecraftForge.EVENT_BUS.register(new ConfigurationHandler());
+        ModConfig.init(event.getSuggestedConfigurationFile());
+        MinecraftForge.EVENT_BUS.register(EventHandlerConfig.class);
 
         // Sided pre-initialization
         proxy.pre_initialize();
@@ -136,45 +116,40 @@ public class ModRedstoneJukebox
     @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event)
     {
-        // Custom commands
-        MyCommands.register(event);
+        Features.registerCommands(event);
     }
-    
-    
-    
-    
-    @Mod.EventHandler
-    public void onMissingMappings(FMLMissingMappingsEvent event) 
-    {
-    	/*
-    	 * I had to rename the Mod ID to match the namespace and resources namespace. The game
-    	 * code automatically appends the mod ID when searching for the blockstates and models,
-    	 * so without changing the mod id I could not point he game to the right place.
-    	 * 
-    	 * This naming style was legacy from old code, was about time to update it. The remapping
-    	 * below should prevent worlds from losing blocks and items. 
-    	 */
-    	
-    	for (MissingMapping miss : event.getAll()) 
-    	{
-    		if (miss.type == GameRegistry.Type.BLOCK) {
-    			
-	    		// Blocks
-	            if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxBlock")) { miss.remap(MyBlocks.redstoneJukebox); }
-	            else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxActiveBlock")) { miss.remap(MyBlocks.redstoneJukeboxActive); }
 
-    		}
-    		
-    		else if (miss.type == GameRegistry.Type.ITEM) {
-    	
-    			// Items
-	            if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxBlock")) { miss.remap(Item.getItemFromBlock(MyBlocks.redstoneJukebox)); }
-	            else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxActiveBlock")) { miss.remap(Item.getItemFromBlock(MyBlocks.redstoneJukeboxActive)); }
-	            else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:CustomRecordItem")) { miss.remap(MyItems.recordCustom); }
-	            else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:BlankRecordItem")) { miss.remap(MyItems.recordBlank); }
-    			
-    		}
-    	}
+
+
+    @Mod.EventHandler
+    public void onMissingMappings(FMLMissingMappingsEvent event)
+    {
+        // Remapping id's from older versions.
+        for (final MissingMapping miss : event.getAll()) {
+            if (miss.type == GameRegistry.Type.BLOCK) {
+
+                if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxBlock")) {
+                    miss.remap(Features.Blocks.REDSTONE_JUKEBOX);
+                } else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxActiveBlock")) {
+                    miss.remap(Features.Blocks.ACTIVE_REDSTONE_JUKEBOX);
+                }
+
+            }
+
+            else if (miss.type == GameRegistry.Type.ITEM) {
+
+                if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxBlock")) {
+                    miss.remap(Item.getItemFromBlock(Features.Blocks.REDSTONE_JUKEBOX));
+                } else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:RedstoneJukeboxActiveBlock")) {
+                    miss.remap(Item.getItemFromBlock(Features.Blocks.ACTIVE_REDSTONE_JUKEBOX));
+                } else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:CustomRecordItem")) {
+                    miss.remap(Features.Items.CUSTOM_RECORD);
+                } else if (miss.name.equalsIgnoreCase("SidbenRedstoneJukebox:BlankRecordItem")) {
+                    miss.remap(Features.Items.BLANK_RECORD);
+                }
+
+            }
+        }
     }
 
 }

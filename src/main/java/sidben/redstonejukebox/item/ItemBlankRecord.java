@@ -6,8 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.translation.I18n;
-import sidben.redstonejukebox.proxy.ClientProxy;
-import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.main.Reference;
+import sidben.redstonejukebox.proxy.ProxyClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -22,14 +22,9 @@ public class ItemBlankRecord extends Item
     public ItemBlankRecord() {
         this.setMaxStackSize(16);
         this.setUnlocalizedName("blank_record");
+        this.setRegistryName("blank_record");
         this.setCreativeTab(CreativeTabs.MISC);
     }
-
-
-
-    // --------------------------------------------------------------------
-    // Textures and Rendering
-    // --------------------------------------------------------------------
 
 
 

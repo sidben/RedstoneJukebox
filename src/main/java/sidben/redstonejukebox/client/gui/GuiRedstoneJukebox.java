@@ -11,8 +11,9 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
-import sidben.redstonejukebox.network.NetworkHelper;
-import sidben.redstonejukebox.proxy.ClientProxy;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.network.NetworkManager;
+import sidben.redstonejukebox.proxy.ProxyClient;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -33,7 +34,7 @@ public class GuiRedstoneJukebox extends GuiContainer
     private int                             danceNoteFrame        = 0;
     private int                             danceNoteCount        = 0;
 
-    private static final ResourceLocation   guiMainTexture        = new ResourceLocation(ClientProxy.guiTextureJukebox);
+    private static final ResourceLocation   guiMainTexture        = new ResourceLocation(ProxyClient.guiTextureJukebox);
     private boolean                         changed               = false;                                              // used to detect if the config was changed, so the server is notified
 
 
@@ -211,7 +212,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
         // -- Volume range indicator (the slice have around 9px width and 8px height)
         final int jukeboxExtraVolumeRange = this.jukeboxInventory.getExtraVolume(false);
-        final int volumeFactor = (int) Math.floor(((float) jukeboxExtraVolumeRange / (float) ModRedstoneJukebox.maxExtraVolume) * 8);
+        final int volumeFactor = (int) Math.floor(((float) jukeboxExtraVolumeRange / (float) ModConfig.maxExtraVolume) * 8);
         this.drawTexturedModalRect(j + 10, k + 27, 176, 42, 1 + volumeFactor, 8);
 
 
@@ -261,7 +262,7 @@ public class GuiRedstoneJukebox extends GuiContainer
 
         if (this.changed) {
             // notify server of the changes made in the GUI
-            NetworkHelper.sendJukeboxGUIUpdatedMessage(this.jukeboxInventory);
+            NetworkManager.sendJukeboxGUIUpdatedMessage(this.jukeboxInventory);
         }
 
     }

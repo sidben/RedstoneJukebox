@@ -1,4 +1,4 @@
-package sidben.redstonejukebox.helper;
+package sidben.redstonejukebox.util;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,7 +15,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.handler.ConfigurationHandler;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
+import sidben.redstonejukebox.main.ModConfig;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -129,7 +130,7 @@ public class MusicHelper
         final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugMusicHelper) {
+        if (ModConfig.debugMusicHelper) {
             LogHelper.info("MusicHelper.playRecordAt()");
             LogHelper.info("    Coords:         " + pos);
             LogHelper.info("    Show name:      " + showName);
@@ -191,7 +192,7 @@ public class MusicHelper
         final ISound isound = this.mapJukeboxesPositions.get(pos);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugMusicHelper) {
+        if (ModConfig.debugMusicHelper) {
             LogHelper.info("MusicHelper.stopPlayingAt()");
             LogHelper.info("    Coords:  " + pos);
             LogHelper.info("    iSound:  " + isound);
@@ -215,7 +216,7 @@ public class MusicHelper
         final RecordInfo recordInfo = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoFromId(recordInfoId);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugMusicHelper) {
+        if (ModConfig.debugMusicHelper) {
             LogHelper.info("MusicHelper.playRecord()");
             LogHelper.info("    Show name:      " + showName);
             LogHelper.info("    Record info id: " + recordInfoId);
@@ -251,7 +252,7 @@ public class MusicHelper
     public void StopAllBackgroundMusic()
     {
         // --- Debug ---
-        if (ConfigurationHandler.debugMusicHelper) {
+        if (ModConfig.debugMusicHelper) {
             LogHelper.info("MusicHelper.StopAllBackgroundMusic()");
             LogHelper.info("    Custom BGMusic: " + this.IsCustomBackgroundMusicPlaying());
         }
@@ -279,7 +280,7 @@ public class MusicHelper
             if (soundObj.getSoundLocation().getResourcePath().startsWith("music.") || soundObj.getAttenuationType() == ISound.AttenuationType.NONE
                     || (soundObj.getXPosF() == 0F && soundObj.getYPosF() == 0F && soundObj.getZPosF() == 0F)) {
 
-                if (ConfigurationHandler.debugMusicHelper) {
+                if (ModConfig.debugMusicHelper) {
                     LogHelper.info("    Stopping sound [" + soundId + "] - " + soundObj.getSoundLocation());
                 }
 

@@ -7,7 +7,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import sidben.redstonejukebox.network.NetworkHelper;
+import sidben.redstonejukebox.network.NetworkManager;
 
 
 
@@ -15,13 +15,13 @@ public class CommandStopAllRecords extends CommandBase
 {
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "stopallrecords";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         return "commands.stopallrecords.usage";
     }
@@ -39,7 +39,7 @@ public class CommandStopAllRecords extends CommandBase
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1) {
-            throw new CommandException(this.getCommandUsage(sender), new Object[0]);
+            throw new CommandException(this.getUsage(sender), new Object[0]);
         } else {
             /*
              * Command syntax:
@@ -50,7 +50,7 @@ public class CommandStopAllRecords extends CommandBase
 
 
             // Send packet requesting record play
-            NetworkHelper.sendCommandStopAllRecordsMessage(player);
+            NetworkManager.sendCommandStopAllRecordsMessage(player);
 
 
             // Writes text on the chat
@@ -64,7 +64,7 @@ public class CommandStopAllRecords extends CommandBase
      * Adds the strings available in this command to the given list of tab completion options.
      */
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         return null;
     }

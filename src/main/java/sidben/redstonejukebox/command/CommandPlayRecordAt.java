@@ -8,20 +8,20 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.network.NetworkHelper;
+import sidben.redstonejukebox.network.NetworkManager;
 
 // TODO: support for ~ on xyz coords, autocomplete of player name
 public class CommandPlayRecordAt extends CommandBase
 {
 
     @Override
-    public String getCommandName()
+    public String getName()
     {
         return "playrecordat";
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender)
+    public String getUsage(ICommandSender sender)
     {
         return "commands.playrecordat.usage";
     }
@@ -39,7 +39,7 @@ public class CommandPlayRecordAt extends CommandBase
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2) {
-            throw new CommandException(this.getCommandUsage(sender), new Object[0]);
+            throw new CommandException(this.getUsage(sender), new Object[0]);
         } else {
             /*
              * Command syntax:
@@ -87,7 +87,7 @@ public class CommandPlayRecordAt extends CommandBase
 
 
             // Send packet requesting record play
-            NetworkHelper.sendCommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, extraVolumeRange, player);
+            NetworkManager.sendCommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, extraVolumeRange, player);
 
 
             // Writes text on the chat
@@ -101,7 +101,7 @@ public class CommandPlayRecordAt extends CommandBase
      * Adds the strings available in this command to the given list of tab completion options.
      */
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1) {
             return CommandBase.getListOfStringsMatchingLastWord(args, ModRedstoneJukebox.instance.getRecordInfoManager().getRecordNames());

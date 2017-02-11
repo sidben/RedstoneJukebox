@@ -6,7 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import sidben.redstonejukebox.proxy.ClientProxy;
+import sidben.redstonejukebox.proxy.ProxyClient;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -21,10 +21,11 @@ public class ItemCustomRecord extends ItemRecord
     // --------------------------------------------------------------------
     // Constructors
     // --------------------------------------------------------------------
-    public ItemCustomRecord(String name) {
-        super(name, null);
+    public ItemCustomRecord() {
+        super("custom_record", null);
         this.setMaxStackSize(1);
-        this.setUnlocalizedName(name);
+        this.setUnlocalizedName("custom_record");
+        this.setRegistryName("custom_record");
         this.setCreativeTab(CreativeTabs.MISC);
 
         this.setMaxDamage(0);

@@ -9,7 +9,6 @@ import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
@@ -19,12 +18,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
 import sidben.redstonejukebox.block.BlockRedstoneJukebox;
-import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.helper.LogHelper;
-import sidben.redstonejukebox.helper.RecordInfo;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
 import sidben.redstonejukebox.inventory.ContainerRedstoneJukebox;
-import sidben.redstonejukebox.network.NetworkHelper;
-import sidben.redstonejukebox.proxy.ClientProxy;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.network.NetworkManager;
+import sidben.redstonejukebox.proxy.ProxyClient;
+import sidben.redstonejukebox.util.LogHelper;
+import sidben.redstonejukebox.util.RecordInfo;
 
 
 
@@ -137,7 +137,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     public ItemStack decrStackSize(int slot, int amount)
     {
         if (this.jukeboxItems[slot] != null) {
-            if (this.jukeboxItems[slot].stackSize <= amount) {
+            if (this.jukeboxItems[slot].getCount() <= amount) {
                 final ItemStack itemstack = this.jukeboxItems[slot];
                 this.jukeboxItems[slot] = null;
                 return itemstack;
@@ -145,7 +145,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
 
             final ItemStack itemstack1 = this.jukeboxItems[slot].splitStack(amount);
 
-            if (this.jukeboxItems[slot].stackSize == 0) {
+            if (this.jukeboxItems[slot].getCount() == 0) {
                 this.jukeboxItems[slot] = null;
             }
 
@@ -181,8 +181,8 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     {
         this.jukeboxItems[slot] = stack;
 
-        if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
-            stack.stackSize = this.getInventoryStackLimit();
+        if (stack != null && stack.getCount() > this.getInventoryStackLimit()) {
+            // TODO: update stack.getCount() = this.getInventoryStackLimit();
         }
     }
 
@@ -222,9 +222,9 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
 
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player)
+    public boolean isUsableByPlayer(EntityPlayer player)
     {
-        if (this.worldObj.getTileEntity(this.pos) != this) {
+        if (this.world.getTileEntity(this.pos) != this) {
             return false;
         }
 
@@ -265,7 +265,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
      */
     public void resync()		// TODO: check if this is needed, it think it only server to update rendering
     {
-    	// this.worldObj.notifyBlockUpdate(pos, state, state, 3);		// Disabled by now
+    	// this.world.notifyBlockUpdate(pos, state, state, 3);		// Disabled by now
         this.markDirty();
     }
 
@@ -288,7 +288,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
             final byte byte0 = nbttagcompound.getByte("Slot");
 
             if (byte0 >= 0 && byte0 < this.jukeboxItems.length) {
-                this.jukeboxItems[byte0] = ItemStack.loadItemStackFromNBT(nbttagcompound);
+                // TODO: update this.jukeboxItems[byte0] = ItemStack.loadItemStackFromNBT(nbttagcompound);
             }
         }
 
@@ -364,7 +364,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
      *            The data packet
      */
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet)
+    public void onDataPacket(net.minecraft.network.NetworkManager net, SPacketUpdateTileEntity packet)
     {
         // Read NBT packet from the server
         final NBTTagCompound tag = packet.getNbtCompound();
@@ -375,7 +375,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
         this.currentJukeboxPlaySlot = tag.getByte("InvSlot");
 
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkJukebox) {
+        if (ModConfig.debugNetworkJukebox) {
             LogHelper.info("TileEntityRedstoneJukebox.onDataPacket()");
             LogHelper.info("    PlayMode: " + this.paramPlayMode);
             LogHelper.info("    Loop:     " + this.paramLoop);
@@ -393,7 +393,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     public SPacketUpdateTileEntity getUpdatePacket()
     {
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkJukebox) {
+        if (ModConfig.debugNetworkJukebox) {
             LogHelper.info("TileEntityRedstoneJukebox.getDescriptionPacket()");
             LogHelper.info("    PlayMode: " + this.paramPlayMode);
             LogHelper.info("    Loop:     " + this.paramLoop);
@@ -426,13 +426,13 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
      */
     public void tickJukebox()
     {
-        if (!this.worldObj.isRemote) {
+        if (!this.world.isRemote) {
 
             // --- Debug ---
-            if (ConfigurationHandler.debugJukeboxTick) {
+            if (ModConfig.debugJukeboxTick) {
                 LogHelper.info("Jukebox.tickJukebox() @ " + this.pos + " isPlaying: " + this.isPlaying() + " - isBlockPowered: " + this.isBlockPowered + " - schdPlayNext: "
                         + this.schedulePlayNextRecord + " - schdStart: " + this.scheduleStartPlaying + " - schdStop: " + this.scheduleStopPlaying + " - playlistFinish: " + this.isPlaylistFinished
-                        + " - songTimer: " + this.songTimer + " - gameTick: " + this.worldObj.getMinecraftServer().getTickCounter());
+                        + " - songTimer: " + this.songTimer + " - gameTick: " + this.world.getMinecraftServer().getTickCounter());
             }
 
 
@@ -495,7 +495,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     public void startPlaying()
     {
         // --- Debug ---
-        if (ConfigurationHandler.debugJukeboxRecordPlay) {
+        if (ModConfig.debugJukeboxRecordPlay) {
             LogHelper.info("Jukebox.startPlaying() @ (" + this.pos + ") - Empty: " + this.isEmpty());
         }
 
@@ -522,16 +522,16 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
         this.scheduleStopPlaying = false;
 
         // --- Debug ---
-        if (ConfigurationHandler.debugJukeboxRecordPlay) {
+        if (ModConfig.debugJukeboxRecordPlay) {
             LogHelper.info("Jukebox.stopPlaying() @ (" + this.pos + ")");
         }
 
         // Send update to clients
-        NetworkHelper.sendJukeboxPlayRecordMessage(this, -1, (byte) -1, 0);
+        NetworkManager.sendJukeboxPlayRecordMessage(this, -1, (byte) -1, 0);
 
         if (updateNeighbors) {
             // To update comparators
-            BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.pos);
+            //TODO: update BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.world, this.pos);
         }
     }
 
@@ -542,7 +542,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     private void playNextRecord()
     {
         // --- Debug ---
-        if (ConfigurationHandler.debugJukeboxRecordPlay) {
+        if (ModConfig.debugJukeboxRecordPlay) {
             LogHelper.info("Jukebox.playNextRecord() @ (" + this.pos + ") - playlist index: " + this.currentIndex + " - current slot: "
                     + this.currentJukeboxPlaySlot + " - Empty: " + this.isEmpty());
         }
@@ -567,7 +567,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
                 nextRecordStack = this.jukeboxItems[this.currentJukeboxPlaySlot];
 
                 // --- Debug ---
-                if (ConfigurationHandler.debugJukeboxRecordPlay) {
+                if (ModConfig.debugJukeboxRecordPlay) {
                     LogHelper.info("    checking item #" + this.currentIndex + " on slot " + this.currentJukeboxPlaySlot + ": " + LogHelper.itemStackToString(nextRecordStack));
                 }
 
@@ -586,7 +586,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
 
 
             // --- Debug ---
-            if (ConfigurationHandler.debugJukeboxRecordPlay) {
+            if (ModConfig.debugJukeboxRecordPlay) {
 
                 if (ModRedstoneJukebox.instance.getRecordInfoManager().isRecord(nextRecordStack)) {
                     final ItemRecord debugRecord = (ItemRecord) (nextRecordStack.getItem());
@@ -597,7 +597,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
                         LogHelper.info("    * recordName:       " + debugRecord.getSound().getSoundName().getResourcePath());
                         LogHelper.info("    * record resource:  " + debugRecord.getSound().getSoundName());
                     }
-                    if (this.worldObj.isRemote) {
+                    if (this.world.isRemote) {
                         LogHelper.info("    * recordName Local: " + debugRecord.getRecordNameLocal());
                     }
                 }
@@ -616,7 +616,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
             // Check if it has a valid item id and a valid song time
             if (recordInfo != null && recordInfo.getRecordDurationSeconds() > 0) {
                 // --- Debug ---
-                if (ConfigurationHandler.debugJukeboxRecordPlay) {
+                if (ModConfig.debugJukeboxRecordPlay) {
                     LogHelper.info("    Record info id: " + recordInfoId);
                     LogHelper.info("    Song time:      " + recordInfo.getRecordDurationSeconds() + " + " + TileEntityRedstoneJukebox.songInterval + " (jukebox interval)");
                 }
@@ -625,14 +625,14 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
                 this.songTimer = recordInfo.getRecordDurationSeconds() + TileEntityRedstoneJukebox.songInterval;
 
                 // Send update to clients
-                NetworkHelper.sendJukeboxPlayRecordMessage(this, recordInfoId, this.getCurrentJukeboxPlaySlot(), this.getExtraVolume(true));
+                NetworkManager.sendJukeboxPlayRecordMessage(this, recordInfoId, this.getCurrentJukeboxPlaySlot(), this.getExtraVolume(true));
 
                 // To update comparators
-                BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.worldObj, this.pos);
+                //TODO: update BlockRedstoneJukebox.updateJukeboxBlockState(this.isBlockPowered, this.world, this.pos);
 
             } else {
                 // --- Debug ---
-                if (ConfigurationHandler.debugJukeboxRecordPlay) {
+                if (ModConfig.debugJukeboxRecordPlay) {
                     LogHelper.info("    Invalid record, skipping to next slot");
                 }
 
@@ -715,13 +715,13 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
         if (this.paramPlayMode == 1 && totalRecords > 1) {
             // Swaps the play order twice
             for (int i = 0; i < this.playOrder.length; i++) {
-                final int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
+                final int randomPosition = this.world.rand.nextInt(this.playOrder.length);
                 final byte temp = this.playOrder[i];
                 this.playOrder[i] = this.playOrder[randomPosition];
                 this.playOrder[randomPosition] = temp;
             }
             for (int i = 0; i < this.playOrder.length; i++) {
-                final int randomPosition = this.worldObj.rand.nextInt(this.playOrder.length);
+                final int randomPosition = this.world.rand.nextInt(this.playOrder.length);
                 final byte temp = this.playOrder[i];
                 this.playOrder[i] = this.playOrder[randomPosition];
                 this.playOrder[randomPosition] = temp;
@@ -750,7 +750,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
     public int getExtraVolume(boolean mustRefresh)
     {
         if (_jukeboxExtraVolumeCached < 0 || mustRefresh) {
-            _jukeboxExtraVolumeCached = BlockRedstoneJukebox.getAmplifierPower(this.worldObj, this.pos);
+            _jukeboxExtraVolumeCached = BlockRedstoneJukebox.getAmplifierPower(this.world, this.pos);
         }
 
         return _jukeboxExtraVolumeCached;
@@ -862,18 +862,18 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
             final ItemStack item = this.getStackInSlot(i1);
 
             if (item != null) {
-                final float f1 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
-                final float f2 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
-                final float f3 = this.worldObj.rand.nextFloat() * 0.8F + 0.1F;
+                final float f1 = this.world.rand.nextFloat() * 0.8F + 0.1F;
+                final float f2 = this.world.rand.nextFloat() * 0.8F + 0.1F;
+                final float f3 = this.world.rand.nextFloat() * 0.8F + 0.1F;
 
-                while (item.stackSize > 0) {
-                    int j1 = this.worldObj.rand.nextInt(21) + 10;
+                while (item.getCount() > 0) {
+                    int j1 = this.world.rand.nextInt(21) + 10;
 
-                    if (j1 > item.stackSize) {
-                        j1 = item.stackSize;
+                    if (j1 > item.getCount()) {
+                        j1 = item.getCount();
                     }
 
-                    item.stackSize -= j1;
+                    // TODO: update item.getCount() -= j1;
                     final EntityItem entityitem = new EntityItem(world, pos.getX() + f1, pos.getY() + f2, pos.getZ() + f3, new ItemStack(item.getItem(), j1, item.getItemDamage()));
 
                     if (item.hasTagCompound()) {
@@ -881,10 +881,10 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
                     }
 
                     final float f4 = 0.05F;
-                    entityitem.motionX = (float) this.worldObj.rand.nextGaussian() * f4;
-                    entityitem.motionY = (float) this.worldObj.rand.nextGaussian() * f4 + 0.2F;
-                    entityitem.motionZ = (float) this.worldObj.rand.nextGaussian() * f4;
-                    world.spawnEntityInWorld(entityitem);
+                    entityitem.motionX = (float) this.world.rand.nextGaussian() * f4;
+                    entityitem.motionY = (float) this.world.rand.nextGaussian() * f4 + 0.2F;
+                    entityitem.motionZ = (float) this.world.rand.nextGaussian() * f4;
+                    world.spawnEntity(entityitem);
                 }
             }
         }
@@ -905,7 +905,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
 	
 	@Override
 	public String getGuiID() {
-		return ClientProxy.getResourceName("redstone_jukebox");
+		return ProxyClient.getResourceName("redstone_jukebox");
 	}
 
 
@@ -936,6 +936,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
             this.jukeboxItems[i] = null;
         }
 	}
+
 
 
 

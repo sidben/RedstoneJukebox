@@ -51,7 +51,7 @@ public class ContainerRedstoneJukebox extends Container
     @Override
     public boolean canInteractWith(EntityPlayer par1EntityPlayer)
     {
-        return this.teJukebox.isUseableByPlayer(par1EntityPlayer);
+        return this.teJukebox.isUsableByPlayer(par1EntityPlayer);
     }
 
 
@@ -105,7 +105,7 @@ public class ContainerRedstoneJukebox extends Container
             }
 
 
-            if (myStack.stackSize == 0) {
+            if (myStack.getCount() == 0) {
                 slot.putStack((ItemStack) null);
             } else {
                 slot.onSlotChanged();

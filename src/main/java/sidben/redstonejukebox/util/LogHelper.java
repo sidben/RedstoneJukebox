@@ -1,37 +1,78 @@
-package sidben.redstonejukebox.helper;
-
+package sidben.redstonejukebox.util;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.village.MerchantRecipe;
 import net.minecraft.village.MerchantRecipeList;
+import java.util.IllegalFormatException;
 import org.apache.logging.log4j.Level;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.main.Reference;
 
 
-// Based on Pahimar LohHelper class
 public class LogHelper 
 {
 	
-	public static void log(Level logLevel, Object object) 
-	{
-		FMLLog.log(Reference.ModName, logLevel, String.valueOf(object));
-	}
-	
-	public static void all(Object object) 		{ log(Level.ALL, object); }
-	public static void debug(Object object) 	{ log(Level.DEBUG, object); }
-	public static void error(Object object) 	{ log(Level.ERROR, object); }
-	public static void fatal(Object object) 	{ log(Level.FATAL, object); }
-	public static void info(Object object) 		{ log(Level.INFO, object); }
-	public static void off(Object object) 		{ log(Level.OFF, object); }
-	public static void trace(Object object) 	{ log(Level.TRACE, object); }
-	public static void warn(Object object) 		{ log(Level.WARN, object); }
+    private static void log(Level logLevel, String format, Object... data)
+    {
+        try {
+            FMLLog.log(Reference.ModID, logLevel, format, data);
+        } catch (final IllegalFormatException e) {
+            System.out.println(e);
+            System.out.println(format);
+        }
+    }
 
-	
-	
-	
+    public static void error(String format, Object... data)
+    {
+        log(Level.ERROR, format, data);
+    }
+
+    public static void error(Object object)
+    {
+        error(String.valueOf(object), new Object[0]);
+    }
+    
+    public static void warn(String format, Object... data)
+    {
+        log(Level.WARN, format, data);
+    }
+
+    public static void info(String format, Object... data)
+    {
+        log(Level.INFO, format, data);
+    }
+
+    public static void debug(String format, Object... data)
+    {
+        if (ModConfig.onDebug()) {
+            log(Level.DEBUG, format, data);
+        }
+    }
+
+    public static void debug(Object object)
+    {
+        debug(String.valueOf(object), new Object[0]);
+    }
+
+    public static void trace(String format, Object... data)
+    {
+        if (ModConfig.onDebug()) {
+            log(Level.TRACE, format, data);
+        }
+    }
+
+    public static void trace(Object object)
+    {
+        trace(String.valueOf(object), new Object[0]);
+    }
+
+    
+    
+    
+    
     public static String recipeListToString(MerchantRecipeList list)
     {
         final StringBuilder r = new StringBuilder();
@@ -59,9 +100,8 @@ public class LogHelper
 
         return r.toString();
     }
-
-
-
+    
+    
     public static String recipeToString(MerchantRecipe recipe)
     {
         if (recipe == null) {
@@ -95,11 +135,10 @@ public class LogHelper
 
         if (stack != null) {
             final Item auxItem = stack.getItem();
-            value = "[" + stack.stackSize + "x " + auxItem.getUnlocalizedName() + " " + Item.getIdFromItem(auxItem) + ":" + stack.getItemDamage() + "]";
+            value = "[" + stack.getCount() + "x " + auxItem.getUnlocalizedName() + " " + Item.getIdFromItem(auxItem) + ":" + stack.getItemDamage() + "]";
         }
 
         return value;
     }
-
-    
+     
 }

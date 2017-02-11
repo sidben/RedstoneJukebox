@@ -5,8 +5,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.LogHelper;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.util.LogHelper;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 

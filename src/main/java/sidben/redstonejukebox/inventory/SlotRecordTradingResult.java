@@ -47,7 +47,7 @@ public class SlotRecordTradingResult extends Slot
     public ItemStack decrStackSize(int par1)
     {
         if (this.getHasStack()) {
-            this.field_75231_g += Math.min(par1, this.getStack().stackSize);
+            this.field_75231_g += Math.min(par1, this.getStack().getCount());
         }
 
         return super.decrStackSize(par1);
@@ -70,12 +70,13 @@ public class SlotRecordTradingResult extends Slot
     @Override
     protected void onCrafting(ItemStack par1ItemStack)
     {
-        par1ItemStack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75231_g);
+        par1ItemStack.onCrafting(this.thePlayer.world, this.thePlayer, this.field_75231_g);
         this.field_75231_g = 0;
     }
 
+    /*
     @Override
-    public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack par2ItemStack)
+    // TODO: update     public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack par2ItemStack)
     {
         this.onCrafting(par2ItemStack);
         final MerchantRecipe slotRecipe = this.theMerchantInventory.getCurrentRecipe();
@@ -86,11 +87,11 @@ public class SlotRecordTradingResult extends Slot
             ItemStack var5 = this.theMerchantInventory.getStackInSlot(1);
 
             if (this.func_75230_a(slotRecipe, var4, var5) || this.func_75230_a(slotRecipe, var5, var4)) {
-                if (var4 != null && var4.stackSize <= 0) {
+                if (var4 != null && var4.getCount() <= 0) {
                     var4 = null;
                 }
 
-                if (var5 != null && var5.stackSize <= 0) {
+                if (var5 != null && var5.getCount() <= 0) {
                     var5 = null;
                 }
 
@@ -101,6 +102,7 @@ public class SlotRecordTradingResult extends Slot
             }
         }
     }
+    */
 
     private boolean func_75230_a(MerchantRecipe par1MerchantRecipe, ItemStack par2ItemStack, ItemStack par3ItemStack)
     {
@@ -109,13 +111,13 @@ public class SlotRecordTradingResult extends Slot
 
         if (par2ItemStack != null && par2ItemStack.getItem() == var4.getItem()) {
             if (var5 != null && par3ItemStack != null && var5.getItem() == par3ItemStack.getItem()) {
-                par2ItemStack.stackSize -= var4.stackSize;
-                par3ItemStack.stackSize -= var5.stackSize;
+                // TODO: update par2ItemStack.getCount() -= var4.getCount();
+             // TODO: update par3ItemStack.getCount() -= var5.getCount();
                 return true;
             }
 
             if (var5 == null && par3ItemStack == null) {
-                par2ItemStack.stackSize -= var4.stackSize;
+             // TODO: update par2ItemStack.getCount() -= var4.getCount();
                 return true;
             }
         }

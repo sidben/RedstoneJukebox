@@ -1,6 +1,7 @@
-package sidben.redstonejukebox.helper;
+package sidben.redstonejukebox.util;
 
-import sidben.redstonejukebox.handler.ConfigurationHandler;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
+import sidben.redstonejukebox.main.ModConfig;
 
 
 public class RecordInfo
@@ -31,7 +32,7 @@ public class RecordInfo
 
     public int getRecordDurationSeconds()
     {
-        return Math.min((this._recordDurationSeconds > 0 ? this._recordDurationSeconds : ConfigurationHandler.defaultSongTime), ConfigurationHandler.maxSongTimeSeconds);
+        return Math.min((this._recordDurationSeconds > 0 ? this._recordDurationSeconds : ModConfig.defaultSongTime), ModConfig.maxSongTimeSeconds);
     }
 
 

@@ -22,10 +22,12 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.init.MyBlocks;
-import sidben.redstonejukebox.proxy.ClientProxy;
-import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.main.Reference;
+import sidben.redstonejukebox.proxy.ProxyClient;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.util.LogHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -79,26 +81,59 @@ public class BlockRedstoneJukebox extends BlockContainer
         this.setSoundType(SoundType.STONE);
         
         if (active) {
-            this.setLightLevel(0.75F);
+            this.setLightLevel(0.75F);          // OBS: redstone torch light level == 0.5
+            this.setRegistryName("redstone_jukebox_active");
         } else {
             this.setCreativeTab(CreativeTabs.REDSTONE);
+            this.setRegistryName("redstone_jukebox");
         }
 
         this.isActive = active;
     }
 
+
+    /**
+     * Returns a new instance of a block's tile entity class. Called on placing the block.
+     */
     @Override
     public TileEntity createNewTileEntity(World world, int damage)
     {
-        return new TileEntityRedstoneJukebox();
+        // return new TileEntityRedstoneJukebox();
+        return null;
     }
 
+    
 
 
     // --------------------------------------------------------------------
     // Parameters
     // --------------------------------------------------------------------
+    
+    /**
+     * How many world ticks before ticking
+     */
+    /*
+    @Override
+    public int tickRate(World world)
+    {
+        return 20;
+    }
+    */
 
+    
+    
+
+
+
+    // --------------------------------------------------------------------
+    // Rendering
+    // --------------------------------------------------------------------
+
+    // TODO: avoid rendering the bottom side if the block below is solid.
+    
+    /**
+     * Used to determine ambient occlusion and culling when rebuilding chunks for render
+     */
     @Override
     public boolean isOpaqueCube(IBlockState state)
     {
@@ -106,66 +141,38 @@ public class BlockRedstoneJukebox extends BlockContainer
     }
 
 
+    @Override
+    public boolean isFullCube(IBlockState state)
+    {
+        return false;
+    }
+
+    
     /**
      * Checks if the block is a solid face on the given side, used by placement logic.
+     * 
+     * Solid faces can be used to place blocks like buttons, torches, leavers.
      */
     @Override
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
     {
+        if (side == EnumFacing.UP) return false;
         return true;
     }
 
     
     /**
-     * Get the Item that this Block should drop when harvested.
-     */
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune)
-    {
-        return Item.getItemFromBlock(MyBlocks.redstoneJukebox);
-    }
-
-
-    /**
-     * Gets an item for the block being called on.
-     */
-    @Deprecated // Forge: Use more sensitive version below: getPickBlock
-    @Override
-    @SideOnly(Side.CLIENT)
-    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
-    {
-        Item item = Item.getItemFromBlock(MyBlocks.redstoneJukebox);
-        return item == null ? null : new ItemStack(item, 1, 0);
-    }
-    
-    
-    /**
-     * How many world ticks before ticking
-     */
-    @Override
-    public int tickRate(World world)
-    {
-        return 20;
-    }
-
-    
-    
-
-
-
-    // --------------------------------------------------------------------
-    // Textures and Rendering
-    // --------------------------------------------------------------------
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    /**
      * Returns true if the given side of this block type should be rendered, if the adjacent block is at the given
      * coordinates.
      */
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess worldIn, BlockPos pos, EnumFacing side)
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
     {
-        return true;		// TODO: return false for bottom
+        if (side == EnumFacing.DOWN) {
+            return blockAccess.getBlockState(pos.down()).isFullBlock() ? false : true;
+        }
+        return true;
     }
 
     
@@ -175,15 +182,18 @@ public class BlockRedstoneJukebox extends BlockContainer
         return BlockRenderLayer.CUTOUT;
     }
 
-
+    
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only,
+     * LIQUID for vanilla liquids, INVISIBLE to skip all rendering
      */
+    @Override
     public EnumBlockRenderType getRenderType(IBlockState state)
     {
         return EnumBlockRenderType.MODEL;
-    }
-
+    }    
+    
+    
 
 
     // ----------------------------------------------------
@@ -200,6 +210,35 @@ public class BlockRedstoneJukebox extends BlockContainer
         return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
     }
 
+
+    
+    
+    // --------------------------------------------------------------------
+    // Block drops
+    // --------------------------------------------------------------------
+
+    /**
+     * Get the Item that this Block should drop when harvested.
+     */
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune)
+    {
+        return Item.getItemFromBlock(Features.Blocks.REDSTONE_JUKEBOX);
+    }
+    
+    @Override
+    public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
+    {
+        return new ItemStack(Features.Blocks.REDSTONE_JUKEBOX);
+    }
+
+    @Override
+    protected ItemStack getSilkTouchDrop(IBlockState state)
+    {
+        return new ItemStack(Features.Blocks.REDSTONE_JUKEBOX);
+    }
+
+    
     
 
 
@@ -210,8 +249,9 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Called upon block activation (right click on the block.)
      */
+    /*
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    // TODO: update public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         final TileEntity tileEntity = worldIn.getTileEntity(pos);
         if (tileEntity == null || playerIn.isSneaking()) {
@@ -221,12 +261,14 @@ public class BlockRedstoneJukebox extends BlockContainer
         playerIn.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, worldIn, pos.getX(), pos.getY(), pos.getZ());		// TODO: check playerIn.displayGUIChest
         return true;
     }
+    */
 
 
 
     /**
      * Called by ItemBlocks after a block is set in the world, to allow post-place logic
      */
+    /*
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
@@ -234,12 +276,65 @@ public class BlockRedstoneJukebox extends BlockContainer
             ((TileEntityRedstoneJukebox) worldIn.getTileEntity(pos)).setInventoryName(stack.getDisplayName());
         }
     }
+    */
 
+    
+    /**
+     * Called after the block is set in the Chunk data, but before the Tile Entity is set
+     */
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
+    {
+        LogHelper.trace("BlockRedstoneJukebox.onBlockAdded()");
+        
+        if (!worldIn.isRemote)
+        {
+            if (this.isActive && !worldIn.isBlockPowered(pos))
+            {
+                worldIn.setBlockState(pos, Features.Blocks.REDSTONE_JUKEBOX.getDefaultState(), 2);
+            }
+            else if (!this.isActive && worldIn.isBlockPowered(pos))
+            {
+                worldIn.setBlockState(pos, Features.Blocks.ACTIVE_REDSTONE_JUKEBOX.getDefaultState(), 2);
+            }
+        }
+    }
+    
 
+    /**
+     * Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
+     * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
+     * block, etc.
+     */
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos)
+    {
+        if (!worldIn.isRemote) {
+            
+            /*
+            final boolean haveEnergy = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
+            if ((this.isActive && !haveEnergy) || (!this.isActive && haveEnergy)) {
+                ((World)world).scheduleBlockUpdate(pos, this, 0, 0);
+            }
+            */
 
+            final boolean haveEnergy = worldIn.isBlockPowered(pos);
+            if (this.isActive && !haveEnergy)
+            {
+                worldIn.scheduleUpdate(pos, this, 4);
+            }
+            else if (!this.isActive && haveEnergy)
+            {
+                worldIn.setBlockState(pos, Features.Blocks.ACTIVE_REDSTONE_JUKEBOX.getDefaultState(), 2);
+            }
+            
+        }
+    }
+
+    
+    
     /**
      * ejects contained items into the world, and notifies neighbors of an update, as appropriate
      */
+    /*
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
@@ -254,23 +349,10 @@ public class BlockRedstoneJukebox extends BlockContainer
 
         super.breakBlock(worldIn, pos, state);
     }
+    */
 
 
-    /**
-     * Called when a neighboring block changes.
-     */
-    @Override
-    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
-    {
-        if (!((World)world).isRemote) {
-            
-            final boolean haveEnergy = ((World)world).isBlockIndirectlyGettingPowered(pos) > 0;
-            if ((this.isActive && !haveEnergy) || (!this.isActive && haveEnergy)) {
-                ((World)world).scheduleBlockUpdate(pos, this, 0, 0);
-            }
 
-        }
-    }
     
     
     /**
@@ -281,6 +363,14 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         if (!worldIn.isRemote)
         {
+            final boolean haveEnergy = worldIn.isBlockPowered(pos);
+
+            if (this.isActive && !haveEnergy)
+            {
+                worldIn.setBlockState(pos, Features.Blocks.REDSTONE_JUKEBOX.getDefaultState(), 2);
+            }
+
+            /*
             final boolean haveEnergy = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
 
@@ -294,12 +384,12 @@ public class BlockRedstoneJukebox extends BlockContainer
             
 
             // Schedule the next tick only when powered  
-            if (haveEnergy) worldIn.scheduleBlockUpdate(pos, MyBlocks.redstoneJukeboxActive, this.tickRate(worldIn), 0);
+            if (haveEnergy) worldIn.scheduleBlockUpdate(pos, Features.Blocks.ACTIVE_REDSTONE_JUKEBOX, this.tickRate(worldIn), 0);
             
             // TODO: test a way to avoid ticking when the playlist ended.
+             */
         }
     }
-    
 
 
 
@@ -310,12 +400,12 @@ public class BlockRedstoneJukebox extends BlockContainer
     // Custom World Events
     // --------------------------------------------------------------------
 
-
     /**
      * Update which block ID the jukebox is using depending on whether or not it is playing.
      * 
      * Triggered by onNeighborBlockChange.
      */
+    /*
     public static void updateJukeboxBlockState(boolean active, World worldIn, BlockPos pos)
     {
         // get the TileEntity so it won't be reset
@@ -325,9 +415,9 @@ public class BlockRedstoneJukebox extends BlockContainer
         // change the block type (without keepMyInventory, Tile Entity would be reset)
         BlockRedstoneJukebox.keepMyInventory = true;
         if (active) {
-        	worldIn.setBlockState(pos, MyBlocks.redstoneJukeboxActive.getDefaultState(), 3);
+        	worldIn.setBlockState(pos, Features.Blocks.ACTIVE_REDSTONE_JUKEBOX.getDefaultState(), 3);
         } else {
-        	worldIn.setBlockState(pos, MyBlocks.redstoneJukebox.getDefaultState(), 3);
+        	worldIn.setBlockState(pos, Features.Blocks.REDSTONE_JUKEBOX.getDefaultState(), 3);
         }
         BlockRedstoneJukebox.keepMyInventory = false;
 
@@ -339,13 +429,16 @@ public class BlockRedstoneJukebox extends BlockContainer
         }
 
     }
+    */
 
 
 
     /**
-     * Return the amount of extra range the jukebox will receive from near note blocks.
+     * Return the amount of extra range the jukebox will receive from near note blocks.<br/><br/>
      * 
-     * Each note block increases the range by 8.
+     * Each note block increases the range by 8.<br/><br/>
+     * 
+     * Reference: {@link net.minecraft.block.BlockEnchantmentTable#randomDisplayTick()}
      */
     public static int getAmplifierPower(World worldIn, BlockPos pos)
     {
@@ -362,9 +455,7 @@ public class BlockRedstoneJukebox extends BlockContainer
                         // look for note blocks
                         if (worldIn.getBlockState(blockpos).getBlock() == Blocks.NOTEBLOCK) {
                             amp += 8;
-                            if (amp >= ModRedstoneJukebox.maxExtraVolume) {
-                                return ModRedstoneJukebox.maxExtraVolume;
-                            }
+                            if (amp >= ModConfig.maxExtraVolume) break;
                         }
                     }
 
@@ -373,9 +464,10 @@ public class BlockRedstoneJukebox extends BlockContainer
         }
 
 
-        return amp;
+        return Math.min(amp, ModConfig.maxExtraVolume);
     }
-
+ 
+    
 
 
     // --------------------------------------------------------------------
@@ -389,32 +481,23 @@ public class BlockRedstoneJukebox extends BlockContainer
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(IBlockState state, World worldIn, BlockPos pos, Random rand)
     {
-
         if (this.isActive) {
-            // redstone ore sparkles
             this.showSparkles(worldIn, pos, rand);
-
-
-            // NOTE: To reduce potential lag, I removed the particle effects that were added on surrounding noteblocks.
-            // There are 75 possible spots (5x5x3) to be checked on every display tick, I don't think the amount
-            // of extra processing is worth some minor visual effects. This may be revisited in the future or
-            // become an optional config, disabled by default.
         }
-
     }
 
 
     /**
-     * Displays redstone sparkles on the block sides.
+     * Displays redstone sparkles on the block sides.<br/><br/>
+     * 
+     * Reference: {@link net.minecraft.block.BlockRedstoneOre#spawnParticles()}
      */
     private void showSparkles(World worldIn, BlockPos pos, Random rand)
     {
         // OBS: If the particle config is set to 'Minimal', particles won't be displayed.
         // That is controlled by the game engine, no need to check it here.
 
-        // Ref: BlockRedstoneOre
         final double distance = 0.0625D;
-
 
         for (int i = 2; i < 6; ++i) {
             double particleX = (double)((float)pos.getX() + rand.nextFloat());
@@ -423,19 +506,19 @@ public class BlockRedstoneJukebox extends BlockContainer
 
 
             if (i == 2 && !worldIn.getBlockState(pos.south()).isOpaqueCube()) {
-                particleZ = (double)pos.getZ() + 1 + distance;
+                particleZ = (double)pos.getZ() + 1.0D + distance;
             }
 
             if (i == 3 && !worldIn.getBlockState(pos.north()).isOpaqueCube()) {
-                particleZ = (double)pos.getZ() + 0 - distance;
+                particleZ = (double)pos.getZ() + 0.0D - distance;
             }
 
             if (i == 4 && !worldIn.getBlockState(pos.east()).isOpaqueCube()) {
-                particleX = (double)pos.getX() + 1 + distance;
+                particleX = (double)pos.getX() + 1.0D + distance;
             }
 
             if (i == 5 && !worldIn.getBlockState(pos.west()).isOpaqueCube()) {
-                particleX = (double)pos.getX() + 0 - distance;
+                particleX = (double)pos.getX() + 0.0D - distance;
             }
 
             if (particleX < (double)pos.getX() || particleX > (double)(pos.getX() + 1) || particleY < 0.0D || particleY > (double)(pos.getY() + 1) || particleZ < (double)pos.getZ() || particleZ > (double)(pos.getZ() + 1)) {
@@ -446,17 +529,6 @@ public class BlockRedstoneJukebox extends BlockContainer
 
 
 
-    /**
-     * Displays a random music note on the block.
-     */
-    /*
-    @SuppressWarnings("unused")            // OBS: Currently disabled
-    private void showNoteAbove(World world, int x, int y, int z)
-    {
-        final int color = world.rand.nextInt(16);
-        world.spawnParticle("note", x + 0.5D, y + 1.2D, z + 0.5D, color / 16.0D, 0.0D, 0.0D);
-    }
-    */
 
 
 
@@ -467,34 +539,40 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Can this block provide power. Only wire currently seems to have this change based on its state.
      */
+    /*
     @Override
     public boolean canProvidePower(IBlockState state)
     {
         return false;
     }
+    */
 
 
     /**
      * If this returns true, then comparators facing away from this block will use the value from
      * getComparatorInputOverride instead of the actual redstone signal strength.
      */
+    /*
     @Override
     public boolean hasComparatorInputOverride(IBlockState state)
     {
         return true;
     }
+    */
 
 
     /**
      * If hasComparatorInputOverride returns true, the return value from this is used instead of the redstone signal
      * strength when this block inputs to a comparator.
      */
+    /*
     @Override
     public int getComparatorInputOverride(IBlockState state, World worldIn, BlockPos pos)
     {
         final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
         return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
     }
+    */
 
 
 }

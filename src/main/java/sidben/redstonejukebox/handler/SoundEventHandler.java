@@ -1,7 +1,8 @@
 package sidben.redstonejukebox.handler;
 
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.helper.LogHelper;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.util.LogHelper;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
@@ -30,7 +31,7 @@ public class SoundEventHandler
         else if (isWorldRunning && soundName != null) {
 
             // --- Debug ---
-            if (ConfigurationHandler.debugSoundEvents) {
+            if (ModConfig.debugSoundEvents) {
                 if (soundCat == SoundCategory.RECORDS || soundCat == SoundCategory.MUSIC) {
                     LogHelper.info("SoundEventHandler.onPlaySound() - " + soundCat + " - " + soundName);
                 }
@@ -52,7 +53,7 @@ public class SoundEventHandler
                 final boolean isCustomBgPlaying = ModRedstoneJukebox.instance.getMusicHelper().IsCustomBackgroundMusicPlaying();
 
                 // --- Debug ---
-                if (ConfigurationHandler.debugSoundEvents) {
+                if (ModConfig.debugSoundEvents) {
                     LogHelper.info("    Any jukebox playing:    " + isJukeboxPlaying);
                     LogHelper.info("    Custom BgMusic playing: " + isCustomBgPlaying);
                     LogHelper.info("    Should deny:            " + (isJukeboxPlaying || isCustomBgPlaying));

@@ -15,17 +15,17 @@ import sidben.redstonejukebox.handler.PlayerEventHandler;
 //import sidben.redstonejukebox.client.renderer.ItemRendererCustomRecord;
 //import sidben.redstonejukebox.client.renderer.RenderRedstoneJukebox;
 import sidben.redstonejukebox.handler.SoundEventHandler;
-import sidben.redstonejukebox.helper.MusicHelper;
-import sidben.redstonejukebox.init.MyBlocks;
-import sidben.redstonejukebox.init.MyItems;
-import sidben.redstonejukebox.reference.Reference;
+import sidben.redstonejukebox.main.Features;
+import sidben.redstonejukebox.main.ModConfig;
+import sidben.redstonejukebox.main.Reference;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.util.MusicHelper;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 
 
-public class ClientProxy extends CommonProxy
+public class ProxyClient extends ProxyCommon
 {
 
 
@@ -39,7 +39,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public World getClientWorld()
     {
-        return FMLClientHandler.instance().getClient().theWorld;
+        return FMLClientHandler.instance().getClient().world;
     }
 
 
@@ -48,19 +48,13 @@ public class ClientProxy extends CommonProxy
     public void pre_initialize()
     {
         // GUI
-        ClientProxy.guiTextureJukebox = this.getResourceName("textures/gui/redstonejukebox-gui.png");
-        ClientProxy.guiTextureTrade = this.getResourceName("textures/gui/recordtrading-gui.png");
-
+        ProxyClient.guiTextureJukebox = this.getResourceName("textures/gui/redstonejukebox-gui.png");
+        ProxyClient.guiTextureTrade = this.getResourceName("textures/gui/recordtrading-gui.png");
 
 		super.pre_initialize();
 
-
-		// Special renderers
-        /*
-        ModRedstoneJukebox.redstoneJukeboxModelID = RenderingRegistry.getNextAvailableRenderId();
-
-        MinecraftForgeClient.registerItemRenderer(MyItems.recordCustom, new ItemRendererCustomRecord());
-        */
+        Features.registerItemModels();
+        Features.registerBlockModels();
     }
 
 
@@ -70,18 +64,9 @@ public class ClientProxy extends CommonProxy
     {
         super.initialize();
 
-		// Item renderers
-		MyItems.registerRender();
-
-		// Block renderes
-		MyBlocks.registerRender();
-
-		// Helper classes single instances
-        ModRedstoneJukebox.instance.setMusicHelper(new MusicHelper(Minecraft.getMinecraft()));
-
-        // Event Handlers
         MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
 
+        ModRedstoneJukebox.instance.setMusicHelper(new MusicHelper(Minecraft.getMinecraft()));
     }
 
 
@@ -89,12 +74,12 @@ public class ClientProxy extends CommonProxy
     @Override
     public Object getClientGuiElement(int guiID, EntityPlayer player, World world, int x, int y, int z)
     {
-    	if (guiID == ModRedstoneJukebox.redstoneJukeboxGuiID) {
+    	if (guiID == ModConfig.redstoneJukeboxGuiID) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) world.getTileEntity(new BlockPos(x, y, z));
             return new GuiRedstoneJukebox(player.inventory, teJukebox);
         }
 
-        else if (guiID == ModRedstoneJukebox.recordTradingGuiID) {
+        else if (guiID == ModConfig.recordTradingGuiID) {
             // OBS: The X value can be used to store the EntityID - facepalm courtesy of http://www.minecraftforge.net/forum/index.php?topic=1671.0
             final Entity villager = world.getEntityByID(x);
             if (villager instanceof EntityVillager) {

@@ -5,22 +5,50 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.ModRedstoneJukebox;
-import sidben.redstonejukebox.handler.ConfigurationHandler;
-import sidben.redstonejukebox.helper.LogHelper;
+import sidben.redstonejukebox.handler.EventHandlerConfig;
+import sidben.redstonejukebox.main.ModConfig;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.util.LogHelper;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 
 
 // TODO: remove this class and add the send/handle logic to each message, as static methods. with that I'll only need to change one file per message. 
 
-public class NetworkHelper
+public class NetworkManager
 {
 
+    private static final String         MOD_CHANNEL = "ch_rsjukebox";
+    private static int                  packetdId   = 0;
+    private static SimpleNetworkWrapper _networkWrapper;
 
+    
+    
+    
+    public static void registerMessages()
+    {
+        _networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_CHANNEL);
+
+        _networkWrapper.registerMessage(NetworkManager.JukeboxGUIHandler.class, JukeboxGUIUpdatedMessage.class, packetdId++, Side.SERVER);
+        _networkWrapper.registerMessage(NetworkManager.JukeboxPlayRecordHandler.class, JukeboxPlayRecordMessage.class, packetdId++, Side.CLIENT);
+        _networkWrapper.registerMessage(NetworkManager.RecordTradingGUIHandler.class, RecordTradingGUIUpdatedMessage.class, packetdId++, Side.SERVER);
+        _networkWrapper.registerMessage(NetworkManager.RecordTradingFullListHandler.class, RecordTradingFullListMessage.class, packetdId++, Side.CLIENT);
+        _networkWrapper.registerMessage(NetworkManager.CommandPlayRecordAtHandler.class, CommandPlayRecordAtMessage.class, packetdId++, Side.CLIENT);
+        _networkWrapper.registerMessage(NetworkManager.CommandPlayRecordHandler.class, CommandPlayRecordMessage.class, packetdId++, Side.CLIENT);
+        _networkWrapper.registerMessage(NetworkManager.CommandStopAllRecordsHandler.class, CommandStopAllRecordsMessage.class, packetdId++, Side.CLIENT);
+    }
+
+    
+    
+    
+    
+    
     // ---------------------------------------------------------------------
     // Message Dispatch
     // ---------------------------------------------------------------------
@@ -39,12 +67,12 @@ public class NetworkHelper
         final JukeboxGUIUpdatedMessage message = new JukeboxGUIUpdatedMessage(teJukebox);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugGuiJukebox) {
+        if (ModConfig.debugGuiJukebox) {
             LogHelper.info("Sending JukeboxGUIUpdatedMessage");
             LogHelper.info("    " + message);
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
+        _networkWrapper.sendToServer(message);
     }
 
 
@@ -63,12 +91,12 @@ public class NetworkHelper
         final TargetPoint target = new TargetPoint(teJukebox.getWorld().provider.getDimension(), teJukebox.getPos().getX(), teJukebox.getPos().getY(), teJukebox.getPos().getZ(), targetRange);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkJukebox) {
+        if (ModConfig.debugNetworkJukebox) {
             LogHelper.info("Sending JukeboxPlayRecordMessage");
             LogHelper.info("    " + message);
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendToAllAround(message, target);
+        _networkWrapper.sendToAllAround(message, target);
     }
 
 
@@ -82,12 +110,12 @@ public class NetworkHelper
         final RecordTradingGUIUpdatedMessage message = new RecordTradingGUIUpdatedMessage(recipeIndex);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugGuiRecordTrading) {
+        if (ModConfig.debugGuiRecordTrading) {
             LogHelper.info("Sending RecordTradingGUIUpdatedMessage");
             LogHelper.info("    " + message);
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendToServer(message);
+        _networkWrapper.sendToServer(message);
     }
 
 
@@ -101,12 +129,12 @@ public class NetworkHelper
         final RecordTradingFullListMessage message = new RecordTradingFullListMessage(list);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkRecordTrading) {
+        if (ModConfig.debugNetworkRecordTrading) {
             LogHelper.info("Sending RecordTradingFullListMessage");
             LogHelper.info("    " + message);
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendTo(message, (EntityPlayerMP) entityPlayer);
+        _networkWrapper.sendTo(message, (EntityPlayerMP) entityPlayer);
     }
 
 
@@ -120,12 +148,12 @@ public class NetworkHelper
         final CommandPlayRecordAtMessage message = new CommandPlayRecordAtMessage(recordInfoId, showName, x, y, z, range);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkCommands) {
+        if (ModConfig.debugNetworkCommands) {
             LogHelper.info("Sending CommandPlayRecordAtMessage");
             LogHelper.info("    " + message);
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
+        _networkWrapper.sendTo(message, entityPlayer);
     }
 
 
@@ -139,12 +167,12 @@ public class NetworkHelper
         final CommandPlayRecordMessage message = new CommandPlayRecordMessage(recordInfoId, showName);
 
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkCommands) {
+        if (ModConfig.debugNetworkCommands) {
             LogHelper.info("Sending CommandPlayRecordMessage");
             LogHelper.info("    " + message);
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendToAll(message);
+        _networkWrapper.sendToAll(message);
     }
 
 
@@ -158,11 +186,11 @@ public class NetworkHelper
         final CommandStopAllRecordsMessage message = new CommandStopAllRecordsMessage();
 
         // --- Debug ---
-        if (ConfigurationHandler.debugNetworkCommands) {
+        if (ModConfig.debugNetworkCommands) {
             LogHelper.info("Sending CommandStopAllRecordsMessage");
         }
 
-        ModRedstoneJukebox.NetworkWrapper.sendTo(message, entityPlayer);
+        _networkWrapper.sendTo(message, entityPlayer);
     }
 
 
@@ -178,12 +206,12 @@ public class NetworkHelper
         public IMessage onMessage(JukeboxGUIUpdatedMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugGuiJukebox) {
+            if (ModConfig.debugGuiJukebox) {
                 LogHelper.info("Handling JukeboxGUIUpdatedMessage");
                 LogHelper.info("    " + message);
             }
 
-            final World world = ctx.getServerHandler().playerEntity.worldObj;
+            final World world = ctx.getServerHandler().playerEntity.world;
             if (world == null) {
                 LogHelper.warn("Server world not found for message [" + message + "]");
             } else {
@@ -202,7 +230,7 @@ public class NetworkHelper
         public IMessage onMessage(JukeboxPlayRecordMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugNetworkJukebox) {
+            if (ModConfig.debugNetworkJukebox) {
                 LogHelper.info("Handling JukeboxPlayRecordMessage");
                 LogHelper.info("    " + message);
             }
@@ -222,7 +250,7 @@ public class NetworkHelper
         public IMessage onMessage(RecordTradingGUIUpdatedMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugGuiRecordTrading) {
+            if (ModConfig.debugGuiRecordTrading) {
                 LogHelper.info("Handling RecordTradingGUIUpdatedMessage");
                 LogHelper.info("    " + message);
             }
@@ -248,7 +276,7 @@ public class NetworkHelper
         public IMessage onMessage(RecordTradingFullListMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugNetworkRecordTrading) {
+            if (ModConfig.debugNetworkRecordTrading) {
                 LogHelper.info("Handling RecordTradingFullListMessage");
                 LogHelper.info("    " + message);
             }
@@ -269,7 +297,7 @@ public class NetworkHelper
         public IMessage onMessage(CommandPlayRecordAtMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugNetworkCommands) {
+            if (ModConfig.debugNetworkCommands) {
                 LogHelper.info("Handling CommandPlayRecordAtMessage");
                 LogHelper.info("    " + message);
             }
@@ -289,7 +317,7 @@ public class NetworkHelper
         public IMessage onMessage(CommandPlayRecordMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugNetworkCommands) {
+            if (ModConfig.debugNetworkCommands) {
                 LogHelper.info("Handling CommandPlayRecordMessage");
                 LogHelper.info("    " + message);
             }
@@ -309,7 +337,7 @@ public class NetworkHelper
         public IMessage onMessage(CommandStopAllRecordsMessage message, MessageContext ctx)
         {
             // --- Debug ---
-            if (ConfigurationHandler.debugNetworkCommands) {
+            if (ModConfig.debugNetworkCommands) {
                 LogHelper.info("Handling CommandStopAllRecordsMessage");
             }
 

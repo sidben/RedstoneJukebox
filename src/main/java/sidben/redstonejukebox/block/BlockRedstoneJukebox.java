@@ -71,17 +71,17 @@ public class BlockRedstoneJukebox extends BlockContainer
     // --------------------------------------------------------------------
 
     public BlockRedstoneJukebox(boolean active) {
-        super(Material.wood);
+        super(Material.WOOD);
 
         this.setHardness(2.0F);
         this.setResistance(10.0F);
         this.setUnlocalizedName("redstone_jukebox");
-        this.setStepSound(SoundType.STONE);
+        this.setSoundType(SoundType.STONE);
         
         if (active) {
             this.setLightLevel(0.75F);
         } else {
-            this.setCreativeTab(CreativeTabs.tabRedstone);
+            this.setCreativeTab(CreativeTabs.REDSTONE);
         }
 
         this.isActive = active;
@@ -259,13 +259,13 @@ public class BlockRedstoneJukebox extends BlockContainer
      * Called when a neighboring block changes.
      */
     @Override
-    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
+    public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor)
     {
-        if (!worldIn.isRemote) {
+        if (!((World)world).isRemote) {
             
-            final boolean haveEnergy = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
+            final boolean haveEnergy = ((World)world).isBlockIndirectlyGettingPowered(pos) > 0;
             if ((this.isActive && !haveEnergy) || (!this.isActive && haveEnergy)) {
-                worldIn.scheduleBlockUpdate(pos, this, 0, 0);
+                ((World)world).scheduleBlockUpdate(pos, this, 0, 0);
             }
 
         }
@@ -359,7 +359,7 @@ public class BlockRedstoneJukebox extends BlockContainer
                         BlockPos blockpos = pos.add(i, j, k);
 
                         // look for note blocks
-                        if (worldIn.getBlockState(blockpos).getBlock() == Blocks.noteblock) {
+                        if (worldIn.getBlockState(blockpos).getBlock() == Blocks.NOTEBLOCK) {
                             amp += 8;
                             if (amp >= ModRedstoneJukebox.maxExtraVolume) {
                                 return ModRedstoneJukebox.maxExtraVolume;

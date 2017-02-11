@@ -22,7 +22,7 @@ public class ItemBlankRecord extends Item
     public ItemBlankRecord() {
         this.setMaxStackSize(16);
         this.setUnlocalizedName("blank_record");
-        this.setCreativeTab(CreativeTabs.tabMisc);
+        this.setCreativeTab(CreativeTabs.MISC);
     }
 
 

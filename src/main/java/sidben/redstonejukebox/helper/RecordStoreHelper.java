@@ -295,9 +295,9 @@ public class RecordStoreHelper
         }
 
         if (auxPriceMin == auxPriceMax) {
-            emeralds = new ItemStack(Items.emerald, auxPriceMin);
+            emeralds = new ItemStack(Items.EMERALD, auxPriceMin);
         } else {
-            emeralds = new ItemStack(Items.emerald, rand.nextInt(auxPriceMax - auxPriceMin + 1) + auxPriceMin);
+            emeralds = new ItemStack(Items.EMERALD, rand.nextInt(auxPriceMax - auxPriceMin + 1) + auxPriceMin);
         }
 
 

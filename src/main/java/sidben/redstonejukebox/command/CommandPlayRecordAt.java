@@ -91,7 +91,7 @@ public class CommandPlayRecordAt extends CommandBase
 
 
             // Writes text on the chat
-            notifyOperators(sender, this, "commands.playrecordat.success", new Object[] { recordName, player.getName() });
+            notifyCommandListener(sender, this, "commands.playrecordat.success", new Object[] { recordName, player.getName() });
         }
 
     }

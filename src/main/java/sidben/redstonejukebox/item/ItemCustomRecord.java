@@ -25,7 +25,7 @@ public class ItemCustomRecord extends ItemRecord
         super(name, null);
         this.setMaxStackSize(1);
         this.setUnlocalizedName(name);
-        this.setCreativeTab(CreativeTabs.tabMisc);
+        this.setCreativeTab(CreativeTabs.MISC);
 
         this.setMaxDamage(0);
         this.setHasSubtypes(true);

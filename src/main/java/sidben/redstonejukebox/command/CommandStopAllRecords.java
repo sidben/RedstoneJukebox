@@ -54,7 +54,7 @@ public class CommandStopAllRecords extends CommandBase
 
 
             // Writes text on the chat
-            notifyOperators(sender, this, "commands.stopallrecords.success", new Object[0]);
+            notifyCommandListener(sender, this, "commands.stopallrecords.success", new Object[0]);
         }
 
     }

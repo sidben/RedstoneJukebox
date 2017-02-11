@@ -321,7 +321,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
      * OBS: This is the only info that will be saved with the world.
      */
     @Override
-    public void writeToNBT(NBTTagCompound par1NBTTagCompound)
+    public NBTTagCompound writeToNBT(NBTTagCompound par1NBTTagCompound)
     {
         super.writeToNBT(par1NBTTagCompound);
 
@@ -349,6 +349,8 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
         if (this.hasCustomName()) {
             par1NBTTagCompound.setString("CustomName", this.customName);
         }
+        
+        return par1NBTTagCompound; 
     }
 
 
@@ -388,7 +390,7 @@ public class TileEntityRedstoneJukebox extends TileEntityLockable implements IIn
      * Gathers data into a packet that is to be sent to the client. Called on server only.
      */
     @Override
-    public Packet getDescriptionPacket()
+    public SPacketUpdateTileEntity getUpdatePacket()
     {
         // --- Debug ---
         if (ConfigurationHandler.debugNetworkJukebox) {

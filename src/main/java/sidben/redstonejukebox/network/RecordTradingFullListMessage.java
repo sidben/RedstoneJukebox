@@ -69,7 +69,7 @@ public class RecordTradingFullListMessage implements IMessage
 
                 final ItemStack emptyDisc = new ItemStack(MyItems.recordBlank, 1);
                 final ItemStack musicDisc = new ItemStack(recordItem, 1, recordInfo.recordItemDamage);
-                final ItemStack emeralds = new ItemStack(Items.emerald, emeraldPrice);
+                final ItemStack emeralds = new ItemStack(Items.EMERALD, emeraldPrice);
 
 
                 // Create the trade
@@ -115,7 +115,7 @@ public class RecordTradingFullListMessage implements IMessage
             int recordInfoId = -1;
 
             // Checks the recipe type
-            if (slotSell.getItem() == Items.emerald) {
+            if (slotSell.getItem() == Items.EMERALD) {
                 recordInfoId = ModRedstoneJukebox.instance.getRecordInfoManager().getRecordInfoIdFromItemStack(slotBuy1);
 
                 if (recordInfoId > -1) {

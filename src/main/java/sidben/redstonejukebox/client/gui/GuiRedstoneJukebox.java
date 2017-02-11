@@ -226,20 +226,20 @@ public class GuiRedstoneJukebox extends GuiContainer
         switch (this.jukeboxInventory.paramPlayMode) {
             case 0:
                 // normal
-            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 0, k + pStartY);
-            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.stone_pickaxe), j + pStartX + spacer * 1, k + pStartY);
-            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.iron_pickaxe), j + pStartX + spacer * 2, k + pStartY);
-            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.golden_pickaxe), j + pStartX + spacer * 3, k + pStartY);
-            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.diamond_pickaxe), j + pStartX + spacer * 4, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.WOODEN_PICKAXE), j + pStartX + spacer * 0, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.STONE_PICKAXE), j + pStartX + spacer * 1, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.IRON_PICKAXE), j + pStartX + spacer * 2, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.GOLDEN_PICKAXE), j + pStartX + spacer * 3, k + pStartY);
+            	this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.DIAMOND_PICKAXE), j + pStartX + spacer * 4, k + pStartY);
                 break;
 
             case 1:
                 // shuffle
-                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.iron_shovel), j + pStartX + spacer * 0, k + pStartY - 1);
-                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.diamond_pickaxe), j + pStartX + spacer * 1, k + pStartY + 4);
-                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.golden_axe), j + pStartX + spacer * 2, k + pStartY - 3);
-                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.wooden_pickaxe), j + pStartX + spacer * 3, k + pStartY + 1);
-                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.stone_pickaxe), j + pStartX + spacer * 4, k + pStartY - 2);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.IRON_SHOVEL), j + pStartX + spacer * 0, k + pStartY - 1);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.DIAMOND_PICKAXE), j + pStartX + spacer * 1, k + pStartY + 4);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.GOLDEN_AXE), j + pStartX + spacer * 2, k + pStartY - 3);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.WOODEN_PICKAXE), j + pStartX + spacer * 3, k + pStartY + 1);
+                this.itemRender.renderItemAndEffectIntoGUI(new ItemStack(Items.STONE_PICKAXE), j + pStartX + spacer * 4, k + pStartY - 2);
                 break;
 
         }

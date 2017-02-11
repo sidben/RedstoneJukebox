@@ -69,7 +69,7 @@ public class CommandPlayRecord extends CommandBase
 
 
             // Writes text on the chat
-            notifyOperators(sender, this, "commands.playrecord.success", new Object[] { recordName });
+            notifyCommandListener(sender, this, "commands.playrecord.success", new Object[] { recordName });
         }
 
     }

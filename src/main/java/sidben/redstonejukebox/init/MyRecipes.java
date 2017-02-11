@@ -16,10 +16,10 @@ public class MyRecipes
     public static void register()
     {
 
-        final ItemStack redstoneTorchStack = new ItemStack(Blocks.redstone_torch);
-        final ItemStack jukeboxStack = new ItemStack(Blocks.jukebox);
-        final ItemStack flintStack = new ItemStack(Items.flint);
-        final ItemStack redstoneStack = new ItemStack(Items.redstone);
+        final ItemStack redstoneTorchStack = new ItemStack(Blocks.REDSTONE_TORCH);
+        final ItemStack jukeboxStack = new ItemStack(Blocks.JUKEBOX);
+        final ItemStack flintStack = new ItemStack(Items.FLINT);
+        final ItemStack redstoneStack = new ItemStack(Items.REDSTONE);
 
 
         final ItemStack redstoneJukeboxStack = new ItemStack(MyBlocks.redstoneJukebox);

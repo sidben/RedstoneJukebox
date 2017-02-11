@@ -70,7 +70,7 @@ public class PlayerEventHandler
 
                     } else {
                         // Don't have trades, play a sound
-                        event.getTarget().playSound(SoundEvents.entity_villager_no, 1F, 1F);
+                        event.getTarget().playSound(SoundEvents.ENTITY_VILLAGER_NO, 1F, 1F);
 
                     }
 

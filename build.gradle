@@ -29,15 +29,14 @@ configFile.withReader {
 
 
 version = config.mod_version
-group= "sidben.redstonejukebox"
 archivesBaseName = "SidbenRedstoneJukebox["+ config.minecraft_version +"]"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 minecraft {
-    version = config.forge_version + "-" + config.minecraft_version
-    runDir = "../run"
+    version = config.minecraft_version + "-" + config.forge_version
+    runDir = "../../run"
     replace '${version}', project.version
 }
 

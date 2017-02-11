@@ -542,8 +542,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Displays a random music note on the block.
      */
-    @SuppressWarnings("unused")            // OBS: Currently disabled
-    private void showNoteAbove(World world, int x, int y, int z)
+    private void showNoteAbove(World world, int x, int y, int z)        // OBS: Currently disabled
     {
         final int color = world.rand.nextInt(16);
         world.spawnParticle("note", x + 0.5D, y + 1.2D, z + 0.5D, color / 16.0D, 0.0D, 0.0D);

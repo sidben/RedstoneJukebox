@@ -17,6 +17,7 @@ import sidben.redstonejukebox.command.CommandPlayRecordAt;
 import sidben.redstonejukebox.command.CommandStopAllRecords;
 import sidben.redstonejukebox.item.ItemBlankRecord;
 import sidben.redstonejukebox.item.ItemCustomRecord;
+import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 
 
 /**
@@ -43,10 +44,7 @@ public class Features
 
         GameRegistry.register(Items.ITEM_REDSTONE_JUKEBOX, Blocks.REDSTONE_JUKEBOX.getRegistryName());
 
-        /*
-         * // Tile Entities
-         * GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, "RedstoneJukeboxPlaylist");
-         */
+        GameRegistry.registerTileEntity(TileEntityRedstoneJukebox.class, Reference.ModID + "_jukebox_playlist");
     }
 
     @SideOnly(Side.CLIENT)

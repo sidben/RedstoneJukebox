@@ -3,6 +3,7 @@ package sidben.redstonejukebox.block;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -10,6 +11,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -30,6 +32,8 @@ import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
 import sidben.redstonejukebox.util.LogHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 
 
@@ -46,10 +50,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * That behavior did not happen in 1.6.2, and this code is the same of the Furnace.
  * 
  * REF: updateJukeboxBlockState() method
+ * 
+ * TODO: test in 1.11
  */
 
 
-public class BlockRedstoneJukebox extends BlockContainer
+public class BlockRedstoneJukebox extends Block implements ITileEntityProvider
 {
 
     
@@ -89,6 +95,7 @@ public class BlockRedstoneJukebox extends BlockContainer
         }
 
         this.isActive = active;
+        this.isBlockContainer = true;
     }
 
 
@@ -98,8 +105,9 @@ public class BlockRedstoneJukebox extends BlockContainer
     @Override
     public TileEntity createNewTileEntity(World world, int damage)
     {
-        // return new TileEntityRedstoneJukebox();
-        return null;
+        LogHelper.debug("BlockRedstoneJukebox.createNewTileEntity()");
+        
+        return new TileEntityRedstoneJukebox();
     }
 
     
@@ -156,6 +164,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     @Override
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
     {
+        // Since the top will (eventually) be animated, non-solid blocks on top would pop off.
         if (side == EnumFacing.UP) return false;
         return true;
     }
@@ -183,15 +192,7 @@ public class BlockRedstoneJukebox extends BlockContainer
     }
 
     
-    /**
-     * The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only,
-     * LIQUID for vanilla liquids, INVISIBLE to skip all rendering
-     */
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
-    }    
+
     
     
 
@@ -249,34 +250,32 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Called upon block activation (right click on the block.)
      */
-    /*
     @Override
-    // TODO: update public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        final TileEntity tileEntity = worldIn.getTileEntity(pos);
-        if (tileEntity == null || playerIn.isSneaking()) {
-            return false;
+        if (world.isRemote) return true;
+        
+        final TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity instanceof TileEntityRedstoneJukebox) {
+            player.openGui(ModRedstoneJukebox.instance, ModConfig.REDSTONE_JUKEBOX_GUI_ID, world, pos.getX(), pos.getY(), pos.getZ());
+            // TODO: add stat player.addStat(StatList.FURNACE_INTERACTION);
         }
-
-        playerIn.openGui(ModRedstoneJukebox.instance, ModRedstoneJukebox.redstoneJukeboxGuiID, worldIn, pos.getX(), pos.getY(), pos.getZ());		// TODO: check playerIn.displayGUIChest
         return true;
     }
-    */
 
 
 
     /**
      * Called by ItemBlocks after a block is set in the world, to allow post-place logic
      */
-    /*
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         if (stack.hasDisplayName()) {
-            ((TileEntityRedstoneJukebox) worldIn.getTileEntity(pos)).setInventoryName(stack.getDisplayName());
+            final TileEntity tileEntity = world.getTileEntity(pos);
+            // ((TileEntityRedstoneJukebox) worldIn.getTileEntity(pos)).setInventoryName(stack.getDisplayName());
         }
     }
-    */
 
     
     /**
@@ -323,7 +322,7 @@ public class BlockRedstoneJukebox extends BlockContainer
             }
             else if (!this.isActive && haveEnergy)
             {
-                worldIn.setBlockState(pos, Features.Blocks.ACTIVE_REDSTONE_JUKEBOX.getDefaultState(), 2);
+                BlockRedstoneJukebox.updateJukeboxBlockState(true, worldIn, pos);
             }
             
         }
@@ -334,24 +333,45 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * ejects contained items into the world, and notifies neighbors of an update, as appropriate
      */
-    /*
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        if (!BlockRedstoneJukebox.keepMyInventory) {
+        LogHelper.debug("BlockRedstoneJukebox.breakBlock()");
+
+        if (!keepMyInventory) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
 
             if (teJukebox != null) {
-                teJukebox.ejectAll(worldIn, pos);
-                teJukebox.stopPlaying(false);
+                dropAllTheThings(worldIn, pos);
+                // teJukebox.stopPlaying(false);
             }
         }
 
         super.breakBlock(worldIn, pos, state);
     }
-    */
 
 
+    
+    /**
+     * Drop all records in the jukebox inventory.
+     */
+    protected void dropAllTheThings(World world, BlockPos pos)
+    {
+        if (!world.isRemote) {
+            TileEntity te = world.getTileEntity(pos);
+            IItemHandler inventory = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            
+            for (int i = 0; i < inventory.getSlots(); i++) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (!stack.isEmpty())
+                {
+                    InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), stack);
+                }
+            }
+        }
+    }
+    
+    
 
     
     
@@ -363,13 +383,20 @@ public class BlockRedstoneJukebox extends BlockContainer
     {
         if (!worldIn.isRemote)
         {
+            LogHelper.debug("BlockRedstoneJukebox.updateTick()");
+            
             final boolean haveEnergy = worldIn.isBlockPowered(pos);
+            final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
+            
+            if ((this.isActive && !haveEnergy) || (!this.isActive && haveEnergy)) {
+                LogHelper.debug("  - have energy: %s", haveEnergy);
+                BlockRedstoneJukebox.updateJukeboxBlockState(haveEnergy, worldIn, pos);
+                // teJukebox.updateJukeboxTileState(haveEnergy);
+            }            
 
-            if (this.isActive && !haveEnergy)
-            {
-                worldIn.setBlockState(pos, Features.Blocks.REDSTONE_JUKEBOX.getDefaultState(), 2);
-            }
-
+            
+            
+            
             /*
             final boolean haveEnergy = worldIn.isBlockIndirectlyGettingPowered(pos) > 0;
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
@@ -401,16 +428,16 @@ public class BlockRedstoneJukebox extends BlockContainer
     // --------------------------------------------------------------------
 
     /**
-     * Update which block ID the jukebox is using depending on whether or not it is playing.
+     * Update which block state the jukebox is using depending on whether or not it is powered.
      * 
-     * Triggered by onNeighborBlockChange.
+     * Reference: {@link net.minecraft.block.BlockFurnace#setState()}
      */
-    /*
     public static void updateJukeboxBlockState(boolean active, World worldIn, BlockPos pos)
     {
+        LogHelper.debug("BlockRedstoneJukebox.updateJukeboxBlockState(%s, world, %s)", active, pos);
+
         // get the TileEntity so it won't be reset
         final TileEntity teJukebox = worldIn.getTileEntity(pos);
-        
 
         // change the block type (without keepMyInventory, Tile Entity would be reset)
         BlockRedstoneJukebox.keepMyInventory = true;
@@ -429,7 +456,6 @@ public class BlockRedstoneJukebox extends BlockContainer
         }
 
     }
-    */
 
 
 
@@ -467,6 +493,11 @@ public class BlockRedstoneJukebox extends BlockContainer
         return Math.min(amp, ModConfig.maxExtraVolume);
     }
  
+    
+    
+    
+    
+    
     
 
 
@@ -539,40 +570,35 @@ public class BlockRedstoneJukebox extends BlockContainer
     /**
      * Can this block provide power. Only wire currently seems to have this change based on its state.
      */
-    /*
     @Override
     public boolean canProvidePower(IBlockState state)
     {
         return false;
     }
-    */
 
 
     /**
      * If this returns true, then comparators facing away from this block will use the value from
      * getComparatorInputOverride instead of the actual redstone signal strength.
      */
-    /*
     @Override
     public boolean hasComparatorInputOverride(IBlockState state)
     {
         return true;
     }
-    */
 
 
     /**
      * If hasComparatorInputOverride returns true, the return value from this is used instead of the redstone signal
      * strength when this block inputs to a comparator.
      */
-    /*
     @Override
     public int getComparatorInputOverride(IBlockState state, World worldIn, BlockPos pos)
     {
         final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) worldIn.getTileEntity(pos);
-        return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
+        // TODO: fix -> return teJukebox == null ? 0 : teJukebox.isPlaying() ? teJukebox.getCurrentJukeboxPlaySlot() + 1 : 0;
+        return isActive ? 1 : 0;
     }
-    */
 
 
 }

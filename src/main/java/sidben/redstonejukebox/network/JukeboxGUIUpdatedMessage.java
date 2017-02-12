@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import sidben.redstonejukebox.tileentity.TileEntityRedstoneJukebox;
+import sidben.redstonejukebox.util.EnumPlayMode;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 
@@ -20,7 +21,7 @@ public class JukeboxGUIUpdatedMessage implements IMessage
     // Fields
     // ---------------------------------------------
     private boolean isLoop;
-    private short   playMode;
+    private EnumPlayMode   playMode;
     private int     x, y, z;
 
 
@@ -33,8 +34,8 @@ public class JukeboxGUIUpdatedMessage implements IMessage
     }
 
     public JukeboxGUIUpdatedMessage(TileEntityRedstoneJukebox teJukebox) {
-        this.isLoop = teJukebox.paramLoop;
-        this.playMode = teJukebox.paramPlayMode;
+        this.isLoop = teJukebox.getShouldLoop();
+        this.playMode = teJukebox.getPlayMode();
         this.x = teJukebox.getPos().getX();
         this.y = teJukebox.getPos().getY();
         this.z = teJukebox.getPos().getZ();
@@ -54,9 +55,10 @@ public class JukeboxGUIUpdatedMessage implements IMessage
         final TileEntity teCandidate = world.getTileEntity(new BlockPos(this.x, this.y, this.z));
         if (teCandidate instanceof TileEntityRedstoneJukebox) {
             final TileEntityRedstoneJukebox teJukebox = (TileEntityRedstoneJukebox) teCandidate;
-            teJukebox.paramLoop = this.isLoop;
-            teJukebox.paramPlayMode = this.playMode;
-            teJukebox.resync();
+            final boolean shouldRefresh = teJukebox.getShouldLoop() != this.isLoop || teJukebox.getPlayMode() != this.playMode;
+            teJukebox.setShouldLoop(this.isLoop);
+            teJukebox.setPlayMode(this.playMode);
+            if (shouldRefresh) teJukebox.markDirty();
         }
     }
 
@@ -67,7 +69,7 @@ public class JukeboxGUIUpdatedMessage implements IMessage
     public void fromBytes(ByteBuf buf)
     {
         this.isLoop = buf.readBoolean();
-        this.playMode = buf.readShort();
+        this.playMode = EnumPlayMode.parse(buf.readByte());
         this.x = buf.readInt();
         this.y = buf.readInt();
         this.z = buf.readInt();
@@ -78,7 +80,7 @@ public class JukeboxGUIUpdatedMessage implements IMessage
     public void toBytes(ByteBuf buf)
     {
         buf.writeBoolean(this.isLoop);
-        buf.writeShort(this.playMode);
+        buf.writeByte(this.playMode.getId());
         buf.writeInt(this.x);
         buf.writeInt(this.y);
         buf.writeInt(this.z);

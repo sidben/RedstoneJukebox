@@ -2,9 +2,8 @@ package sidben.redstonejukebox.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -14,14 +13,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiRedstoneJukeboxButtonLoop extends GuiButton
 {
 
-    private final static int       myWidth  = 24;
-    private final static int       myHeight = 25;
+    private final static int       WIDTH  = 24;
+    private final static int       HEIGHT = 25;
     private final ResourceLocation guiMainTexture;
 
 
 
     public GuiRedstoneJukeboxButtonLoop(int index, int x, int y, ResourceLocation guiTexture) {
-        super(index, x, y, myWidth, myHeight, "");
+        super(index, x, y, WIDTH, HEIGHT, "");
         this.guiMainTexture = guiTexture;
     }
 
@@ -31,21 +30,15 @@ public class GuiRedstoneJukeboxButtonLoop extends GuiButton
      * Draws this button to the screen.
      */
     @Override
-    public void drawButton(Minecraft par1Minecraft, int mouseX, int mouseY)
+    public void drawButton(Minecraft mc, int mouseX, int mouseY)
     {
         if (this.visible) {
-        	this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
 
-            if (this.hovered) {			// TODO: use GlStateManager
-                par1Minecraft.getTextureManager().bindTexture(this.guiMainTexture);
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                GL11.glEnable(GL11.GL_BLEND);                       // need those lines for alpha, wasn't needed before (1.6.2)
-                OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-                this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 166, myWidth, myHeight);
-
-                GL11.glDisable(GL11.GL_BLEND);                      // cleanup (needed?)
+            if (this.hovered) {
+                mc.getTextureManager().bindTexture(this.guiMainTexture);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 166, WIDTH, HEIGHT);
             }
         }
     }
